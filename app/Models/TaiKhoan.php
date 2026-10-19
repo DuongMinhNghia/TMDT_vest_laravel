@@ -41,4 +41,25 @@ class TaiKhoan extends Authenticatable
     {
         return $this->hasOne(NhanVien::class, 'tai_khoan_id');
     }
+
+    public function getNameAttribute()
+    {
+        if ($this->nhanVien && $this->nhanVien->ho_ten) {
+            return $this->nhanVien->ho_ten;
+        }
+        if ($this->khachHang && $this->khachHang->ho_ten) {
+            return $this->khachHang->ho_ten;
+        }
+        return explode('@', $this->email)[0];
+    }
+
+    public function getQuyenAttribute()
+    {
+        return $this->vai_tro === 'admin' ? 'Admin' : ($this->vai_tro === 'nhan_vien' ? 'NhanVien' : 'KhachHang');
+    }
+
+    public function isAdmin(): bool
+    {
+        return strtolower($this->vai_tro ?? '') === 'admin';
+    }
 }

@@ -413,6 +413,34 @@
     }
 </style>
 
+@if(Auth::check() && (Auth::user()->vai_tro == 'admin' || Auth::user()->quyen == 'Admin'))
+<div style="background: linear-gradient(135deg, #1f1a10 0%, #121212 100%); border-bottom: 2px solid #C5A059; padding: 12px 25px; margin: -1.5rem -12px 20px;">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div style="display:flex; align-items:center; gap:8px; color:#C5A059; font-weight:700; font-size:0.92rem;">
+            <i class="bi bi-shield-lock-fill" style="font-size:1.15rem;"></i>
+            <span>BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN:</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+            <a href="{{ url('/san-pham/danh-sach') }}" class="btn-action-gold" style="font-size:0.82rem; padding:6px 14px; text-decoration:none;">
+                <i class="bi bi-box-seam-fill"></i> Quản Lý Sản Phẩm
+            </a>
+            <a href="{{ route('bosuutap.danhsach') }}" class="btn-action-gold" style="font-size:0.82rem; padding:6px 14px; text-decoration:none; background:linear-gradient(135deg,#C5A059,#e8d098); color:#000; font-weight:700;">
+                <i class="bi bi-collection-play-fill"></i> Quản Lý Bộ Sưu Tập
+            </a>
+            <a href="{{ route('giamgia.danhsach') }}" class="btn-action-gold" style="font-size:0.82rem; padding:6px 14px; text-decoration:none; background:linear-gradient(135deg,#e74c3c,#c0392b); color:#fff; font-weight:700;">
+                <i class="bi bi-tag-fill"></i> Khuyến Mãi Flash Sale
+            </a>
+            <a href="{{ route('nguoidung.index') }}" class="btn-action-gold" style="font-size:0.82rem; padding:6px 14px; text-decoration:none;">
+                <i class="bi bi-people-fill"></i> Quản Lý Tài Khoản
+            </a>
+            <a href="{{ route('thongke.doanhthu') }}" class="btn-action-gold" style="font-size:0.82rem; padding:6px 14px; text-decoration:none;">
+                <i class="bi bi-bar-chart-fill"></i> Thống Kê
+            </a>
+        </div>
+    </div>
+</div>
+@endif
+
 {{-- HERO CAROUSEL --}}
 <div class="hero-carousel" style="margin: -1.5rem -12px 0;">
     <div id="heroCarousel" class="carousel slide" style="height:600px;">
@@ -515,6 +543,50 @@
     </div>
 </section>
 
+{{-- BỘ SƯU TẬP THỜI TRANG ĐỘC BẢN (Task 1.2 - Thành viên 1) --}}
+@if(isset($boSuuTaps) && $boSuuTaps->isNotEmpty())
+<section class="collections-section" style="padding: 70px 0; background: linear-gradient(180deg, #0e0e0e 0%, #171717 100%); border-top: 1px solid rgba(212, 175, 55, 0.2); border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span style="color:#C5A059; letter-spacing:3px; text-transform:uppercase; font-size:0.85rem; font-weight:700;">Exclusive Collections</span>
+            <h2 class="section-title" style="margin-top:5px;"><i class="bi bi-collection-play"></i> Bộ Sưu Tập Độc Bản</h2>
+            <p class="section-subtitle">Được tuyển chọn tỉ mỉ theo từng phong cách, tôn vinh đẳng cấp quý ông</p>
+            @if(Auth::check() && (Auth::user()->vai_tro == 'admin' || Auth::user()->quyen == 'Admin'))
+            <div style="margin-top:16px;">
+                <a href="{{ route('bosuutap.danhsach') }}" class="btn-action-gold" style="display:inline-flex; align-items:center; gap:8px; padding:9px 24px; font-size:0.88rem; text-decoration:none; border-radius:25px; background:linear-gradient(135deg,#C5A059,#e8d098); color:#000; font-weight:700;">
+                    <i class="bi bi-gear-fill"></i> Quản Lý Bộ Sưu Tập (Admin)
+                </a>
+            </div>
+            @endif
+        </div>
+
+        <div class="row g-4">
+            @foreach($boSuuTaps as $bst)
+            <div class="col-lg-6 col-md-12">
+                <div class="collection-banner-card" style="position:relative; border-radius:16px; overflow:hidden; height:340px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border:1px solid #333;">
+                    <img src="{{ asset('images/' . ($bst->hinh_banner ?: 'banner_default.jpg')) }}"
+                        alt="{{ $bst->ten_bo_suu_tap }}"
+                        style="width:100%; height:100%; object-fit:cover; filter: brightness(0.6); transition: transform 0.6s ease;"
+                        class="col-img"
+                        onerror="this.src='https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1000'">
+                    <div style="position:absolute; inset:0; background: linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.3) 60%, transparent 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:30px;">
+                        <span style="display:inline-block; align-self:flex-start; background:rgba(212,175,55,0.2); border:1px solid #d4af37; color:#d4af37; padding:3px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; margin-bottom:10px;">
+                            <i class="bi bi-gem"></i> {{ $bst->san_phams_count }} Mẫu Thiết Kế Tuyển Chọn
+                        </span>
+                        <h3 style="font-family:'Playfair Display', serif; color:#fff; font-size:1.75rem; font-weight:700; margin-bottom:8px;">{{ $bst->ten_bo_suu_tap }}</h3>
+                        <p style="color:#bbb; font-size:0.9rem; line-height:1.5; margin-bottom:16px; max-width:480px;">{{ \Illuminate\Support\Str::limit($bst->mo_ta ?: 'Tuyển tập những mẫu vest sang trọng chuẩn phong thái quý ông.', 110) }}</p>
+                        <a href="{{ route('bosuutap.chitiet', $bst->id) }}" class="btn-carousel" style="align-self:flex-start; padding:9px 24px; font-size:0.88rem;">
+                            <i class="bi bi-arrow-right-circle"></i> Khám Phá Bộ Sưu Tập
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- SẢN PHẨM NỔI BẬT --}}
 <section style="padding: 60px 0; background:#111;">
     <div class="container">
@@ -541,7 +613,15 @@
                     </div>
                     <div class="product-info">
                         <h5 class="product-name">{{ $sp->ten_sp }}</h5>
-                        <p class="product-price">{{ number_format($sp->gia, 0, ',', '.') }} đ</p>
+                        @if($sp->phan_tram_giam > 0)
+                            <p class="product-price" style="margin-bottom:8px;">
+                                <span style="color:#e74c3c;">{{ number_format($sp->gia_khuyen_mai, 0, ',', '.') }} đ</span>
+                                <span style="text-decoration:line-through; color:#777; font-size:0.85rem; margin-left:6px; font-weight:normal;">{{ number_format($sp->gia_ban, 0, ',', '.') }} đ</span>
+                                <span style="background:rgba(231,76,60,0.15); border:1px solid #e74c3c; color:#e74c3c; font-size:0.75rem; padding:2px 6px; border-radius:12px; margin-left:6px; font-weight:700;">-{{ $sp->phan_tram_giam }}%</span>
+                            </p>
+                        @else
+                            <p class="product-price">{{ number_format($sp->gia, 0, ',', '.') }} đ</p>
+                        @endif
                         <a href="{{ url('/san-pham') }}" class="btn-view text-center mt-auto">
                             <i class="bi bi-cart-plus"></i> Xem Thêm
                         </a>

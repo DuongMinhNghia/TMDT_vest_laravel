@@ -336,10 +336,20 @@
                         </a>
                     </li>
 
-                    @if(Auth::check() && Auth::user()->quyen == 'Admin')
+                    @if(Auth::check() && (Auth::user()->vai_tro == 'admin' || Auth::user()->quyen == 'Admin'))
                         <li class="nav-item">
                             <a href="{{ url('/san-pham/danh-sach') }}" class="nav-link nav-link-main">
                                 <i class="bi bi-box-seam"></i> Quản Lý Sản Phẩm
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('bosuutap.danhsach') }}" class="nav-link nav-link-main">
+                                <i class="bi bi-collection-play"></i> Bộ Sưu Tập
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('giamgia.danhsach') }}" class="nav-link nav-link-main">
+                                <i class="bi bi-tag-fill" style="color:#e74c3c;"></i> Khuyến Mãi
                             </a>
                         </li>
 

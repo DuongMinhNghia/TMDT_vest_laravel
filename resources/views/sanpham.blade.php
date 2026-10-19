@@ -493,7 +493,9 @@
                         </div>
                         @endif
 
-                        @if($sp->gia > 3000000)
+                        @if($sp->phan_tram_giam > 0)
+                        <span class="badge-hot" style="background:linear-gradient(135deg, #e74c3c, #c0392b);">🔥 -{{ $sp->phan_tram_giam }}% FLASH SALE</span>
+                        @elseif($sp->gia > 3000000)
                         <span class="badge-hot">🔥 HOT</span>
                         @endif
                     </div>
@@ -519,7 +521,12 @@
                         @endif
 
                         <div class="price">
-                            <span class="current">{{ number_format($sp->gia, 0, ',', '.') }} ₫</span>
+                            @if($sp->phan_tram_giam > 0)
+                                <span class="current" style="color:#e74c3c; font-weight:700;">{{ number_format($sp->gia_khuyen_mai, 0, ',', '.') }} ₫</span>
+                                <span class="old-price" style="text-decoration:line-through; color:#777; font-size:0.85rem; margin-left:6px;">{{ number_format($sp->gia_ban, 0, ',', '.') }} ₫</span>
+                            @else
+                                <span class="current">{{ number_format($sp->gia, 0, ',', '.') }} ₫</span>
+                            @endif
                         </div>
 
                         <div class="product-actions">
