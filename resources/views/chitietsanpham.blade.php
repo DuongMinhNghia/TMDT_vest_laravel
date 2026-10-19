@@ -416,25 +416,56 @@
                     <div class="product-price" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                         <div>
                             <i class="bi bi-tag-fill"></i>
-                            <span id="vnd_price" data-val="{{ $sanPham->gia }}">
-                                {{ number_format($sanPham->gia, 0, ',', '.') }}
+                            <span id="vnd_price" data-val="{{ $sanPham->gia_khuyen_mai }}">
+                                {{ number_format($sanPham->gia_khuyen_mai, 0, ',', '.') }}
                             </span> VNĐ
                         </div>
+
+                        @if($sanPham->phan_tram_giam > 0)
+                        <div style="font-size: 0.95rem; color: #ff4444; background: rgba(255, 68, 68, 0.15); border: 1px solid rgba(255, 68, 68, 0.4); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                            -{{ $sanPham->phan_tram_giam }}% FLASH SALE
+                        </div>
+                        <div style="font-size: 1.1rem; color: #777; text-decoration: line-through;">
+                            {{ number_format($sanPham->gia_ban, 0, ',', '.') }} VNĐ
+                        </div>
+                        @endif
 
                         <div style="font-size: 1.2rem; color: #a0a0a0; font-weight: 500; border-left: 1px solid #555; padding-left: 15px; display: flex; align-items: center; gap: 5px;">
                             <i class="bi bi-arrow-left-right" style="font-size: 1rem;"></i>
                             <span id="usd_price">Đang tính...</span> USD
                         </div>
                     </div>
+                    @php
+                        $activeSale = $sanPham->giamGias()->dangChay()->first() ?? \App\Models\GiamGia::dangChay()->where('ap_dung_tat_ca', true)->first();
+                    @endphp
+                    @if($activeSale)
+                    <div class="flash-sale-timer-box" style="margin: 15px 0 25px; padding: 14px 20px; background: linear-gradient(135deg, #241010 0%, #151515 100%); border: 1px solid rgba(231, 76, 60, 0.45); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px; color: #e74c3c; font-weight: 700; font-size: 0.95rem;">
+                            <i class="bi bi-fire" style="font-size: 1.3rem;"></i>
+                            <span>{{ $activeSale->tieu_de }}:</span>
+                        </div>
+                        <div id="flash-sale-countdown" data-end="{{ $activeSale->thoi_gian_ket_thuc ? $activeSale->thoi_gian_ket_thuc->timestamp : 0 }}" style="display: flex; gap: 6px; color: #fff; font-size: 0.85rem; font-weight: 700;">
+                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-days">00</span> <span style="color: #aaa; align-self: center;">ngày</span>
+                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-hours">00</span> <span style="color: #aaa; align-self: center;">giờ</span>
+                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-mins">00</span> <span style="color: #aaa; align-self: center;">phút</span>
+                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-secs">00</span> <span style="color: #aaa; align-self: center;">giây</span>
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="product-detail-item">
                         <span class="detail-label"><i class="bi bi-globe"></i> Xuất xứ:</span>
-                        <span class="detail-value">{{ $sanPham->xuat_xu }}</span>
+                        <span class="detail-value">{{ $sanPham->xuat_xu ?? 'Chính hãng' }}</span>
                     </div>
 
                     <div class="product-detail-item">
                         <span class="detail-label"><i class="bi bi-stars"></i> Chất liệu:</span>
-                        <span class="detail-value">{{ $sanPham->chat_lieu }}</span>
+                        <span class="detail-value">{{ $sanPham->chat_lieu ?? 'Vải cao cấp' }}</span>
+                    </div>
+
+                    <div class="product-detail-item">
+                        <span class="detail-label"><i class="bi bi-person-badge"></i> Form dáng:</span>
+                        <span class="detail-value">{{ $sanPham->form_dang ?? 'Slim-fit' }}</span>
                     </div>
 
                     <div class="product-detail-item">
@@ -444,25 +475,54 @@
 
                     {{-- CHỌN SIZE --}}
                     <div class="size-selection">
-                        <label class="size-label">
-                            <i class="bi bi-rulers"></i> Chọn Kích Thước
-                        </label>
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                            <label class="size-label" style="margin: 0;">
+                                <i class="bi bi-rulers"></i> Chọn Kích Thước (Tổng kho: <strong style="color:#C5A059;">{{ $sanPham->tongTonKho() }}</strong> chiếc)
+                            </label>
+                            <button type="button" onclick="openSizeGuideModal()" style="background: transparent; border: none; color: #C5A059; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="bi bi-info-circle-fill"></i> Bảng gợi ý chọn size
+                            </button>
+                        </div>
                         <div class="size-options">
-                            <div class="size-option">
-                                <input type="radio" name="size" id="size-s" value="S" checked />
-                                <label for="size-s">S</label>
-                            </div>
-                            <div class="size-option">
-                                <input type="radio" name="size" id="size-m" value="M" />
-                                <label for="size-m">M</label>
-                            </div>
-                            <div class="size-option">
-                                <input type="radio" name="size" id="size-l" value="L" />
-                                <label for="size-l">L</label>
-                            </div>
+                            @php $firstAvailable = false; @endphp
+                            @forelse($sanPham->sizes as $s)
+                                @php
+                                    $isAvail = $s->so_luong_ton > 0;
+                                    $checkAttr = '';
+                                    if ($isAvail && !$firstAvailable) {
+                                        $checkAttr = 'checked';
+                                        $firstAvailable = true;
+                                    }
+                                @endphp
+                                <div class="size-option" style="{{ !$isAvail ? 'opacity: 0.45;' : '' }}">
+                                    <input type="radio" name="size" id="size-{{ strtolower($s->ten_size) }}" value="{{ $s->ten_size }}" {{ $checkAttr }} {{ !$isAvail ? 'disabled' : '' }} />
+                                    <label for="size-{{ strtolower($s->ten_size) }}" title="{{ $s->chieu_cao_goi_y }} | {{ $s->can_nang_goi_y }}" style="{{ !$isAvail ? 'cursor: not-allowed; text-decoration: line-through;' : '' }}">
+                                        {{ $s->ten_size }}
+                                        @if(!$isAvail)
+                                            <span style="font-size: 0.65rem; display: block; color: #ff5555;">Hết</span>
+                                        @else
+                                            <span style="font-size: 0.65rem; display: block; color: #aaa;">({{ $s->so_luong_ton }})</span>
+                                        @endif
+                                    </label>
+                                </div>
+                            @empty
+                                <div class="size-option">
+                                    <input type="radio" name="size" id="size-s" value="S" checked />
+                                    <label for="size-s">S</label>
+                                </div>
+                                <div class="size-option">
+                                    <input type="radio" name="size" id="size-m" value="M" />
+                                    <label for="size-m">M</label>
+                                </div>
+                                <div class="size-option">
+                                    <input type="radio" name="size" id="size-l" value="L" />
+                                    <label for="size-l">L</label>
+                                </div>
+                            @endforelse
+
                             <div class="size-option">
                                 <input type="radio" name="size" id="size-custom" value="Custom" />
-                                <label for="size-custom"><i class="bi bi-pencil-square"></i></label>
+                                <label for="size-custom" title="Đặt may đo theo số đo riêng"><i class="bi bi-pencil-square"></i></label>
                             </div>
                         </div>
                         {{-- CUSTOM SIZE --}}
@@ -603,5 +663,112 @@
                 '&url=' + encodeURIComponent(currentUrl);
         });
     });
+
+    // Modal Size Guide
+    function openSizeGuideModal() {
+        document.getElementById('modal-size-guide').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSizeGuideModal() {
+        document.getElementById('modal-size-guide').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    // Flash Sale Countdown Logic
+    const timerEl = document.getElementById('flash-sale-countdown');
+    if (timerEl) {
+        const endTime = parseInt(timerEl.getAttribute('data-end')) * 1000;
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+
+            if (distance < 0) {
+                document.getElementById('fs-days').innerText = '00';
+                document.getElementById('fs-hours').innerText = '00';
+                document.getElementById('fs-mins').innerText = '00';
+                document.getElementById('fs-secs').innerText = '00';
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('fs-days').innerText = String(days).padStart(2, '0');
+            document.getElementById('fs-hours').innerText = String(hours).padStart(2, '0');
+            document.getElementById('fs-mins').innerText = String(minutes).padStart(2, '0');
+            document.getElementById('fs-secs').innerText = String(seconds).padStart(2, '0');
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    }
 </script>
+
+{{-- MODAL BẢNG GỢI Ý SIZE MAY ĐO --}}
+<div class="sp-modal-overlay" id="modal-size-guide" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1060; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
+    <div style="background:#181818; border:1px solid #333; border-radius:16px; width:100%; max-width:620px; padding:28px; position:relative; box-shadow:0 15px 40px rgba(0,0,0,0.8);">
+        <button onclick="closeSizeGuideModal()" style="position:absolute; top:18px; right:20px; background:none; border:none; color:#888; font-size:1.6rem; cursor:pointer;">&times;</button>
+        <h4 style="font-family:'Playfair Display', serif; color:#C5A059; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+            <i class="bi bi-rulers"></i> Bảng Thông Số & Gợi Ý Thể Hình Vest Nam
+        </h4>
+        <p style="color:#aaa; font-size:0.86rem; line-height:1.5;">Thông số chuẩn may đo cho phom áo vest Kingsman. Nếu chiều cao và cân nặng nằm giữa 2 size, quý khách nên chọn size lớn hơn để mặc thoải mái.</p>
+        
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; color:#ddd; font-size:0.86rem; margin-top:14px;">
+                <thead>
+                    <tr style="background:#222; color:#C5A059; text-align:left;">
+                        <th style="padding:10px 14px; border:1px solid #333;">Size</th>
+                        <th style="padding:10px 14px; border:1px solid #333;">Chiều cao</th>
+                        <th style="padding:10px 14px; border:1px solid #333;">Cân nặng</th>
+                        <th style="padding:10px 14px; border:1px solid #333;">Vòng ngực</th>
+                        <th style="padding:10px 14px; border:1px solid #333;">Dài áo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size S</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">1m60 - 1m68</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">52kg - 60kg</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">88 - 92 cm</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">68 cm</td>
+                    </tr>
+                    <tr style="background:rgba(255,255,255,0.02);">
+                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size M</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">1m68 - 1m74</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">60kg - 68kg</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">92 - 96 cm</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">70 cm</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size L</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">1m74 - 1m78</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">68kg - 75kg</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">96 - 100 cm</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">72 cm</td>
+                    </tr>
+                    <tr style="background:rgba(255,255,255,0.02);">
+                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size XL</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">1m78 - 1m83</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">75kg - 82kg</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">100 - 104 cm</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">74 cm</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size XXL</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">1m80 - 1m88</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">82kg - 90kg</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">104 - 110 cm</td>
+                        <td style="padding:9px 14px; border:1px solid #282828;">76 cm</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top:18px; padding:12px; background:#1f190e; border:1px solid #C5A059; border-radius:8px; color:#C5A059; font-size:0.82rem;">
+            <i class="bi bi-lightbulb-fill"></i> <strong>Tư vấn may đo:</strong> Quý khách cũng có thể chọn mục <strong>[May đo riêng]</strong> hoặc đặt lịch hẹn để nghệ nhân may đo của Kingsman hỗ trợ lấy số đo chuẩn xác nhất.
+        </div>
+    </div>
+</div>
 @endsection
