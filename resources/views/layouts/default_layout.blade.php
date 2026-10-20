@@ -405,9 +405,17 @@
                     @endif
 
                     @if(Auth::check() && Auth::user()->quyen != 'Admin')
+                    <a href="{{ route('donhang.lichsu') }}" class="btn-action-gold">
+                        <i class="bi bi-receipt"></i> Đơn hàng
+                    </a>
                     <a href="{{ url('/gio-hang') }}" class="btn-action-gold cart-badge">
                         <i class="bi bi-cart3"></i> Giỏ hàng
-                        @php $soLuongGioHang = collect(session('gio_hang_' . Auth::id(), []))->sum('so_luong'); @endphp
+                        @php
+                            $khId = optional(Auth::user()->khachHang)->id;
+                            $soLuongGioHang = $khId
+                                ? \App\Models\ChiTietGioHang::whereHas('gioHang', fn($q) => $q->where('khach_hang_id', $khId))->sum('so_luong')
+                                : 0;
+                        @endphp
                         @if($soLuongGioHang > 0)
                         <span class="badge">{{ $soLuongGioHang }}</span>
                         @endif

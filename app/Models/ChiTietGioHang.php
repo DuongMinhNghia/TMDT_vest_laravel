@@ -11,5 +11,20 @@ class ChiTietGioHang extends Model
 
     protected $table = 'chi_tiet_gio_hangs';
 
-    // TODO: Thành viên phụ trách bổ sung $fillable và các relationships tại đây
+    protected $fillable = ['gio_hang_id', 'san_pham_id', 'size_id', 'so_luong'];
+
+    public function gioHang()
+    {
+        return $this->belongsTo(GioHang::class, 'gio_hang_id');
+    }
+
+    public function sanPham()
+    {
+        return $this->belongsTo(SanPham::class, 'san_pham_id');
+    }
+
+    public function size()
+    {
+        return $this->belongsTo(Size::class, 'size_id');
+    }
 }

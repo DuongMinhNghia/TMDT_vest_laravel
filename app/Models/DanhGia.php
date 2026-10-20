@@ -11,5 +11,15 @@ class DanhGia extends Model
 
     protected $table = 'danh_gias';
 
-    // TODO: Thành viên phụ trách bổ sung $fillable và các relationships tại đây
+    protected $fillable = ['san_pham_id', 'khach_hang_id', 'so_sao', 'noi_dung', 'hinh_anh'];
+
+    public function sanPham()
+    {
+        return $this->belongsTo(SanPham::class, 'san_pham_id');
+    }
+
+    public function khachHang()
+    {
+        return $this->belongsTo(KhachHang::class, 'khach_hang_id');
+    }
 }

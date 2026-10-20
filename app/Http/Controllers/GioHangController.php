@@ -2,117 +2,174 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChiTietGioHang;
+use App\Models\GioHang;
+use App\Models\SanPham;
+use App\Models\Size;
+use App\Services\DonHangService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\SanPham;
+use RuntimeException;
 
+/**
+ * Task 3.1 (giỏ hàng lưu Database) + Task 3.2 (checkout, trừ kho, chiết khấu hạng)
+ */
 class GioHangController extends Controller
 {
-    private function sessionKey()
+    public function __construct(private DonHangService $donHangService)
     {
-        return 'gio_hang_' . Auth::id();
+    }
+
+    private function khachHang()
+    {
+        return Auth::user()->khachHang; // null nếu là admin/nhân viên
+    }
+
+    private function gioHangCuaToi(): GioHang
+    {
+        return GioHang::firstOrCreate(['khach_hang_id' => $this->khachHang()->id]);
+    }
+
+    private function chanNeuKhongPhaiKhach()
+    {
+        if (!$this->khachHang()) {
+            return redirect()->route('sanpham.index')
+                ->with('error', 'Chỉ tài khoản khách hàng mới sử dụng được giỏ hàng.');
+        }
+        return null;
     }
 
     public function index()
     {
-        $gioHang  = session()->get($this->sessionKey(), []);
-        $tongTien = collect($gioHang)->sum(fn($item) => $item['gia'] * $item['so_luong']);
-        if (session('thanhtoan')) {
-            $gioHang  = session('gioHang_thanhtoan', []);
-            $tongTien = session('tongTien_thanhtoan', 0);
+        if ($chan = $this->chanNeuKhongPhaiKhach()) {
+            return $chan;
         }
 
-        return view('giohang', compact('gioHang', 'tongTien'));
+        $khachHang = $this->khachHang();
+        $chiTiets  = $this->gioHangCuaToi()->chiTiets()->with(['sanPham', 'size'])->get();
+
+        $gioHang = [];
+        foreach ($chiTiets as $ct) {
+            $gioHang[$ct->id] = [
+                'id'       => $ct->san_pham_id,
+                'ten_sp'   => $ct->sanPham->ten_sp,
+                'gia'      => $ct->sanPham->gia_khuyen_mai,
+                'gia_goc'  => $ct->sanPham->gia_ban,
+                'sale'     => $ct->sanPham->phan_tram_giam,
+                'hinh_anh' => $ct->sanPham->hinh_anh,
+                'size'     => $ct->size->ten_size,
+                'so_luong' => $ct->so_luong,
+                'ton'      => $ct->size->so_luong_ton,
+            ];
+        }
+
+        $tien           = $this->donHangService->tinhTien($chiTiets, $khachHang);
+        $tongTien       = $tien['tam_tinh'];
+        $diaChiMacDinh  = $khachHang->dia_chi;
+        $tenHang        = optional($khachHang->hangThanhVien)->ten_hang;
+
+        return view('giohang', compact('gioHang', 'tongTien', 'tien', 'diaChiMacDinh', 'tenHang'));
     }
 
     public function addToCart(Request $request)
     {
-        $id      = $request->id;
-        $size    = $request->size;
-        $sanPham = SanPham::findOrFail($id);
-
-        $gioHang = session()->get($this->sessionKey(), []);
-        $key     = $id . '_' . $size;
-
-        if (isset($gioHang[$key])) {
-            $gioHang[$key]['so_luong']++;
-        } else {
-            $gioHang[$key] = [
-                'id'       => $sanPham->id,
-                'ten_sp'   => $sanPham->ten_sp,
-                'gia'      => $sanPham->gia,
-                'hinh_anh' => $sanPham->hinh_anh,
-                'size'     => $size,
-                'so_luong' => 1,
-            ];
+        if ($chan = $this->chanNeuKhongPhaiKhach()) {
+            return $chan;
         }
 
-        session()->put($this->sessionKey(), $gioHang);
+        $sanPham = SanPham::findOrFail($request->id);
+        $size    = Size::where('san_pham_id', $sanPham->id)->where('ten_size', $request->size)->first();
 
-        $backUrl = $request->url ?: route('sanpham.index');
-        return redirect($backUrl)->with('success', 'Đã thêm vào giỏ hàng!');
+        if (!$size) {
+            return back()->with('error', 'Size "' . $request->size . '" chưa hỗ trợ đặt trực tiếp. Với size may đo, vui lòng liên hệ cửa hàng.');
+        }
+
+        $chiTiet  = ChiTietGioHang::firstOrNew([
+            'gio_hang_id' => $this->gioHangCuaToi()->id,
+            'san_pham_id' => $sanPham->id,
+            'size_id'     => $size->id,
+        ]);
+        $soLuongMoi = ((int) $chiTiet->so_luong) + 1;
+
+        // TV1: kiểm tra tồn kho trước khi cho vào giỏ
+        if (!$sanPham->kiemTraTonKhoSize($size->ten_size, $soLuongMoi)) {
+            return back()->with('error', 'Size ' . $size->ten_size . ' hiện không đủ số lượng trong kho!');
+        }
+
+        $chiTiet->so_luong = $soLuongMoi;
+        $chiTiet->save();
+
+        return redirect($this->diaChiQuayLai($request))->with('success', 'Đã thêm vào giỏ hàng!');
     }
 
     public function updateSL(Request $request)
     {
-        $key     = $request->key;
-        $type    = $request->type;
-        $gioHang = session()->get($this->sessionKey(), []);
-
-        if (isset($gioHang[$key])) {
-            $gioHang[$key]['so_luong'] += $type;
-            if ($gioHang[$key]['so_luong'] <= 0) {
-                unset($gioHang[$key]);
-            }
+        if ($chan = $this->chanNeuKhongPhaiKhach()) {
+            return $chan;
         }
 
-        session()->put($this->sessionKey(), $gioHang);
+        $chiTiet = ChiTietGioHang::where('gio_hang_id', $this->gioHangCuaToi()->id)
+            ->with(['sanPham', 'size'])
+            ->findOrFail($request->key);
+
+        $soLuongMoi = $chiTiet->so_luong + (int) $request->type;
+
+        if ($soLuongMoi <= 0) {
+            $chiTiet->delete();
+        } elseif (!$chiTiet->sanPham->kiemTraTonKhoSize($chiTiet->size->ten_size, $soLuongMoi)) {
+            return redirect()->route('giohang.index')
+                ->with('error', 'Size ' . $chiTiet->size->ten_size . ' chỉ còn ' . $chiTiet->size->so_luong_ton . ' sản phẩm!');
+        } else {
+            $chiTiet->update(['so_luong' => $soLuongMoi]);
+        }
+
         return redirect()->route('giohang.index');
     }
 
     public function remove(Request $request)
     {
-        $key     = $request->key;
-        $gioHang = session()->get($this->sessionKey(), []);
-        unset($gioHang[$key]);
-        session()->put($this->sessionKey(), $gioHang);
+        if ($chan = $this->chanNeuKhongPhaiKhach()) {
+            return $chan;
+        }
+
+        ChiTietGioHang::where('gio_hang_id', $this->gioHangCuaToi()->id)
+            ->where('id', $request->key)
+            ->delete();
+
         return redirect()->route('giohang.index');
     }
 
     public function checkout(Request $request)
     {
-        $gioHang = session()->get($this->sessionKey(), []);
-
-        if (empty($gioHang)) {
-            return redirect()->route('giohang.index')->with('error', 'Giỏ hàng trống!');
+        if ($chan = $this->chanNeuKhongPhaiKhach()) {
+            return $chan;
         }
 
-        $tongTien = collect($gioHang)->sum(fn($item) => $item['gia'] * $item['so_luong']);
-
-        // Tạo hóa đơn
-        $hoaDon = \App\Models\HoaDon::create([
-            'user_id'    => Auth::id(),
-            'ngay_ban'   => now(),
-            'trang_thai' => 'Chờ xử lý',
-            'thanh_toan' => $tongTien,
-            'dia_chi'    => $request->dia_chi ?? 'Chưa cập nhật',
+        $data = $request->validate([
+            'dia_chi'     => 'required|string|max:500',
+            'phuong_thuc' => 'required|in:COD,Chuyển khoản',
+            'ghi_chu'     => 'nullable|string|max:500',
+        ], [
+            'dia_chi.required' => 'Vui lòng nhập địa chỉ giao hàng.',
         ]);
 
-        // Lưu chi tiết từng sản phẩm
-        foreach ($gioHang as $item) {
-            \App\Models\ChiTietHoaDon::create([
-                'hoa_don_id'  => $hoaDon->id,
-                'san_pham_id' => $item['id'],
-                'so_luong'    => $item['so_luong'],
-                'don_gia'     => $item['gia'],
-                'tong_tien'   => $item['gia'] * $item['so_luong'],
-                'size'        => $item['size'] ?? '',  // ← thêm dòng này
-            ]);
+        try {
+            $hoaDon = $this->donHangService->taoDonTuGioHang($this->khachHang(), $this->gioHangCuaToi(), $data);
+        } catch (RuntimeException $e) {
+            return redirect()->route('giohang.index')->with('error', $e->getMessage());
         }
 
-        // Xóa giỏ hàng
-        session()->forget($this->sessionKey());
+        return redirect()->route('donhang.chitiet', $hoaDon->id)
+            ->with('success', 'Đặt hàng thành công! Mã đơn: ' . $hoaDon->ma_don_hang . '. Chờ xác nhận từ cửa hàng.');
+    }
 
-        return redirect()->route('sanpham.index')->with('success', 'Đặt hàng thành công! Chờ xác nhận từ cửa hàng.');
+    /** Chỉ cho quay lại trang cùng domain, tránh open-redirect */
+    private function diaChiQuayLai(Request $request): string
+    {
+        $url = $request->url;
+        if ($url && parse_url($url, PHP_URL_HOST) === $request->getHost()) {
+            return $url;
+        }
+        return route('sanpham.index');
     }
 }

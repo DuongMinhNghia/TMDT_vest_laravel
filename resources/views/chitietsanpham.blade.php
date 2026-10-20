@@ -568,6 +568,9 @@
     </div>
 </div>
 
+{{-- ĐÁNH GIÁ SẢN PHẨM (Task 3.4 - TV3) --}}
+@include('partials.danhgia', ['sanPham' => $sanPham])
+
 {{-- SẢN PHẨM LIÊN QUAN --}}
 <div class="related-products">
     <div class="container">
