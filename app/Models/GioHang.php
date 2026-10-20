@@ -11,5 +11,15 @@ class GioHang extends Model
 
     protected $table = 'gio_hangs';
 
-    // TODO: Thành viên phụ trách bổ sung $fillable và các relationships tại đây
+    protected $fillable = ['khach_hang_id'];
+
+    public function khachHang()
+    {
+        return $this->belongsTo(KhachHang::class, 'khach_hang_id');
+    }
+
+    public function chiTiets()
+    {
+        return $this->hasMany(ChiTietGioHang::class, 'gio_hang_id');
+    }
 }

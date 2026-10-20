@@ -7,6 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 class HoaDon extends Model
 {
     protected $table = 'hoa_dons';
+
+    public const PHI_VAN_CHUYEN = 30000;
+
+    public const CHO_XU_LY  = 'Chờ xử lý';
+    public const DANG_MAY   = 'Đang may/gói';
+    public const DANG_GIAO  = 'Đang giao';
+    public const HOAN_THANH = 'Hoàn Thành';
+    public const DA_HUY     = 'Đã hủy';
+
+    /** Luồng chuyển trạng thái hợp lệ: trạng thái hiện tại => các trạng thái được phép chuyển tới */
+    public const LUONG_TRANG_THAI = [
+        self::CHO_XU_LY  => [self::DANG_MAY, self::DA_HUY],
+        self::DANG_MAY   => [self::DANG_GIAO, self::DA_HUY],
+        self::DANG_GIAO  => [self::HOAN_THANH],
+        self::HOAN_THANH => [],
+        self::DA_HUY     => [],
+    ];
+
     protected $fillable = [
         'khach_hang_id',
         'nhan_vien_duyet_id',
@@ -19,15 +37,28 @@ class HoaDon extends Model
         'ghi_chu'
     ];
 
-    public function khachHang() {
+    protected function casts(): array
+    {
+        return ['ngay_dat' => 'datetime'];
+    }
+
+    public function khachHang()
+    {
         return $this->belongsTo(KhachHang::class, 'khach_hang_id');
     }
 
-    public function nhanVienDuyet() {
+    public function nhanVienDuyet()
+    {
         return $this->belongsTo(NhanVien::class, 'nhan_vien_duyet_id');
     }
 
-    public function chiTiets() {
+    public function chiTiets()
+    {
         return $this->hasMany(ChiTietHoaDon::class, 'hoa_don_id');
+    }
+
+    public static function trangThaiCoTheChuyenTu(string $hienTai): array
+    {
+        return self::LUONG_TRANG_THAI[$hienTai] ?? [];
     }
 }

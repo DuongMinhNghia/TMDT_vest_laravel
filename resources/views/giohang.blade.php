@@ -318,6 +318,17 @@
     </div>
     @endif
 
+    @if(session('error'))
+    <div class="alert" style="background:rgba(255,68,68,0.12); border:1px solid #ff4444; color:#ff6b6b; border-radius:10px; padding:12px 20px; margin-bottom:20px;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+    </div>
+    @endif
+    @if($errors->any())
+    <div class="alert" style="background:rgba(255,68,68,0.12); border:1px solid #ff4444; color:#ff6b6b; border-radius:10px; padding:12px 20px; margin-bottom:20px;">
+        @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
+    </div>
+    @endif
+
     @if(empty($gioHang))
     <div class="empty-cart">
         <i class="bi bi-cart-x"></i>
@@ -355,7 +366,14 @@
                                 </div>
                             </td>
                             <td class="text-center price-col">
+                                @if($item['sale'] > 0)
+                                <div style="color:#777; text-decoration:line-through; font-size:0.8rem; font-weight:400;">{{ number_format($item['gia_goc'], 0, ',', '.') }} VNĐ</div>
+                                <span style="color:#e74c3c; font-size:0.75rem;">-{{ $item['sale'] }}%</span>
+                                @endif
                                 {{ number_format($item['gia'], 0, ',', '.') }} VNĐ
+                                @if($item['so_luong'] > $item['ton'])
+                                <div style="color:#ff4444; font-size:0.75rem; font-weight:400;">Chỉ còn {{ $item['ton'] }} sản phẩm</div>
+                                @endif
                             </td>
                             <td class="text-center">
                                 <div class="qty-control">
@@ -401,15 +419,40 @@
                     </div>
                     <div class="summary-row">
                         <span>Phí vận chuyển:</span>
-                        <span>30.000 VNĐ</span>
+                        <span>{{ number_format($tien['phi_ship'], 0, ',', '.') }} VNĐ</span>
                     </div>
+                    @if($tien['phan_tram_hang'] > 0)
+                    <div class="summary-row">
+                        <span>Ưu đãi hạng {{ $tenHang }} (-{{ $tien['phan_tram_hang'] }}%):</span>
+                        <span style="color:#2ecc71;">- {{ number_format($tien['giam_hang'], 0, ',', '.') }} VNĐ</span>
+                    </div>
+                    @endif
                     <div class="summary-total">
                         <span>Thanh toán:</span>
-                        <span>{{ number_format($tongTien + 30000, 0, ',', '.') }} VNĐ</span>
+                        <span>{{ number_format($tien['thanh_toan'], 0, ',', '.') }} VNĐ</span>
                     </div>
-                    <a href="#" class="btn-checkout" id="btnThanhToan">
-                        <i class="bi bi-bag-check-fill me-2"></i> Tiến Hành Thanh Toán
-                    </a>
+
+                    <form method="POST" action="{{ route('giohang.checkout') }}" style="margin-top:20px;">
+                        @csrf
+                        <label style="color:#aaa; font-size:0.85rem;">Địa chỉ giao hàng</label>
+                        <textarea name="dia_chi" rows="2" required
+                            style="width:100%; background:#111; border:1px solid #333; color:#e0e0e0; border-radius:8px; padding:8px 10px; margin:6px 0 12px;">{{ old('dia_chi', $diaChiMacDinh) }}</textarea>
+
+                        <label style="color:#aaa; font-size:0.85rem;">Phương thức thanh toán</label>
+                        <select name="phuong_thuc"
+                            style="width:100%; background:#111; border:1px solid #333; color:#e0e0e0; border-radius:8px; padding:8px 10px; margin:6px 0 12px;">
+                            <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+                            <option value="Chuyển khoản" {{ old('phuong_thuc') == 'Chuyển khoản' ? 'selected' : '' }}>Chuyển khoản</option>
+                        </select>
+
+                        <label style="color:#aaa; font-size:0.85rem;">Ghi chú (không bắt buộc)</label>
+                        <input type="text" name="ghi_chu" value="{{ old('ghi_chu') }}" maxlength="500"
+                            style="width:100%; background:#111; border:1px solid #333; color:#e0e0e0; border-radius:8px; padding:8px 10px; margin:6px 0 0;">
+
+                        <button type="submit" class="btn-checkout">
+                            <i class="bi bi-bag-check-fill me-2"></i> Đặt Hàng
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -417,58 +460,4 @@
     @endif
 </div>
 
-{{-- MODAL THANH TOÁN THÀNH CÔNG --}}
-<div class="modal fade" id="modalThanhToan" tabindex="-1" data-bs-backdrop="static">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background:#1a1a1a; border:2px solid #C5A059; border-radius:16px;">
-            <div class="modal-body text-center" style="padding:40px;">
-                <i class="bi bi-check-circle-fill" style="font-size:4rem; color:#C5A059; display:block; margin-bottom:20px;"></i>
-                <h4 style="color:#C5A059; font-family:'Playfair Display',serif; margin-bottom:15px;">Thanh Toán Thành Công!</h4>
-                <p style="color:#aaa; margin-bottom:25px;">Cảm ơn bạn đã mua hàng tại Kingsman. Chúng tôi sẽ liên hệ xác nhận đơn hàng sớm nhất.</p>
-
-                <div style="background:#111; border-radius:10px; padding:20px; margin-bottom:25px; text-align:left;">
-                    @foreach($gioHang as $item)
-                    <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #2a2a2a;">
-                        <img src="{{ asset('images/' . $item['hinh_anh']) }}"
-                            style="width:50px; height:50px; object-fit:cover; border-radius:8px;" />
-                        <div style="flex:1;">
-                            <div style="color:#e0e0e0; font-weight:600; font-size:0.9rem;">{{ $item['ten_sp'] }}</div>
-                            <div style="color:#888; font-size:0.8rem;">Size: {{ $item['size'] }} × {{ $item['so_luong'] }}</div>
-                        </div>
-                        <div style="color:#C5A059; font-weight:700; font-size:0.9rem;">
-                            {{ number_format($item['gia'] * $item['so_luong'], 0, ',', '.') }} VNĐ
-                        </div>
-                    </div>
-                    @endforeach
-                    <div style="display:flex; justify-content:space-between; padding-top:15px;">
-                        <span style="color:#aaa;">Tổng cộng:</span>
-                        <span style="color:#C5A059; font-weight:700; font-size:1.1rem;">
-                            {{ number_format($tongTien + 30000, 0, ',', '.') }} VNĐ
-                        </span>
-                    </div>
-                </div>
-
-                <a href="{{ route('sanpham.index') }}" class="btn-checkout" style="display:inline-block; width:auto; padding:12px 35px;">
-                    <i class="bi bi-bag me-2"></i> Tiếp tục mua sắm
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-@endsection
-
-@section('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('modalThanhToan');
-        if (modal && modal.dataset.autoShow === 'true') {
-            new bootstrap.Modal(modal).show();
-        }
-    });
-    document.getElementById('btnThanhToan').addEventListener('click', function() {
-        alert('Thanh toán thành công! Cảm ơn bạn đã mua hàng tại Kingsman.');
-        window.location.href = "{{ route('giohang.checkout') }}";
-    });
-</script>
 @endsection

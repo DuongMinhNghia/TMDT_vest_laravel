@@ -45,6 +45,9 @@
             </a>
         </div>
 
+        @if(session('error'))
+        <div class="alert-success-custom" style="border-color:#ff4444; color:#ff6b6b;"><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}</div>
+        @endif
         @if(session('success'))
         <div class="alert-success-custom"><i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}</div>
         @endif
@@ -85,6 +88,7 @@
                     <select name="trang_thai" class="form-select form-select-dark">
                         <option value="">-- Tất cả --</option>
                         <option value="Chờ xử lý" {{ $trangThai=='Chờ xử lý'?'selected':'' }}>⏳ Chờ xử lý</option>
+                        <option value="Đang may/gói" {{ $trangThai=='Đang may/gói'?'selected':'' }}>🧵 Đang may/gói</option>
                         <option value="Đang giao" {{ $trangThai=='Đang giao'?'selected':'' }}>🚚 Đang giao</option>
                         <option value="Hoàn Thành" {{ $trangThai=='Hoàn Thành'?'selected':'' }}>✅ Hoàn thành</option>
                         <option value="Đã hủy" {{ $trangThai=='Đã hủy'?'selected':'' }}>❌ Đã hủy</option>
@@ -126,19 +130,21 @@
                 <tbody>
                     @forelse($donHangs as $dh)
                     <tr>
-                        <td style="color:#d4af37; font-weight:700;">#{{ str_pad($dh->id, 4, '0', STR_PAD_LEFT) }}</td>
+                        <td style="color:#d4af37; font-weight:700;"><a href="{{ route('donhang.chitiet', $dh->id) }}" style="color:#d4af37; text-decoration:none;">{{ $dh->ma_don_hang ?? '#'.str_pad($dh->id, 4, '0', STR_PAD_LEFT) }}</a></td>
                         <td>
-                            <div style="font-weight:600;">{{ $dh->user->name ?? 'N/A' }}</div>
-                            <div style="color:#666; font-size:0.78rem;">{{ $dh->user->email ?? '' }}</div>
+                            <div style="font-weight:600;">{{ $dh->khachHang->ho_ten ?? 'N/A' }}</div>
+                            <div style="color:#666; font-size:0.78rem;">{{ $dh->khachHang->taiKhoan->email ?? '' }}</div>
                         </td>
-                        <td style="color:#aaa;">{{ \Carbon\Carbon::parse($dh->ngay_ban)->format('d/m/Y') }}</td>
+                        <td style="color:#aaa;">{{ \Carbon\Carbon::parse($dh->ngay_dat)->format('d/m/Y') }}</td>
                         <td style="color:#aaa; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.85rem;">
-                            {{ $dh->dia_chi ?? '—' }}
+                            {{ $dh->dia_chi_giao_hang ?? '—' }}
                         </td>
-                        <td style="color:#d4af37; font-weight:700;">{{ number_format($dh->thanh_toan, 0, ',', '.') }} đ</td>
+                        <td style="color:#d4af37; font-weight:700;">{{ number_format($dh->tong_tien, 0, ',', '.') }} đ</td>
                         <td>
                             @if($dh->trang_thai === 'Hoàn Thành')
                                 <span class="badge-hoan">✅ Hoàn Thành</span>
+                            @elseif($dh->trang_thai === 'Đang may/gói')
+                                <span class="badge-giao">🧵 Đang may/gói</span>
                             @elseif($dh->trang_thai === 'Đang giao')
                                 <span class="badge-giao">🚚 Đang giao</span>
                             @elseif($dh->trang_thai === 'Chờ xử lý')
@@ -146,12 +152,19 @@
                             @else
                                 <span class="badge-huy">❌ Đã hủy</span>
                             @endif
+                            @if($dh->nhanVienDuyet)
+                                <div style="color:#666; font-size:0.75rem; margin-top:4px;">Duyệt: {{ $dh->nhanVienDuyet->ho_ten }}</div>
+                            @endif
                         </td>
                         <td style="text-align:center;">
+                            @if(count($luongTrangThai[$dh->trang_thai] ?? []) > 0)
                             <button class="btn-update"
                                 onclick="moModalCapNhat({{ $dh->id }}, '{{ $dh->trang_thai }}')">
-                                <i class="bi bi-pencil-fill me-1"></i>Sửa
+                                <i class="bi bi-pencil-fill me-1"></i>Xử lý
                             </button>
+                            @else
+                            <span style="color:#555; font-size:0.8rem;">—</span>
+                            @endif
                         </td>
                     </tr>
                     @empty
@@ -169,7 +182,7 @@
         @if($donHangs->count() > 0)
         <div class="mt-3" style="color:#555; font-size:0.85rem; text-align:right;">
             Hiển thị {{ $donHangs->count() }} đơn hàng
-            — Tổng tiền: <span style="color:#d4af37; font-weight:700;">{{ number_format($donHangs->sum('thanh_toan'), 0, ',', '.') }} đ</span>
+            — Tổng tiền: <span style="color:#d4af37; font-weight:700;">{{ number_format($donHangs->sum('tong_tien'), 0, ',', '.') }} đ</span>
         </div>
         @endif
 
@@ -188,12 +201,7 @@
                 @csrf
                 <div class="modal-body">
                     <label style="color:#aaa; font-size:0.85rem; margin-bottom:8px; display:block;">TRẠNG THÁI MỚI</label>
-                    <select name="trang_thai" id="select_trangthai" class="form-select form-select-dark">
-                        <option value="Chờ xử lý">⏳ Chờ xử lý</option>
-                        <option value="Đang giao">🚚 Đang giao</option>
-                        <option value="Hoàn Thành">✅ Hoàn thành</option>
-                        <option value="Đã hủy">❌ Đã hủy</option>
-                    </select>
+                    <select name="trang_thai" id="select_trangthai" class="form-select form-select-dark"></select>
                 </div>
                 <div class="modal-footer">
                     <button type="button" style="background:transparent; border:1px solid #555; color:#aaa; padding:8px 16px; border-radius:8px;" data-bs-dismiss="modal">Hủy</button>
@@ -207,9 +215,16 @@
 </div>
 
 <script>
+const LUONG_TRANG_THAI = @json($luongTrangThai);
 function moModalCapNhat(id, trangThai) {
     document.getElementById('formCapNhat').action = '/don-hang/' + id + '/cap-nhat';
-    document.getElementById('select_trangthai').value = trangThai;
+    const sel = document.getElementById('select_trangthai');
+    sel.innerHTML = '';
+    (LUONG_TRANG_THAI[trangThai] || []).forEach(function (t) {
+        const o = document.createElement('option');
+        o.value = t; o.textContent = t;
+        sel.appendChild(o);
+    });
     new bootstrap.Modal(document.getElementById('modalCapNhat')).show();
 }
 </script>

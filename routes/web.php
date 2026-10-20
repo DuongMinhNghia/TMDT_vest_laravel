@@ -11,6 +11,8 @@ use App\Http\Controllers\QuanLyNguoiDungController;
 use App\Http\Controllers\ThongKeController;
 use App\Http\Controllers\BoSuuTapController;
 use App\Http\Controllers\GiamGiaController;
+use App\Http\Controllers\DonHangController;
+use App\Http\Controllers\DanhGiaController;
 
 // 1. Route xác thực (Guest)
 Route::middleware('guest')->group(function () {
@@ -33,7 +35,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/gio-hang/them', [GioHangController::class, 'addToCart'])->name('giohang.add');
     Route::get('/gio-hang/update', [GioHangController::class, 'updateSL'])->name('giohang.update');
     Route::get('/gio-hang/xoa', [GioHangController::class, 'remove'])->name('giohang.remove');
-    Route::get('/gio-hang/checkout', [GioHangController::class, 'checkout'])->name('giohang.checkout');
+    Route::post('/gio-hang/checkout', [GioHangController::class, 'checkout'])->name('giohang.checkout');
+
+    // Đơn hàng của khách + Đánh giá sản phẩm (Task 3.3, 3.4 - Thành viên 3)
+    Route::get('/don-hang', [DonHangController::class, 'lichSu'])->name('donhang.lichsu');
+    Route::get('/don-hang/{id}', [DonHangController::class, 'chiTiet'])->name('donhang.chitiet');
+    Route::post('/don-hang/{id}/huy', [DonHangController::class, 'huy'])->name('donhang.huy');
+    Route::post('/san-pham/{id}/danh-gia', [DanhGiaController::class, 'luu'])->name('danhgia.luu');
 
     // CRUD Sản phẩm
     Route::post('/san-pham/them', [SanPhamController::class, 'luuThem'])->name('sanpham.luuthem');
