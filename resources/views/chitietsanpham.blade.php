@@ -526,27 +526,35 @@
                             </div>
                         </div>
                         {{-- CUSTOM SIZE --}}
+                        @php
+                            $userSoDo = Auth::check() ? optional(Auth::user()->khachHang)->soDoMacDinh() : null;
+                        @endphp
                         <div class="custom-size-container" id="customSizeContainer">
+                            @if($userSoDo)
+                            <div class="mb-2 p-2 rounded" style="background: rgba(212,175,55,0.1); border: 1px dashed #d4af37; font-size: 0.8rem; color: #d4af37;">
+                                <i class="bi bi-magic me-1"></i> Đã tự động điền thông số từ hồ sơ: <strong>{{ $userSoDo->ten_ho_so }}</strong> của bạn.
+                            </div>
+                            @endif
                             <div class="custom-measurements">
                                 <div class="measurement-input">
                                     <label><i class="bi bi-arrows-expand"></i> Vai (cm)</label>
-                                    <input type="number" id="shoulder" placeholder="VD: 45" min="0" step="0.5" />
+                                    <input type="number" id="shoulder" placeholder="VD: 45" min="0" step="0.5" value="{{ $userSoDo?->rong_vai }}" />
                                 </div>
                                 <div class="measurement-input">
                                     <label><i class="bi bi-arrows-expand"></i> Ngực (cm)</label>
-                                    <input type="number" id="chest" placeholder="VD: 96" min="0" step="0.5" />
+                                    <input type="number" id="chest" placeholder="VD: 96" min="0" step="0.5" value="{{ $userSoDo?->vong_nguc }}" />
                                 </div>
                                 <div class="measurement-input">
                                     <label><i class="bi bi-arrows-expand"></i> Eo (cm)</label>
-                                    <input type="number" id="waist" placeholder="VD: 84" min="0" step="0.5" />
+                                    <input type="number" id="waist" placeholder="VD: 84" min="0" step="0.5" value="{{ $userSoDo?->vong_eo }}" />
                                 </div>
                                 <div class="measurement-input">
                                     <label><i class="bi bi-arrows-vertical"></i> Dài áo (cm)</label>
-                                    <input type="number" id="length" placeholder="VD: 75" min="0" step="0.5" />
+                                    <input type="number" id="length" placeholder="VD: 75" min="0" step="0.5" value="{{ $userSoDo?->dai_ao_vest }}" />
                                 </div>
                             </div>
                             <div class="measurement-guide">
-                                <p><i class="bi bi-info-circle-fill"></i> Vui lòng nhập số đo.</p>
+                                <p><i class="bi bi-info-circle-fill"></i> Vui lòng nhập số đo hoặc quản lý tại trang <a href="{{ route('khachhang.dashboard', ['#sodo']) }}" style="color:#d4af37; text-decoration:underline;">Hồ Sơ & VIP</a>.</p>
                                 <p><i class="bi bi-telephone-fill"></i> Liên hệ hotline <strong style="color:#C5A059;">1900-xxxx</strong> để được hướng dẫn đo size chi tiết.</p>
                             </div>
                         </div>
@@ -554,9 +562,12 @@
                 </div>
 
                 {{-- ACTION BUTTONS --}}
-                <div class="action-buttons">
+                <div class="action-buttons" style="display: flex; flex-wrap: wrap; gap: 10px;">
                     <a href="#" class="btn-luxury btn-add-cart" id="addToCartBtn">
                         <i class="bi bi-cart-plus-fill"></i> Thêm vào giỏ
+                    </a>
+                    <a href="{{ route('lichhen.create', ['san_pham_id' => $sanPham->id]) }}" class="btn-luxury" style="background: linear-gradient(135deg, #1f4e79, #15324e); border: 1px solid #3270a6; color: #fff;">
+                        <i class="bi bi-calendar2-check-fill"></i> Đặt lịch thử tại tiệm
                     </a>
                     <a href="{{ route('sanpham.index') }}" class="btn-luxury btn-back">
                         <i class="bi bi-arrow-left-circle-fill"></i> Quay lại

@@ -81,9 +81,9 @@ def create_plan_document():
         p.runs[0].font.size = Pt(9)
 
     eval_data = [
-        ("Phần 1: Sản phẩm, Kho Size & Khuyến mãi", "danh_mucs, san_phams, sizes, bo_suu_taps, giam_gias", "Đã có CRUD Danh mục & Sản phẩm; Size rời rạc", "Khoảng 40%", "Cần làm thêm"),
-        ("Phần 2: Người dùng, Thành viên & Lịch hẹn", "users, hang_thanh_viens, khach_hangs, nhan_viens, so_do, lich_hens", "Mới có Đăng nhập & Đăng ký tài khoản cơ bản", "Khoảng 20%", "Làm mới nhiều"),
-        ("Phần 3: Giỏ hàng, Đơn hàng & Đánh giá", "gio_hangs, chi_tiet_gio_hangs, hoa_dons, chi_tiet_hoa_dons, danh_gias", "Giỏ hàng Session, Checkout đơn, Thống kê doanh thu", "Khoảng 70%", "Nhiều nhất ⭐")
+        ("Phần 1: Sản phẩm, Kho Size & Khuyến mãi", "danh_mucs, san_phams, sizes, bo_suu_taps, giam_gias", "Đầy đủ CRUD Sản phẩm, Kho Size, Bộ sưu tập & Flash Sale", "Hoàn thành 100%", "Đã hoàn tất ⭐"),
+        ("Phần 2: Người dùng, Thành viên & Lịch hẹn", "tai_khoans, hang_thanh_viens, khach_hangs, nhan_viens, so_do, lich_hens", "Đầy đủ Dashboard khách hàng, Thẻ VIP, Số đo & Đặt lịch hẹn showroom", "Hoàn thành 100%", "Đã hoàn tất ⭐"),
+        ("Phần 3: Giỏ hàng, Đơn hàng & Đánh giá", "gio_hangs, chi_tiet_gio_hangs, hoa_dons, chi_tiet_hoa_dons, danh_gias", "Giỏ hàng Session/DB, Checkout đơn, Thống kê doanh thu & Trừ tồn kho", "Khoảng 70% - 80%", "Đang hoàn thiện")
     ]
 
     for row in eval_data:
@@ -165,8 +165,8 @@ def create_plan_document():
     
     doc.add_paragraph(
         "• Vai trò chính: Quản lý định danh tài khoản, phân tách khách hàng & nhân sự, chương trình khách hàng thân thiết (Loyalty), hồ sơ số đo may đo vest và dịch vụ đặt lịch thử đồ tại cửa hàng.\n"
-        "• Bảng dữ liệu phụ trách (6 bảng): users, hang_thanh_viens, khach_hangs, nhan_viens, so_do_khach_hangs, lich_hens.\n"
-        "• Khối lượng hiện tại: Đã xong 20% (Mới có đăng nhập/đăng ký cơ bản trên users cũ)."
+        "• Bảng dữ liệu phụ trách (6 bảng): tai_khoans, hang_thanh_viens, khach_hangs, nhan_viens, so_do_khach_hangs, lich_hens.\n"
+        "• Khối lượng hiện tại: ĐÃ HOÀN THÀNH 100% (Hoàn thành trọn vẹn cả 4 Task: 2.1, 2.2, 2.3, 2.4 - Đã có báo cáo hoàn thiện và hướng dẫn ghép nối)."
     )
 
     t2 = doc.add_table(rows=1, cols=4)
@@ -286,9 +286,9 @@ def create_plan_document():
         r2 = p.add_run(desc)
 
     # Save
-    out_path = r"c:\Laragon\www\demo\Ke_Hoach_Trien_Khai_Du_An_Vest_Nhom_3_Nguoi.docx"
+    out_path = r"c:\laragon\www\TMDT_vest_laravel\Ke_Hoach_Trien_Khai_Du_An_Vest_Nhom_3_Nguoi.docx"
     doc.save(out_path)
-    print(f"Plan document successfully created at: {out_path}")
+    print("Plan document successfully created at:", out_path)
 
 if __name__ == '__main__':
     create_plan_document()

@@ -6,6 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property int $id
+ * @property string $email
+ * @property string $password
+ * @property string $vai_tro
+ * @property bool $trang_thai
+ * @property string $name
+ * @property string $quyen
+ * @property string|null $phone
+ * @property string|null $address
+ * @property \App\Models\KhachHang|null $khachHang
+ * @property \App\Models\NhanVien|null $nhanVien
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
 class TaiKhoan extends Authenticatable
 {
     use HasFactory, Notifiable;
@@ -55,7 +69,20 @@ class TaiKhoan extends Authenticatable
 
     public function getQuyenAttribute()
     {
-        return $this->vai_tro === 'admin' ? 'Admin' : ($this->vai_tro === 'nhan_vien' ? 'NhanVien' : 'KhachHang');
+        if ($this->vai_tro === 'admin') {
+            return 'Admin';
+        }
+        return 'Khách hàng';
+    }
+
+    public function getPhoneAttribute()
+    {
+        return $this->nhanVien?->so_dien_thoai ?? $this->khachHang?->so_dien_thoai;
+    }
+
+    public function getAddressAttribute()
+    {
+        return $this->khachHang?->dia_chi;
     }
 
     public function isAdmin(): bool

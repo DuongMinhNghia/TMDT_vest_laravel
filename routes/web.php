@@ -13,6 +13,9 @@ use App\Http\Controllers\BoSuuTapController;
 use App\Http\Controllers\GiamGiaController;
 use App\Http\Controllers\DonHangController;
 use App\Http\Controllers\DanhGiaController;
+use App\Http\Controllers\KhachHangDashboardController;
+use App\Http\Controllers\LichHenController;
+use App\Http\Controllers\HangThanhVienController;
 
 // 1. Route xác thực (Guest)
 Route::middleware('guest')->group(function () {
@@ -42,6 +45,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/don-hang/{id}', [DonHangController::class, 'chiTiet'])->name('donhang.chitiet');
     Route::post('/don-hang/{id}/huy', [DonHangController::class, 'huy'])->name('donhang.huy');
     Route::post('/san-pham/{id}/danh-gia', [DanhGiaController::class, 'luu'])->name('danhgia.luu');
+
+    // =========================================================================
+    // PHÂN HỆ THÀNH VIÊN 2: TÀI KHOẢN, HẠNG VIP, SỐ ĐO MAY VEST & LỊCH HẸN
+    // =========================================================================
+
+    // Dashboard Khách Hàng (Task 2.1, 2.2, 2.3)
+    Route::get('/khach-hang/dashboard', [KhachHangDashboardController::class, 'index'])->name('khachhang.dashboard');
+    Route::post('/khach-hang/thong-tin', [KhachHangDashboardController::class, 'capNhatThongTin'])->name('khachhang.thongtin.luu');
+    Route::post('/khach-hang/so-do', [KhachHangDashboardController::class, 'luuSoDo'])->name('khachhang.sodo.luu');
+    Route::post('/khach-hang/so-do/{id}/xoa', [KhachHangDashboardController::class, 'xoaSoDo'])->name('khachhang.sodo.xoa');
+
+    // Đặt lịch hẹn showroom (Task 2.4 - Phía Khách Hàng)
+    Route::get('/dat-lich', [LichHenController::class, 'create'])->name('lichhen.create');
+    Route::post('/dat-lich', [LichHenController::class, 'store'])->name('lichhen.store');
+    Route::post('/lich-hen/{id}/huy', [LichHenController::class, 'huy'])->name('lichhen.huy');
+
+    // Quản trị Lịch Hẹn Showroom (Task 2.4 - Phía Admin/Nhân viên)
+    Route::get('/quan-ly-lich-hen', [LichHenController::class, 'quanLy'])->name('lichhen.quanly');
+    Route::post('/lich-hen/{id}/cap-nhat', [LichHenController::class, 'capNhat'])->name('lichhen.capnhat');
+    Route::post('/lich-hen/{id}/xoa', [LichHenController::class, 'xoa'])->name('lichhen.xoa');
+
+    // Quản lý Hạng thành viên Loyalty (Task 2.2 - Phía Admin)
+    Route::get('/hang-thanh-vien', [HangThanhVienController::class, 'index'])->name('hangthanhvien.index');
+    Route::post('/hang-thanh-vien/{id}/cap-nhat', [HangThanhVienController::class, 'capNhat'])->name('hangthanhvien.capnhat');
+
+    // =========================================================================
+    // PHÂN HỆ THÀNH VIÊN 1: SẢN PHẨM, BỘ SƯU TẬP, GIẢM GIÁ FLASH SALE
+    // =========================================================================
 
     // CRUD Sản phẩm
     Route::post('/san-pham/them', [SanPhamController::class, 'luuThem'])->name('sanpham.luuthem');
