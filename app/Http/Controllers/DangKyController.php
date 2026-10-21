@@ -32,12 +32,16 @@ class DangKyController extends Controller
             'vai_tro' => 'khach_hang'
         ]);
 
-        // Tạo hồ sơ khách hàng tương ứng
+        // Tạo hồ sơ khách hàng tương ứng (Hạng mặc định: Đồng)
+        $hangKhoiDau = \App\Models\HangThanhVien::orderBy('diem_toi_thieu', 'asc')->first();
         \App\Models\KhachHang::create([
-            'tai_khoan_id' => $taiKhoan->id,
-            'ho_ten' => $request->name,
-            'so_dien_thoai' => $request->phone ?? null,
-            'dia_chi' => $request->address ?? null,
+            'tai_khoan_id'       => $taiKhoan->id,
+            'hang_thanh_vien_id' => $hangKhoiDau?->id ?? 1,
+            'ma_kh'              => 'KH' . str_pad($taiKhoan->id, 4, '0', STR_PAD_LEFT),
+            'ho_ten'             => $request->name,
+            'so_dien_thoai'      => $request->phone ?? null,
+            'dia_chi'            => $request->address ?? null,
+            'diem_tich_luy'      => 0,
         ]);
 
         return redirect('/dang-nhap')->with('success', 'Đăng ký thành công! Vui lòng đăng nhập.');

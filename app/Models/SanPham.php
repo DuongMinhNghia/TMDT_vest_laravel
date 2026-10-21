@@ -85,6 +85,14 @@ class SanPham extends Model
         return $this->hasMany(DanhGia::class, 'san_pham_id');
     }
 
+    /**
+     * Quan hệ: Các lịch hẹn khách hàng chọn thử sản phẩm này
+     */
+    public function lichHens()
+    {
+        return $this->hasMany(LichHen::class, 'san_pham_quan_tam_id');
+    }
+
     // ==========================================
     // HÀM NGHIỆP VỤ & TỰ ĐỘNG TÍNH GIÁ SALE
     // ==========================================

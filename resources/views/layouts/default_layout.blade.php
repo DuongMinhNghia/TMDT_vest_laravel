@@ -335,6 +335,11 @@
                             <i class="bi bi-grid"></i> Sản phẩm
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="{{ route('lichhen.create') }}" class="nav-link nav-link-main">
+                            <i class="bi bi-calendar2-heart"></i> Đặt Lịch Hẹn
+                        </a>
+                    </li>
 
                     @if(Auth::check() && (Auth::user()->vai_tro == 'admin' || Auth::user()->quyen == 'Admin'))
                         <li class="nav-item">
@@ -352,6 +357,11 @@
                                 <i class="bi bi-tag-fill" style="color:#e74c3c;"></i> Khuyến Mãi
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a href="{{ route('lichhen.quanly') }}" class="nav-link nav-link-main">
+                                <i class="bi bi-calendar2-check"></i> Quản Lý Lịch Hẹn
+                            </a>
+                        </li>
 
                         <li class="nav-item dropdown dropdown-hover">
                             <a class="nav-link nav-link-main dropdown-toggle" href="#" data-bs-toggle="dropdown">
@@ -362,6 +372,11 @@
                                 <li>
                                     <a class="dropdown-item" href="{{ route('nguoidung.index') }}">
                                         <i class="bi bi-person-lines-fill me-2"></i>Danh Sách Tài Khoản
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('hangthanhvien.index') }}">
+                                        <i class="bi bi-award me-2"></i>Chính Sách Hạng VIP
                                     </a>
                                 </li>
                             </ul>
@@ -405,6 +420,9 @@
                     @endif
 
                     @if(Auth::check() && Auth::user()->quyen != 'Admin')
+                    <a href="{{ route('khachhang.dashboard') }}" class="btn-action-gold">
+                        <i class="bi bi-person-badge"></i> Hồ Sơ & VIP
+                    </a>
                     <a href="{{ route('donhang.lichsu') }}" class="btn-action-gold">
                         <i class="bi bi-receipt"></i> Đơn hàng
                     </a>

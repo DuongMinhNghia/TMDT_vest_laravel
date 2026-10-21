@@ -31,4 +31,9 @@ class NhanVien extends Model
     {
         return $this->hasMany(HoaDon::class, 'nhan_vien_duyet_id');
     }
+
+    public function lichHensTiepDon()
+    {
+        return $this->hasMany(LichHen::class, 'nhan_vien_tiep_don_id');
+    }
 }

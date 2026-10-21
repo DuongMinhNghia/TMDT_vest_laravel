@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\TaiKhoan;
 
 class QuanLyNguoiDungController extends Controller
@@ -36,6 +37,7 @@ class QuanLyNguoiDungController extends Controller
 
     public function luuSua(Request $request, $id)
     {
+        /** @var TaiKhoan $user */
         $user = TaiKhoan::findOrFail($id);
 
         $request->validate([
@@ -70,9 +72,10 @@ class QuanLyNguoiDungController extends Controller
 
     public function xoa($id)
     {
+        /** @var TaiKhoan $user */
         $user = TaiKhoan::findOrFail($id);
 
-        if ($user->id === auth()->id()) {
+        if ($user->id === Auth::id()) {
             return redirect()->route('nguoidung.index')->with('error', 'Không thể xóa tài khoản đang đăng nhập!');
         }
 
