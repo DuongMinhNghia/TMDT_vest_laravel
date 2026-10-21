@@ -55,7 +55,20 @@ class TaiKhoan extends Authenticatable
 
     public function getQuyenAttribute()
     {
-        return $this->vai_tro === 'admin' ? 'Admin' : ($this->vai_tro === 'nhan_vien' ? 'NhanVien' : 'KhachHang');
+        if ($this->vai_tro === 'admin') {
+            return 'Admin';
+        }
+        return 'Khách hàng';
+    }
+
+    public function getPhoneAttribute()
+    {
+        return $this->nhanVien?->so_dien_thoai ?? $this->khachHang?->so_dien_thoai;
+    }
+
+    public function getAddressAttribute()
+    {
+        return $this->khachHang?->dia_chi;
     }
 
     public function isAdmin(): bool
