@@ -1,221 +1,222 @@
-@extends('layouts.default_layout')
+@extends('layouts.admin_layout')
 
-@section('title', 'Quản Lý Khuyến Mãi & Flash Sale - Kingsman')
+@section('title', 'Quản Lý Khuyến Mãi & Flash Sale - Kingsman Admin')
+@section('page_name', 'Khuyến Mãi & Flash Sale')
 
 @section('content')
 <style>
-    .sale-wrap {
-        max-width: 1300px;
-        margin: 0 auto;
-        padding: 10px 15px 50px;
+    /* Executive Luxury Dark Palette for Giảm Giá & Flash Sale */
+    .sale-container {
+        padding: 4px 0 40px;
     }
 
-    /* Header */
-    .sale-header {
+    /* Page Header Toolbar */
+    .sale-top-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid rgba(197, 160, 89, 0.25);
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--adm-border);
     }
 
-    .sale-title {
-        font-family: 'Playfair Display', serif;
-        color: #C5A059;
-        font-size: 1.85rem;
+    .sale-header-title {
+        font-family: var(--adm-font-heading);
+        color: var(--adm-text-main);
+        font-size: 1.6rem;
+        font-weight: 700;
         margin: 0;
         display: flex;
         align-items: center;
         gap: 10px;
     }
 
-    .btn-gold-add {
-        background: linear-gradient(135deg, #d4af37, #c19b2f);
+    .sale-header-title i {
+        color: #f43f5e;
+    }
+
+    .sale-subtitle {
+        color: var(--adm-text-muted);
+        font-size: 0.82rem;
+        margin-top: 4px;
+    }
+
+    .btn-gold-action {
+        background: linear-gradient(135deg, var(--adm-gold-light), var(--adm-gold));
         color: #0b0b0b;
         font-weight: 700;
         border: none;
-        border-radius: 25px;
-        padding: 10px 22px;
+        border-radius: 8px;
+        padding: 9px 20px;
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        font-size: 0.84rem;
         cursor: pointer;
         transition: all 0.25s ease;
         text-decoration: none;
+        box-shadow: 0 4px 14px rgba(212, 178, 111, 0.2);
     }
 
-    .btn-gold-add:hover {
+    .btn-gold-action:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+        box-shadow: 0 6px 20px rgba(212, 178, 111, 0.35);
         color: #000;
     }
 
-    /* Stat Cards */
+    /* KPI Summary Cards */
     .sale-stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 18px;
-        margin-bottom: 30px;
+        gap: 16px;
+        margin-bottom: 24px;
     }
 
     .sale-stat-card {
-        background: #141414;
-        border: 1px solid #282828;
-        border-radius: 12px;
-        padding: 18px 22px;
+        background: var(--adm-bg-surface);
+        border: 1px solid var(--adm-border);
+        border-radius: 10px;
+        padding: 16px 20px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        transition: all 0.2s;
+        transition: border-color 0.2s, transform 0.2s;
     }
+
     .sale-stat-card:hover {
-        border-color: #444;
+        border-color: var(--adm-border-focus);
         transform: translateY(-2px);
     }
 
     .stat-label {
-        color: #888;
-        font-size: 0.82rem;
+        color: var(--adm-text-muted);
+        font-size: 0.74rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 5px;
+        letter-spacing: 0.8px;
+        font-weight: 600;
+        margin-bottom: 4px;
     }
 
     .stat-num {
-        font-size: 1.75rem;
+        font-size: 1.65rem;
         font-weight: 700;
-        color: #f5f5f5;
-        font-family: 'Playfair Display', serif;
+        color: var(--adm-text-main);
+        font-family: var(--adm-font-heading);
     }
 
     .stat-badge-icon {
         width: 44px;
         height: 44px;
-        border-radius: 10px;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.35rem;
+        font-size: 1.3rem;
     }
 
-    /* Alerts */
-    .sale-alert {
-        padding: 12px 18px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.92rem;
-    }
-
-    .sale-alert-success {
-        background: rgba(46, 204, 113, 0.15);
-        border: 1px solid rgba(46, 204, 113, 0.4);
-        color: #2ecc71;
-    }
-
-    /* Bảng danh sách */
+    /* Table Container */
     .sale-table-card {
-        background: #141414;
-        border: 1px solid #282828;
-        border-radius: 14px;
+        background: var(--adm-bg-surface);
+        border: 1px solid var(--adm-border);
+        border-radius: 12px;
         overflow: hidden;
     }
 
     .sale-table {
         width: 100%;
         border-collapse: collapse;
-        color: #ddd;
-        font-size: 0.9rem;
+        color: var(--adm-text-main);
+        font-size: 0.88rem;
     }
 
     .sale-table th {
-        background: #1a1a1a;
-        color: #C5A059;
+        background: var(--adm-bg-card);
+        color: var(--adm-gold);
         font-weight: 600;
         padding: 14px 18px;
         text-align: left;
-        border-bottom: 1px solid #282828;
-        font-size: 0.82rem;
+        border-bottom: 1px solid var(--adm-border);
+        font-size: 0.78rem;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.8px;
     }
 
     .sale-table td {
-        padding: 16px 18px;
-        border-bottom: 1px solid #202020;
+        padding: 15px 18px;
+        border-bottom: 1px solid var(--adm-border);
         vertical-align: middle;
     }
 
     .sale-table tr:hover {
-        background: rgba(255, 255, 255, 0.02);
+        background: var(--adm-bg-hover);
     }
 
     /* Badges */
     .discount-pill {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        background: linear-gradient(135deg, #e74c3c, #c0392b);
-        color: #fff;
-        font-weight: 800;
-        font-size: 0.85rem;
-        padding: 4px 10px;
+        gap: 3px;
+        background: rgba(244, 63, 94, 0.15);
+        color: #f43f5e;
+        border: 1px solid rgba(244, 63, 94, 0.35);
+        font-weight: 700;
+        font-size: 0.82rem;
+        padding: 3px 9px;
         border-radius: 20px;
-        box-shadow: 0 2px 8px rgba(231, 76, 60, 0.35);
     }
 
     .scope-pill {
         padding: 3px 9px;
         border-radius: 6px;
-        font-size: 0.78rem;
+        font-size: 0.75rem;
         font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
     .scope-all {
-        background: rgba(197, 160, 89, 0.15);
-        color: #C5A059;
-        border: 1px solid rgba(197, 160, 89, 0.35);
+        background: rgba(212, 178, 111, 0.12);
+        color: var(--adm-gold);
+        border: 1px solid rgba(212, 178, 111, 0.3);
     }
     .scope-custom {
-        background: rgba(52, 152, 219, 0.15);
-        color: #3498db;
-        border: 1px solid rgba(52, 152, 219, 0.35);
+        background: rgba(56, 189, 248, 0.12);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.3);
     }
 
     .status-badge {
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        font-size: 0.78rem;
-        font-weight: 700;
-        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 3px 10px;
         border-radius: 20px;
     }
     .status-active {
-        background: rgba(46, 204, 113, 0.15);
-        color: #2ecc71;
-        border: 1px solid rgba(46, 204, 113, 0.4);
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.3);
     }
     .status-upcoming {
-        background: rgba(241, 196, 15, 0.15);
-        color: #f1c40f;
-        border: 1px solid rgba(241, 196, 15, 0.4);
+        background: rgba(234, 179, 8, 0.12);
+        color: #eab308;
+        border: 1px solid rgba(234, 179, 8, 0.3);
     }
     .status-ended {
-        background: rgba(255, 255, 255, 0.08);
-        color: #888;
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--adm-text-dim);
+        border: 1px solid var(--adm-border);
     }
 
     /* Actions */
     .btn-action-icon {
-        background: #202020;
-        border: 1px solid #333;
-        color: #ccc;
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        color: var(--adm-text-muted);
         width: 32px;
         height: 32px;
         border-radius: 6px;
@@ -227,13 +228,13 @@
         text-decoration: none;
     }
     .btn-action-icon:hover {
-        border-color: #C5A059;
-        color: #C5A059;
+        border-color: var(--adm-gold);
+        color: var(--adm-gold);
         transform: translateY(-1px);
     }
     .btn-action-del:hover {
-        border-color: #e74c3c;
-        color: #e74c3c;
+        border-color: #f43f5e;
+        color: #f43f5e;
     }
 
     /* Modals */
@@ -241,8 +242,8 @@
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 1050;
+        background: rgba(0, 0, 0, 0.82);
+        z-index: 1060;
         align-items: center;
         justify-content: center;
         padding: 20px;
@@ -254,16 +255,16 @@
     }
 
     .sale-modal {
-        background: #181818;
-        border: 1px solid #333;
-        border-radius: 16px;
+        background: var(--adm-bg-surface);
+        border: 1px solid var(--adm-border-focus);
+        border-radius: 14px;
         width: 100%;
-        max-width: 680px;
+        max-width: 660px;
         max-height: 90vh;
         overflow-y: auto;
-        padding: 28px;
+        padding: 26px;
         position: relative;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     }
 
     .sale-modal-close {
@@ -272,8 +273,8 @@
         right: 20px;
         background: none;
         border: none;
-        color: #888;
-        font-size: 1.6rem;
+        color: var(--adm-text-muted);
+        font-size: 1.5rem;
         cursor: pointer;
         line-height: 1;
         transition: color 0.2s;
@@ -283,13 +284,13 @@
     }
 
     .sale-modal h3 {
-        font-family: 'Playfair Display', serif;
-        color: #C5A059;
-        font-size: 1.45rem;
-        margin-bottom: 22px;
+        font-family: var(--adm-font-heading);
+        color: var(--adm-gold);
+        font-size: 1.35rem;
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
-        gap: 9px;
+        gap: 8px;
     }
 
     .form-row-2 {
@@ -304,59 +305,57 @@
 
     .form-label {
         display: block;
-        color: #ccc;
-        font-size: 0.86rem;
+        color: var(--adm-text-main);
+        font-size: 0.84rem;
         font-weight: 600;
         margin-bottom: 6px;
     }
 
-    .form-control {
+    .form-control, .form-select {
         width: 100%;
-        background: #101010;
-        border: 1px solid #333;
-        border-radius: 8px;
-        color: #f0f0f0;
-        padding: 9px 13px;
-        font-size: 0.9rem;
-        transition: border-color 0.2s;
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        border-radius: 6px;
+        color: var(--adm-text-main);
+        padding: 9px 12px;
+        font-size: 0.88rem;
+        transition: all 0.2s;
     }
-    .form-control:focus {
-        border-color: #C5A059;
+    .form-control:focus, .form-select:focus {
+        border-color: var(--adm-gold);
         outline: none;
-        background: #141414;
+        box-shadow: 0 0 0 3px var(--adm-gold-glow);
+        background: #1c202b;
         color: #fff;
     }
 
     .radio-box {
         display: flex;
-        gap: 20px;
-        padding: 10px 14px;
-        background: #101010;
-        border: 1px solid #282828;
+        gap: 15px;
+        background: var(--adm-bg-card);
+        padding: 12px 14px;
         border-radius: 8px;
+        border: 1px solid var(--adm-border);
     }
 
     .radio-item {
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #ddd;
-        font-size: 0.88rem;
         cursor: pointer;
+        font-size: 0.85rem;
+        color: var(--adm-text-main);
     }
 
     .radio-item input[type="radio"] {
-        accent-color: #C5A059;
-        width: 16px;
-        height: 16px;
+        accent-color: var(--adm-gold);
     }
 
-    /* Product picker */
     .suit-picker-box {
-        background: #101010;
-        border: 1px solid #282828;
-        border-radius: 10px;
-        padding: 12px;
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        border-radius: 8px;
+        padding: 10px;
         max-height: 200px;
         overflow-y: auto;
     }
@@ -365,13 +364,14 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 7px;
+        padding: 8px;
         border-radius: 6px;
+        transition: background 0.15s;
         cursor: pointer;
-        border-bottom: 1px solid #1a1a1a;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
     .suit-item-check:hover {
-        background: rgba(197, 160, 89, 0.08);
+        background: var(--adm-bg-hover);
     }
     .suit-item-check:last-child {
         border-bottom: none;
@@ -380,26 +380,27 @@
     .suit-item-check input[type="checkbox"] {
         width: 16px;
         height: 16px;
-        accent-color: #C5A059;
+        accent-color: var(--adm-gold);
+        cursor: pointer;
     }
 
     .suit-thumb {
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
         border-radius: 6px;
         object-fit: cover;
-        border: 1px solid #333;
+        border: 1px solid var(--adm-border);
     }
 
     .btn-submit-gold {
         width: 100%;
-        padding: 12px;
-        background: linear-gradient(135deg, #d4af37, #c19b2f);
+        padding: 11px;
+        background: linear-gradient(135deg, var(--adm-gold-light), var(--adm-gold));
         color: #000;
         font-weight: 700;
         border: none;
         border-radius: 8px;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         cursor: pointer;
         margin-top: 15px;
         transition: all 0.2s;
@@ -411,33 +412,32 @@
 
     /* Delete modal */
     .del-center { text-align: center; }
-    .del-icon { font-size: 3.2rem; color: #e74c3c; margin-bottom: 12px; }
+    .del-icon { font-size: 3rem; color: #f43f5e; margin-bottom: 12px; }
     .del-btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-    .btn-cancel { padding: 9px 20px; background: #333; color: #ccc; border: none; border-radius: 6px; cursor: pointer; }
-    .btn-confirm-del { padding: 9px 22px; background: #e74c3c; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+    .btn-cancel { padding: 9px 20px; background: var(--adm-bg-card); color: var(--adm-text-muted); border: 1px solid var(--adm-border); border-radius: 6px; cursor: pointer; }
+    .btn-cancel:hover { color: #fff; }
+    .btn-confirm-del { padding: 9px 22px; background: #f43f5e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
 </style>
 
-<div class="sale-wrap">
+<div class="sale-container">
 
-    <div class="sale-header">
-        <h2 class="sale-title">
-            <i class="bi bi-tag-fill" style="color:#e74c3c;"></i> Quản Lý Khuyến Mãi & Flash Sale
-        </h2>
-        <button class="btn-gold-add" onclick="openModal('modal-add-sale')">
+    <!-- TOP TOOLBAR -->
+    <div class="sale-top-bar">
+        <div>
+            <h2 class="sale-header-title">
+                <i class="bi bi-tag-fill"></i> Quản Lý Khuyến Mãi & Flash Sale
+            </h2>
+            <div class="sale-subtitle">Quản trị các chiến dịch ưu đãi giá, flash sale mùa cưới và sự kiện đặc biệt</div>
+        </div>
+        <button class="btn-gold-action" onclick="openModal('modal-add-sale')">
             <i class="bi bi-plus-circle-fill"></i> Tạo Chiến Dịch Giảm Giá
         </button>
     </div>
 
-    @if(session('success'))
-    <div class="sale-alert sale-alert-success">
-        <i class="bi bi-check-circle-fill"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
+    <!-- VALIDATION ERRORS -->
     @if(isset($errors) && $errors->any())
-    <div class="sale-alert" style="background:rgba(231,76,60,0.15); border:1px solid rgba(231,76,60,0.4); color:#e74c3c;">
-        <i class="bi bi-exclamation-triangle-fill"></i>
+    <div class="admin-alert admin-alert-error" style="margin-bottom: 20px;">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
         <div>
             @foreach($errors->all() as $err)
             <div>{{ $err }}</div>
@@ -451,36 +451,36 @@
         <div class="sale-stat-card">
             <div>
                 <div class="stat-label">Tổng Chiến Dịch</div>
-                <div class="stat-num">{{ $thongKe['tong'] }}</div>
+                <div class="stat-num" style="color: var(--adm-gold);">{{ $thongKe['tong'] }}</div>
             </div>
-            <div class="stat-badge-icon" style="background:rgba(197,160,89,0.15); color:#C5A059;">
+            <div class="stat-badge-icon" style="background:var(--adm-gold-glow); color:var(--adm-gold);">
                 <i class="bi bi-tags-fill"></i>
             </div>
         </div>
         <div class="sale-stat-card">
             <div>
                 <div class="stat-label">Đang Diễn Ra (Live)</div>
-                <div class="stat-num" style="color:#2ecc71;">{{ $thongKe['dang_chay'] }}</div>
+                <div class="stat-num" style="color:#22c55e;">{{ $thongKe['dang_chay'] }}</div>
             </div>
-            <div class="stat-badge-icon" style="background:rgba(46,204,113,0.15); color:#2ecc71;">
+            <div class="stat-badge-icon" style="background:rgba(34,197,94,0.12); color:#22c55e;">
                 <i class="bi bi-broadcast"></i>
             </div>
         </div>
         <div class="sale-stat-card">
             <div>
                 <div class="stat-label">Sắp Diễn Ra</div>
-                <div class="stat-num" style="color:#f1c40f;">{{ $thongKe['sap_dien_ra'] }}</div>
+                <div class="stat-num" style="color:#eab308;">{{ $thongKe['sap_dien_ra'] }}</div>
             </div>
-            <div class="stat-badge-icon" style="background:rgba(241,196,15,0.15); color:#f1c40f;">
+            <div class="stat-badge-icon" style="background:rgba(234,179,8,0.12); color:#eab308;">
                 <i class="bi bi-clock-history"></i>
             </div>
         </div>
         <div class="sale-stat-card">
             <div>
                 <div class="stat-label">Đã Kết Thúc / Tắt</div>
-                <div class="stat-num" style="color:#888;">{{ $thongKe['ket_thuc'] }}</div>
+                <div class="stat-num" style="color:var(--adm-text-dim);">{{ $thongKe['ket_thuc'] }}</div>
             </div>
-            <div class="stat-badge-icon" style="background:rgba(255,255,255,0.08); color:#888;">
+            <div class="stat-badge-icon" style="background:rgba(255,255,255,0.05); color:var(--adm-text-dim);">
                 <i class="bi bi-slash-circle"></i>
             </div>
         </div>
@@ -490,10 +490,10 @@
     <div class="sale-table-card">
         @if($giamGias->isEmpty())
         <div style="text-align:center; padding: 60px 20px;">
-            <i class="bi bi-ticket-perforated" style="font-size:3.5rem; color:#555;"></i>
-            <h4 style="color:#aaa; margin-top:15px;">Chưa có chương trình giảm giá nào</h4>
-            <p style="color:#777; font-size:0.9rem;">Hãy tạo chiến dịch Flash Sale đầu tiên để kích thích doanh số mua sắm áo vest!</p>
-            <button class="btn-gold-add" onclick="openModal('modal-add-sale')" style="margin-top:10px;">
+            <i class="bi bi-ticket-perforated" style="font-size:3.5rem; color:var(--adm-text-dim);"></i>
+            <h4 style="color:var(--adm-text-main); margin-top:15px; font-family:var(--adm-font-heading);">Chưa có chương trình giảm giá nào</h4>
+            <p style="color:var(--adm-text-muted); font-size:0.88rem;">Hãy tạo chiến dịch Flash Sale đầu tiên để kích thích doanh số mua sắm áo vest!</p>
+            <button class="btn-gold-action" onclick="openModal('modal-add-sale')" style="margin-top:10px;">
                 <i class="bi bi-plus-circle-fill"></i> Tạo Khuyến Mãi Ngay
             </button>
         </div>
@@ -501,7 +501,7 @@
         <table class="sale-table">
             <thead>
                 <tr>
-                    <th style="width: 50px;">#ID</th>
+                    <th style="width: 60px;">#ID</th>
                     <th>Tên Chương Trình</th>
                     <th>Mức Giảm</th>
                     <th>Phạm Vi Áp Dụng</th>
@@ -519,9 +519,9 @@
                     $isUpcoming = $g->trang_thai && $g->thoi_gian_bat_dau > $now;
                 @endphp
                 <tr>
-                    <td style="color:#666; font-weight:600;">#{{ $g->id }}</td>
+                    <td style="color:var(--adm-text-dim); font-weight:600;">#{{ $g->id }}</td>
                     <td>
-                        <strong style="color:#fff; font-size:0.95rem;">{{ $g->tieu_de }}</strong>
+                        <strong style="color:var(--adm-text-main); font-size:0.92rem;">{{ $g->tieu_de }}</strong>
                     </td>
                     <td>
                         <span class="discount-pill"><i class="bi bi-arrow-down-short"></i> -{{ $g->phan_tram_giam }}%</span>
@@ -534,14 +534,14 @@
                         @endif
                     </td>
                     <td>
-                        <div style="font-size:0.83rem; color:#bbb;">
-                            <div><i class="bi bi-calendar-event" style="color:#C5A059;"></i> {{ $g->thoi_gian_bat_dau ? $g->thoi_gian_bat_dau->format('d/m/Y H:i') : '--' }}</div>
-                            <div style="color:#777; margin-top:2px;">đến {{ $g->thoi_gian_ket_thuc ? $g->thoi_gian_ket_thuc->format('d/m/Y H:i') : '--' }}</div>
+                        <div style="font-size:0.82rem; color:var(--adm-text-muted);">
+                            <div><i class="bi bi-calendar-event" style="color:var(--adm-gold);"></i> {{ $g->thoi_gian_bat_dau ? $g->thoi_gian_bat_dau->format('d/m/Y H:i') : '--' }}</div>
+                            <div style="color:var(--adm-text-dim); margin-top:2px;">đến {{ $g->thoi_gian_ket_thuc ? $g->thoi_gian_ket_thuc->format('d/m/Y H:i') : '--' }}</div>
                         </div>
                     </td>
                     <td>
                         @if($isLive)
-                            <span class="status-badge status-active"><i class="bi bi-broadcast"></i> Đang Chạy (Live)</span>
+                            <span class="status-badge status-active"><i class="bi bi-broadcast"></i> Đang Chạy</span>
                         @elseif($isUpcoming)
                             <span class="status-badge status-upcoming"><i class="bi bi-hourglass-split"></i> Sắp Diễn Ra</span>
                         @else
@@ -553,9 +553,9 @@
                             @csrf
                             <button type="submit" class="btn-action-icon" title="{{ $g->trang_thai ? 'Bấm để Tạm dừng' : 'Bấm để Kích hoạt' }}">
                                 @if($g->trang_thai)
-                                    <i class="bi bi-toggle-on" style="color:#2ecc71; font-size:1.3rem;"></i>
+                                    <i class="bi bi-toggle-on" style="color:#22c55e; font-size:1.3rem;"></i>
                                 @else
-                                    <i class="bi bi-toggle-off" style="color:#666; font-size:1.3rem;"></i>
+                                    <i class="bi bi-toggle-off" style="color:var(--adm-text-dim); font-size:1.3rem;"></i>
                                 @endif
                             </button>
                         </form>
@@ -594,7 +594,7 @@
 <div class="sale-modal-overlay" id="modal-add-sale">
     <div class="sale-modal">
         <button class="sale-modal-close" onclick="closeModal('modal-add-sale')">&times;</button>
-        <h3><i class="bi bi-tag-fill" style="color:#e74c3c;"></i> Tạo Chiến Dịch Giảm Giá Mới</h3>
+        <h3><i class="bi bi-tag-fill" style="color:#f43f5e;"></i> Tạo Chiến Dịch Giảm Giá Mới</h3>
 
         <form action="{{ route('giamgia.luuthem') }}" method="POST">
             @csrf
@@ -640,9 +640,9 @@
                     <label class="suit-item-check">
                         <input type="checkbox" name="san_pham_ids[]" value="{{ $sp->id }}">
                         <img src="{{ asset('images/' . ($sp->hinh_anh ?: 'placeholder.jpg')) }}" class="suit-thumb" alt="sp" onerror="this.src='https://via.placeholder.com/40'">
-                        <div style="flex:1; font-size:0.85rem;">
-                            <div style="color:#eee; font-weight:600;">{{ $sp->ten_sp }}</div>
-                            <div style="color:#888; font-size:0.76rem;">{{ $sp->danhMuc->ten_danh_muc ?? 'Áo Vest' }} • {{ number_format($sp->gia_ban) }} VNĐ</div>
+                        <div style="flex:1; font-size:0.82rem;">
+                            <div style="color:var(--adm-text-main); font-weight:600;">{{ $sp->ten_sp }}</div>
+                            <div style="color:var(--adm-text-muted); font-size:0.75rem;">{{ $sp->danhMuc->ten_danh_muc ?? 'Áo Vest' }} • {{ number_format($sp->gia_ban) }} VNĐ</div>
                         </div>
                     </label>
                     @endforeach
@@ -706,9 +706,9 @@
                     <label class="suit-item-check">
                         <input type="checkbox" name="san_pham_ids[]" value="{{ $sp->id }}" class="edit-sale-suit-checkbox">
                         <img src="{{ asset('images/' . ($sp->hinh_anh ?: 'placeholder.jpg')) }}" class="suit-thumb" alt="sp" onerror="this.src='https://via.placeholder.com/40'">
-                        <div style="flex:1; font-size:0.85rem;">
-                            <div style="color:#eee; font-weight:600;">{{ $sp->ten_sp }}</div>
-                            <div style="color:#888; font-size:0.76rem;">{{ $sp->danhMuc->ten_danh_muc ?? 'Áo Vest' }} • {{ number_format($sp->gia_ban) }} VNĐ</div>
+                        <div style="flex:1; font-size:0.82rem;">
+                            <div style="color:var(--adm-text-main); font-weight:600;">{{ $sp->ten_sp }}</div>
+                            <div style="color:var(--adm-text-muted); font-size:0.75rem;">{{ $sp->danhMuc->ten_danh_muc ?? 'Áo Vest' }} • {{ number_format($sp->gia_ban) }} VNĐ</div>
                         </div>
                     </label>
                     @endforeach
@@ -728,8 +728,8 @@
         <button class="sale-modal-close" onclick="closeModal('modal-del-sale')">&times;</button>
         <div class="del-center">
             <i class="bi bi-exclamation-triangle-fill del-icon"></i>
-            <h4 style="color:#f0f0f0; margin-bottom:10px;">Xác Nhận Xóa Chiến Dịch</h4>
-            <p id="del-sale-text" style="color:#aaa; font-size:0.9rem; line-height:1.5;">Bạn có chắc muốn xóa chương trình giảm giá này?</p>
+            <h4 style="color:var(--adm-text-main); margin-bottom:10px; font-family:var(--adm-font-heading);">Xác Nhận Xóa Chiến Dịch</h4>
+            <p id="del-sale-text" style="color:var(--adm-text-muted); font-size:0.88rem; line-height:1.5;">Bạn có chắc muốn xóa chương trình giảm giá này?</p>
             <form id="form-del-sale" action="" method="POST">
                 @csrf
                 <div class="del-btn-group">
@@ -795,7 +795,6 @@
             toggleEditPicker(true);
         }
 
-        // Tích chọn checkbox sản phẩm cũ
         document.querySelectorAll('.edit-sale-suit-checkbox').forEach(function(cb) {
             var val = parseInt(cb.value);
             cb.checked = spIds.includes(val);
@@ -809,7 +808,7 @@
         var ten = btn.getAttribute('data-ten');
 
         document.getElementById('form-del-sale').action = '{{ url("/giam-gia") }}/' + id + '/xoa';
-        document.getElementById('del-sale-text').innerHTML = 'Bạn có chắc chắn muốn xóa chiến dịch <strong style="color:#C5A059;">"' + ten + '"</strong>?<br><span style="font-size:0.8rem; color:#777;">Giá của các sản phẩm sẽ được khôi phục về giá bán niêm yết ban đầu.</span>';
+        document.getElementById('del-sale-text').innerHTML = 'Bạn có chắc chắn muốn xóa chiến dịch <strong style="color:var(--adm-gold);">"' + ten + '"</strong>?<br><span style="font-size:0.8rem; color:var(--adm-text-dim);">Giá của các sản phẩm sẽ được khôi phục về giá bán niêm yết ban đầu.</span>';
 
         openModal('modal-del-sale');
     }

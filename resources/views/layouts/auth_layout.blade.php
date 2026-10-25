@@ -5,11 +5,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@yield('title', 'Kingsman Vietnam')</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Google Fonts: Playfair Display + Plus Jakarta Sans (Full Vietnamese Support) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap Icons & Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
 
     <style>
+        :root {
+            --auth-bg-main: #111317;
+            --auth-bg-surface: #141720;
+            --auth-bg-card: #181B24;
+            --auth-border: rgba(255, 255, 255, 0.08);
+            --auth-border-focus: rgba(212, 178, 111, 0.4);
+            --auth-gold: #D4B26F;
+            --auth-gold-light: #E8CA8C;
+            --auth-gold-glow: rgba(212, 178, 111, 0.15);
+            --auth-text-main: #F1F5F9;
+            --auth-text-muted: #94A3B8;
+            --auth-text-dim: #64748B;
+            --auth-font-heading: 'Playfair Display', Georgia, serif;
+            --auth-font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,9 +39,9 @@
         }
 
         body {
-            background-color: #000;
-            color: #f0f0f0;
-            font-family: 'Montserrat', sans-serif;
+            background-color: var(--auth-bg-main);
+            color: var(--auth-text-main);
+            font-family: var(--auth-font-body);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -27,169 +49,168 @@
 
         /* TOP BAR */
         .top-bar {
-            background-color: #0a0a0a;
-            padding: 10px 0;
-            border-bottom: 1px solid #222;
-            font-size: 0.85rem;
+            background-color: #0c0e12;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--auth-border);
+            font-size: 0.78rem;
+            color: var(--auth-text-muted);
         }
 
         .top-bar a {
-            color: #a0a0a0;
+            color: var(--auth-text-muted);
             text-decoration: none;
-            margin: 0 15px;
-            transition: color 0.3s;
+            margin: 0 12px;
+            transition: color 0.2s;
         }
 
         .top-bar a:hover {
-            color: #d4af37;
-        }
-
-        .top-bar span {
-            color: #a0a0a0;
+            color: var(--auth-gold);
         }
 
         /* NAVBAR */
         .navbar {
-            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
-            border-bottom: 2px solid #d4af37;
-            padding: 18px 0;
-            box-shadow: 0 2px 15px rgba(212, 175, 55, 0.15);
+            background: var(--auth-bg-surface);
+            border-bottom: 1px solid var(--auth-border);
+            padding: 12px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
         }
 
         .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            color: #d4af37 !important;
-            letter-spacing: 3px;
+            font-family: var(--auth-font-heading);
+            font-size: 1.4rem;
+            color: var(--auth-gold) !important;
+            letter-spacing: 2px;
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s;
         }
 
         .navbar-brand:hover {
-            color: #f0c864 !important;
+            color: var(--auth-gold-light) !important;
         }
 
         /* CARD */
         .auth-card {
-            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
-            border: 1px solid #d4af37;
-            border-radius: 15px;
+            background: var(--auth-bg-surface);
+            border: 1px solid var(--auth-border);
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(212, 175, 55, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.3s;
+        }
+
+        .auth-card:hover {
+            border-color: var(--auth-border-focus);
         }
 
         .auth-card-header {
-            background: linear-gradient(135deg, #d4af37, #c19b2f);
-            color: #000;
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
+            background: var(--auth-bg-card);
+            color: var(--auth-gold);
+            font-family: var(--auth-font-heading);
+            font-size: 1.25rem;
             font-weight: 700;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-align: center;
             padding: 20px;
+            border-bottom: 1px solid var(--auth-border);
         }
 
         .auth-card-body {
-            padding: 35px;
+            padding: 32px 30px;
         }
 
         /* FORM */
         .form-label {
-            color: #a0a0a0;
-            font-size: 0.85rem;
+            color: var(--auth-text-main);
+            font-size: 0.82rem;
             font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
         .form-control {
-            background: #0f0f0f !important;
-            border: 1px solid #444 !important;
+            background: var(--auth-bg-card) !important;
+            border: 1px solid var(--auth-border) !important;
             border-radius: 8px !important;
-            color: #f0f0f0 !important;
-            padding: 12px 15px;
-            transition: all 0.3s;
+            color: var(--auth-text-main) !important;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            transition: all 0.2s;
         }
 
         .form-control:focus {
-            border-color: #d4af37 !important;
-            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15) !important;
+            border-color: var(--auth-gold) !important;
+            box-shadow: 0 0 0 3px var(--auth-gold-glow) !important;
+            background: #1c202b !important;
+            color: #fff !important;
         }
 
         .form-control::placeholder {
-            color: #555;
+            color: var(--auth-text-dim);
         }
 
-        /* ALERT */
+        /* ALERTS */
         .alert-success {
-            background: rgba(40, 167, 69, 0.15) !important;
-            border: 1px solid rgba(40, 167, 69, 0.3) !important;
-            color: #75d98b !important;
+            background: rgba(34, 197, 94, 0.12) !important;
+            border: 1px solid rgba(34, 197, 94, 0.3) !important;
+            color: #22c55e !important;
             border-radius: 8px;
+            font-size: 0.85rem;
         }
 
         .alert-danger {
-            background: rgba(220, 53, 69, 0.15) !important;
-            border: 1px solid rgba(220, 53, 69, 0.3) !important;
-            color: #f5a0a8 !important;
+            background: rgba(244, 63, 94, 0.12) !important;
+            border: 1px solid rgba(244, 63, 94, 0.3) !important;
+            color: #f43f5e !important;
             border-radius: 8px;
+            font-size: 0.85rem;
         }
 
         /* BUTTON */
         .btn-gold {
-            background: linear-gradient(135deg, #d4af37, #c19b2f);
-            color: #000;
+            background: linear-gradient(135deg, var(--auth-gold-light), var(--auth-gold));
+            color: #0b0b0b;
             border: none;
-            border-radius: 30px;
+            border-radius: 8px;
             font-weight: 700;
-            font-size: 1rem;
-            letter-spacing: 1px;
-            padding: 13px;
+            font-size: 0.92rem;
+            letter-spacing: 0.8px;
+            padding: 11px;
             width: 100%;
-            transition: all 0.3s;
-            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 14px rgba(212, 178, 111, 0.2);
         }
 
         .btn-gold:hover {
-            background: linear-gradient(135deg, #e0c148, #d4af37);
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+            box-shadow: 0 6px 20px rgba(212, 178, 111, 0.35);
             color: #000;
         }
 
         .link-gold {
-            color: #d4af37;
+            color: var(--auth-gold);
             font-weight: 600;
             text-decoration: none;
-            transition: color 0.3s;
+            transition: color 0.2s;
         }
 
         .link-gold:hover {
-            color: #f0c864;
+            color: var(--auth-gold-light);
             text-decoration: underline;
         }
 
         /* FOOTER */
         footer {
-            background-color: #0a0a0a;
-            border-top: 2px solid #d4af37;
-            padding: 20px 0;
+            background-color: #0c0e12;
+            border-top: 1px solid var(--auth-border);
+            padding: 16px 0;
             margin-top: auto;
-        }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #1a1a1a;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #d4af37;
-            border-radius: 5px;
+            color: var(--auth-text-dim);
+            font-size: 0.8rem;
         }
     </style>
 </head>
@@ -201,11 +222,11 @@
         <div class="container-fluid px-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <span><i class="bi bi-clock"></i> Thời gian làm việc: Hàng ngày từ 9h - 21h</span>
+                    <span><i class="bi bi-clock me-1"></i> Thời gian phục vụ: Hàng ngày từ 9:00 - 21:00</span>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <a href="tel:0901234567"><i class="bi bi-telephone"></i> 0901 234 567</a>
-                    <a href="mailto:vip@kingsman.vn"><i class="bi bi-envelope"></i> vip@kingsman.vn</a>
+                    <a href="tel:0901234567"><i class="bi bi-telephone me-1"></i> 0901 234 567</a>
+                    <a href="mailto:vip@kingsman.vn"><i class="bi bi-envelope me-1"></i> vip@kingsman.vn</a>
                 </div>
             </div>
         </div>
@@ -214,15 +235,15 @@
     {{-- NAVBAR --}}
     <nav class="navbar">
         <div class="container justify-content-center">
-            <a class="navbar-brand" href="{{ url('/dang-nhap') }}">
+            <a class="navbar-brand" href="{{ url('/') }}">
                 <i class="bi bi-gem"></i> KINGSMAN
             </a>
         </div>
     </nav>
 
     {{-- CONTENT --}}
-    <div class="container grow d-flex align-items-center justify-content-center py-5">
-        <div style="width: 100%; max-width: 480px;">
+    <div class="container d-flex align-items-center justify-content-center py-5" style="flex: 1;">
+        <div style="width: 100%; max-width: 450px;">
             @yield('content')
         </div>
     </div>
@@ -230,7 +251,7 @@
     {{-- FOOTER --}}
     <footer>
         <div class="container text-center">
-            <small style="color:#666;">&copy; 2026 Kingsman Bespoke. All rights reserved.</small>
+            &copy; {{ date('Y') }} Kingsman Vietnam — Savile Row Heritage Tailoring. All rights reserved.
         </div>
     </footer>
 

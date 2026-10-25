@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@yield('title', 'Kingsman Vietnam')</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
 
@@ -18,88 +20,106 @@
         }
 
         body {
-            background-color: #000;
-            color: #f0f0f0;
-            font-family: 'Montserrat', sans-serif;
+            background-color: #111317;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
+        h1, h2, h3, .navbar-brand {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+
         /* TOP BAR */
         .top-bar {
-            background-color: #0a0a0a;
-            padding: 10px 0;
-            border-bottom: 1px solid #222;
-            font-size: 0.85rem;
+            background-color: #0c0e12;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.78rem;
+            color: #94a3b8;
         }
 
         .top-bar a {
-            color: #a0a0a0;
+            color: #94a3b8;
             text-decoration: none;
-            transition: color 0.3s;
-            margin: 0 15px;
+            transition: color 0.25s;
+            margin: 0 12px;
         }
 
         .top-bar a:hover {
-            color: #d4af37;
+            color: #D4B26F;
         }
 
         .top-bar span {
-            color: #a0a0a0;
+            color: #94a3b8;
         }
 
         /* NAVBAR */
         .navbar {
-            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
-            border-bottom: 2px solid #d4af37;
-            padding: 18px 0;
-            box-shadow: 0 2px 15px rgba(212, 175, 55, 0.15);
+            background: #141720 !important;
+            border-bottom: 1px solid rgba(212, 178, 111, 0.25) !important;
+            padding: 8px 0 !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
         }
 
         .navbar-brand {
-            font-family: 'Playfair Display', serif;
-            font-size: 2rem;
-            color: #d4af37 !important;
-            letter-spacing: 3px;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.35rem !important;
+            color: #D4B26F !important;
+            letter-spacing: 2px;
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            text-shadow: none !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 !important;
+            margin-right: 22px;
             transition: all 0.3s;
+        }
+
+        .navbar-brand i {
+            font-size: 1.15rem;
         }
 
         .navbar-brand:hover {
-            color: #f0c864 !important;
-            text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            color: #E8CA8C !important;
         }
 
         .nav-link-main {
-            color: #f0f0f0 !important;
-            font-weight: 500;
-            font-size: 0.95rem;
-            padding: 10px 18px !important;
+            color: #cbd5e1 !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            font-weight: 500 !important;
+            font-size: 0.83rem !important;
+            padding: 6px 11px !important;
+            margin: 0 1px;
+            border-radius: 6px;
+            white-space: nowrap !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
             position: relative;
-            border-radius: 4px;
-            transition: all 0.3s;
+            transition: all 0.25s ease;
         }
 
-        .nav-link-main::after {
-            content: '';
-            position: absolute;
-            bottom: 5px;
-            left: 18px;
-            width: 0;
-            height: 2px;
-            background: #d4af37;
-            transition: width 0.3s;
+        .nav-link-main i {
+            font-size: 0.88rem;
+            color: #94a3b8;
+            transition: color 0.25s;
         }
 
         .nav-link-main:hover {
-            color: #d4af37 !important;
-            background: rgba(212, 175, 55, 0.1);
+            color: #D4B26F !important;
+            background: rgba(212, 178, 111, 0.1);
         }
 
-        .nav-link-main:hover::after {
-            width: calc(100% - 36px);
+        .nav-link-main:hover i {
+            color: #D4B26F;
+        }
+
+        .nav-link-main::after {
+            display: none !important;
         }
 
         /* DROPDOWN */
@@ -109,62 +129,70 @@
         }
 
         .dropdown-menu {
-            background-color: #1a1a1a;
-            border: 1px solid #d4af37;
-            border-radius: 4px;
-            padding: 0.5rem 0;
+            background-color: #161922;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 6px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .dropdown-item {
-            color: #c0c0c0;
-            padding: 10px 20px;
-            transition: all 0.3s;
+            color: #cbd5e1;
+            font-size: 0.82rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
 
         .dropdown-item:hover {
-            background-color: #d4af37;
-            color: #000;
+            background-color: rgba(212, 178, 111, 0.15);
+            color: #D4B26F;
         }
 
         /* BUTTONS */
         .btn-action-gold {
-            color: #d4af37 !important;
-            border: 2px solid #d4af37 !important;
+            color: #D4B26F !important;
+            border: 1px solid rgba(212, 178, 111, 0.5) !important;
             background: transparent;
-            border-radius: 25px;
-            font-size: 0.9rem;
+            border-radius: 20px;
+            font-size: 0.8rem !important;
             font-weight: 600;
-            padding: 9px 22px;
-            transition: all 0.3s;
-            letter-spacing: 0.5px;
+            padding: 5px 14px !important;
+            transition: all 0.25s;
+            letter-spacing: 0.3px;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             text-decoration: none;
+            white-space: nowrap;
         }
 
         .btn-action-gold:hover {
-            background: #d4af37 !important;
-            color: #000 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+            background: #D4B26F !important;
+            color: #111317 !important;
+            box-shadow: 0 3px 12px rgba(212, 178, 111, 0.25);
         }
 
         /* USER INFO */
         .user-info {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 10px;
-            color: #c0c0c0;
-            font-size: 0.9rem;
-            padding: 8px 16px;
-            background: rgba(42, 42, 42, 0.5);
-            border-radius: 25px;
-            border: 1px solid #333;
+            gap: 6px;
+            color: #cbd5e1;
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            white-space: nowrap;
         }
 
         .user-info strong {
-            color: #d4af37;
+            color: #D4B26F;
+            font-weight: 600;
         }
 
         /* CART */
@@ -324,7 +352,7 @@
             </button>
 
             <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-                <ul class="navbar-nav">
+                <ul class="navbar-nav align-items-center">
                     <li class="nav-item">
                         <a href="{{ url('/') }}" class="nav-link nav-link-main">
                             <i class="bi bi-house-door"></i> Trang chủ
@@ -342,33 +370,41 @@
                     </li>
 
                     @if(Auth::check() && (Auth::user()->vai_tro == 'admin' || Auth::user()->quyen == 'Admin'))
-                        <li class="nav-item">
-                            <a href="{{ url('/san-pham/danh-sach') }}" class="nav-link nav-link-main">
-                                <i class="bi bi-box-seam"></i> Quản Lý Sản Phẩm
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('bosuutap.danhsach') }}" class="nav-link nav-link-main">
-                                <i class="bi bi-collection-play"></i> Bộ Sưu Tập
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('giamgia.danhsach') }}" class="nav-link nav-link-main">
-                                <i class="bi bi-tag-fill" style="color:#e74c3c;"></i> Khuyến Mãi
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('lichhen.quanly') }}" class="nav-link nav-link-main">
-                                <i class="bi bi-calendar2-check"></i> Quản Lý Lịch Hẹn
-                            </a>
-                        </li>
-
+                        {{-- MENU QUẢN LÝ CỬA HÀNG --}}
                         <li class="nav-item dropdown dropdown-hover">
                             <a class="nav-link nav-link-main dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                <i class="bi bi-people"></i> Quản Lý Người Dùng
+                                <i class="bi bi-shop"></i> Quản Lý Cửa Hàng
                             </a>
                             <ul class="dropdown-menu">
-                                {{-- Chỗ 1: đổi url('/nguoi-dung') → route('nguoidung.index') --}}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url('/san-pham/danh-sach') }}">
+                                        <i class="bi bi-box-seam me-2"></i>Quản Lý Sản Phẩm
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('bosuutap.danhsach') }}">
+                                        <i class="bi bi-collection-play me-2"></i>Bộ Sưu Tập
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('giamgia.danhsach') }}">
+                                        <i class="bi bi-tag-fill me-2 text-danger"></i>Khuyến Mãi
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('lichhen.quanly') }}">
+                                        <i class="bi bi-calendar2-check me-2"></i>Quản Lý Lịch Hẹn
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        {{-- MENU HỆ THỐNG & THỐNG KÊ --}}
+                        <li class="nav-item dropdown dropdown-hover">
+                            <a class="nav-link nav-link-main dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                <i class="bi bi-gear-wide-connected"></i> Hệ Thống & Thống Kê
+                            </a>
+                            <ul class="dropdown-menu">
                                 <li>
                                     <a class="dropdown-item" href="{{ route('nguoidung.index') }}">
                                         <i class="bi bi-person-lines-fill me-2"></i>Danh Sách Tài Khoản
@@ -379,24 +415,15 @@
                                         <i class="bi bi-award me-2"></i>Chính Sách Hạng VIP
                                     </a>
                                 </li>
-                            </ul>
-                        </li>
-
-                        <li class="nav-item dropdown dropdown-hover">
-                            <a class="nav-link nav-link-main dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                <i class="bi bi-graph-up-arrow"></i> Thống kê
-                            </a>
-                            <ul class="dropdown-menu">
-                                {{-- Chỗ 2: đổi url('/thong-ke/doanh-thu') → route('thongke.doanhthu') --}}
+                                <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.08);"></li>
                                 <li>
                                     <a class="dropdown-item" href="{{ route('thongke.doanhthu') }}">
-                                        <i class="bi bi-bar-chart me-2"></i>Doanh thu
+                                        <i class="bi bi-bar-chart me-2"></i>Thống Kê Doanh Thu
                                     </a>
                                 </li>
-                                {{-- Chỗ 3: đổi url('/thong-ke/don-hang') → route('thongke.donhang') --}}
                                 <li>
                                     <a class="dropdown-item" href="{{ route('thongke.donhang') }}">
-                                        <i class="bi bi-receipt-cutoff me-2"></i>Đơn hàng
+                                        <i class="bi bi-receipt-cutoff me-2"></i>Thống Kê Đơn Hàng
                                     </a>
                                 </li>
                             </ul>
@@ -404,13 +431,13 @@
                     @endif
                 </ul>
 
-                <div class="d-flex align-items-center gap-4 ms-auto justify-content-end">
+                <div class="d-flex align-items-center gap-2 ms-auto justify-content-end">
                     @if(Auth::check())
                     <div class="user-info">
                         <i class="bi bi-person-circle"></i>
                         <span>Xin chào, <strong>{{ Auth::user()->name }}</strong></span>
                     </div>
-                    <a href="{{ url('/dang-xuat') }}" class="btn-action-gold" style="margin-left: 12px;margin-right: 12px;">
+                    <a href="{{ url('/dang-xuat') }}" class="btn-action-gold ms-1">
                         <i class="bi bi-box-arrow-right"></i> Đăng xuất
                     </a>
                     @else

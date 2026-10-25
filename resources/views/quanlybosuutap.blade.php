@@ -1,116 +1,166 @@
-@extends('layouts.default_layout')
+@extends('layouts.admin_layout')
 
-@section('title', 'Quản Lý Bộ Sưu Tập Thời Trang - Kingsman')
+@section('title', 'Quản Lý Bộ Sưu Tập Thời Trang - Kingsman Admin')
+@section('page_name', 'Quản Lý Bộ Sưu Tập')
 
 @section('content')
 <style>
-    .bst-wrap {
-        max-width: 1300px;
-        margin: 0 auto;
-        padding: 10px 15px 50px;
+    /* Executive Luxury Dark Palette for Bộ Sưu Tập */
+    .bst-container {
+        padding: 4px 0 40px;
     }
 
-    /* Header */
-    .bst-header {
+    /* Page Header Toolbar */
+    .bst-top-bar {
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid rgba(197, 160, 89, 0.25);
+        gap: 16px;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid var(--adm-border);
     }
 
-    .bst-title {
-        font-family: 'Playfair Display', serif;
-        color: #C5A059;
-        font-size: 1.85rem;
+    .bst-header-title {
+        font-family: var(--adm-font-heading);
+        color: var(--adm-text-main);
+        font-size: 1.6rem;
+        font-weight: 700;
         margin: 0;
         display: flex;
         align-items: center;
         gap: 10px;
     }
 
-    .btn-gold-add {
-        background: linear-gradient(135deg, #d4af37, #c19b2f);
+    .bst-header-title i {
+        color: var(--adm-gold);
+    }
+
+    .bst-subtitle {
+        color: var(--adm-text-muted);
+        font-size: 0.82rem;
+        margin-top: 4px;
+    }
+
+    .btn-gold-action {
+        background: linear-gradient(135deg, var(--adm-gold-light), var(--adm-gold));
         color: #0b0b0b;
         font-weight: 700;
         border: none;
-        border-radius: 25px;
-        padding: 10px 22px;
+        border-radius: 8px;
+        padding: 9px 20px;
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        font-size: 0.84rem;
         cursor: pointer;
         transition: all 0.25s ease;
         text-decoration: none;
+        box-shadow: 0 4px 14px rgba(212, 178, 111, 0.2);
     }
 
-    .btn-gold-add:hover {
+    .btn-gold-action:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(212, 175, 55, 0.35);
+        box-shadow: 0 6px 20px rgba(212, 178, 111, 0.35);
         color: #000;
     }
 
-    /* Alerts */
-    .bst-alert {
-        padding: 12px 18px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 0.92rem;
+    /* KPI Summary Cards */
+    .bst-kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
     }
 
-    .bst-alert-success {
-        background: rgba(46, 204, 113, 0.15);
-        border: 1px solid rgba(46, 204, 113, 0.4);
-        color: #2ecc71;
+    .bst-kpi-card {
+        background: var(--adm-bg-surface);
+        border: 1px solid var(--adm-border);
+        border-radius: 10px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .bst-kpi-card:hover {
+        border-color: var(--adm-border-focus);
+        transform: translateY(-2px);
+    }
+
+    .bst-kpi-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--adm-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 4px;
+    }
+
+    .bst-kpi-val {
+        font-family: var(--adm-font-heading);
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--adm-gold);
+    }
+
+    .bst-kpi-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        background: var(--adm-gold-glow);
+        color: var(--adm-gold);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
     }
 
     /* Grid danh sách BST */
     .bst-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-        gap: 25px;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 22px;
     }
 
     .bst-card {
-        background: #141414;
-        border: 1px solid #2a2a2a;
-        border-radius: 14px;
+        background: var(--adm-bg-surface);
+        border: 1px solid var(--adm-border);
+        border-radius: 12px;
         overflow: hidden;
-        transition: all 0.3s;
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
         display: flex;
         flex-direction: column;
     }
 
     .bst-card:hover {
-        border-color: #C5A059;
+        border-color: var(--adm-gold);
         transform: translateY(-4px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
     }
 
     .bst-banner {
         width: 100%;
-        height: 190px;
+        height: 180px;
         object-fit: cover;
-        background: #202020;
+        background: #181b24;
         display: block;
+        border-bottom: 1px solid var(--adm-border);
     }
 
     .bst-banner-placeholder {
         width: 100%;
-        height: 190px;
-        background: linear-gradient(135deg, #1c1c1c, #2a2519);
+        height: 180px;
+        background: linear-gradient(135deg, #181B24, #12141A);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        color: #C5A059;
+        color: var(--adm-gold);
         font-size: 2.2rem;
+        border-bottom: 1px solid var(--adm-border);
     }
 
     .bst-card-body {
@@ -121,16 +171,16 @@
     }
 
     .bst-name {
-        font-family: 'Playfair Display', serif;
-        font-size: 1.3rem;
-        color: #f5f5f5;
+        font-family: var(--adm-font-heading);
+        font-size: 1.25rem;
+        color: var(--adm-text-main);
         margin-bottom: 8px;
         font-weight: 700;
     }
 
     .bst-desc {
-        color: #999;
-        font-size: 0.88rem;
+        color: var(--adm-text-muted);
+        font-size: 0.84rem;
         line-height: 1.55;
         margin-bottom: 15px;
         min-height: 40px;
@@ -141,49 +191,49 @@
         align-items: center;
         justify-content: space-between;
         padding: 10px 14px;
-        background: #1a1a1a;
+        background: var(--adm-bg-card);
         border-radius: 8px;
-        border: 1px solid #282828;
-        margin-bottom: 15px;
+        border: 1px solid var(--adm-border);
+        margin-bottom: 14px;
     }
 
     .bst-count {
-        color: #C5A059;
+        color: var(--adm-gold);
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 0.88rem;
     }
 
     .bst-suits-list {
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        margin-bottom: 20px;
+        margin-bottom: 18px;
         max-height: 80px;
         overflow-y: auto;
     }
 
     .suit-tag {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #ddd;
-        padding: 2px 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--adm-border);
+        color: #CBD5E1;
+        padding: 3px 8px;
         border-radius: 4px;
-        font-size: 0.76rem;
+        font-size: 0.74rem;
     }
 
     .bst-actions {
         display: flex;
         gap: 8px;
         margin-top: auto;
-        padding-top: 15px;
-        border-top: 1px solid #222;
+        padding-top: 14px;
+        border-top: 1px solid var(--adm-border);
     }
 
     .btn-card-action {
         flex: 1;
-        padding: 8px 12px;
+        padding: 7px 10px;
         border-radius: 6px;
-        font-size: 0.83rem;
+        font-size: 0.8rem;
         font-weight: 600;
         cursor: pointer;
         text-align: center;
@@ -193,46 +243,46 @@
         justify-content: center;
         gap: 5px;
         transition: all 0.2s;
-        border: none;
+        border: 1px solid transparent;
     }
 
     .btn-act-view {
-        background: rgba(197, 160, 89, 0.15);
-        color: #C5A059;
-        border: 1px solid rgba(197, 160, 89, 0.35);
+        background: rgba(212, 178, 111, 0.12);
+        color: var(--adm-gold);
+        border-color: rgba(212, 178, 111, 0.3);
     }
     .btn-act-view:hover {
-        background: #C5A059;
+        background: var(--adm-gold);
         color: #000;
     }
 
     .btn-act-edit {
-        background: rgba(52, 152, 219, 0.15);
-        color: #3498db;
-        border: 1px solid rgba(52, 152, 219, 0.35);
+        background: rgba(56, 189, 248, 0.12);
+        color: #38bdf8;
+        border-color: rgba(56, 189, 248, 0.3);
     }
     .btn-act-edit:hover {
-        background: #3498db;
-        color: #fff;
+        background: #38bdf8;
+        color: #000;
     }
 
     .btn-act-del {
-        background: rgba(231, 76, 60, 0.15);
-        color: #e74c3c;
-        border: 1px solid rgba(231, 76, 60, 0.35);
+        background: rgba(244, 63, 94, 0.12);
+        color: #f43f5e;
+        border-color: rgba(244, 63, 94, 0.3);
     }
     .btn-act-del:hover {
-        background: #e74c3c;
+        background: #f43f5e;
         color: #fff;
     }
 
-    /* Modals */
+    /* Modal Dark Theme */
     .bst-modal-overlay {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 1050;
+        background: rgba(0, 0, 0, 0.82);
+        z-index: 1060;
         align-items: center;
         justify-content: center;
         padding: 20px;
@@ -244,16 +294,16 @@
     }
 
     .bst-modal {
-        background: #181818;
-        border: 1px solid #333;
-        border-radius: 16px;
+        background: var(--adm-bg-surface);
+        border: 1px solid var(--adm-border-focus);
+        border-radius: 14px;
         width: 100%;
-        max-width: 680px;
+        max-width: 660px;
         max-height: 90vh;
         overflow-y: auto;
-        padding: 28px;
+        padding: 26px;
         position: relative;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     }
 
     .bst-modal-close {
@@ -262,8 +312,8 @@
         right: 20px;
         background: none;
         border: none;
-        color: #888;
-        font-size: 1.6rem;
+        color: var(--adm-text-muted);
+        font-size: 1.5rem;
         cursor: pointer;
         line-height: 1;
         transition: color 0.2s;
@@ -273,13 +323,13 @@
     }
 
     .bst-modal h3 {
-        font-family: 'Playfair Display', serif;
-        color: #C5A059;
-        font-size: 1.45rem;
-        margin-bottom: 22px;
+        font-family: var(--adm-font-heading);
+        color: var(--adm-gold);
+        font-size: 1.35rem;
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
-        gap: 9px;
+        gap: 8px;
     }
 
     .form-group {
@@ -288,26 +338,27 @@
 
     .form-label {
         display: block;
-        color: #ccc;
-        font-size: 0.86rem;
+        color: var(--adm-text-main);
+        font-size: 0.84rem;
         font-weight: 600;
         margin-bottom: 6px;
     }
 
     .form-control, .form-select {
         width: 100%;
-        background: #101010;
-        border: 1px solid #333;
-        border-radius: 8px;
-        color: #f0f0f0;
-        padding: 9px 13px;
-        font-size: 0.9rem;
-        transition: border-color 0.2s;
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        border-radius: 6px;
+        color: var(--adm-text-main);
+        padding: 9px 12px;
+        font-size: 0.88rem;
+        transition: all 0.2s;
     }
     .form-control:focus, .form-select:focus {
-        border-color: #C5A059;
+        border-color: var(--adm-gold);
         outline: none;
-        background: #141414;
+        box-shadow: 0 0 0 3px var(--adm-gold-glow);
+        background: #1c202b;
         color: #fff;
     }
 
@@ -316,20 +367,19 @@
         resize: vertical;
     }
 
-    /* Product picker box */
     .suit-picker-box {
-        background: #101010;
-        border: 1px solid #282828;
-        border-radius: 10px;
-        padding: 12px;
-        max-height: 220px;
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        border-radius: 8px;
+        padding: 10px;
+        max-height: 200px;
         overflow-y: auto;
     }
 
     .suit-picker-title {
-        font-size: 0.82rem;
-        color: #C5A059;
-        margin-bottom: 10px;
+        font-size: 0.8rem;
+        color: var(--adm-gold);
+        margin-bottom: 8px;
         font-weight: 600;
     }
 
@@ -341,19 +391,19 @@
         border-radius: 6px;
         transition: background 0.15s;
         cursor: pointer;
-        border-bottom: 1px solid #1a1a1a;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
     .suit-item-check:hover {
-        background: rgba(197, 160, 89, 0.08);
+        background: var(--adm-bg-hover);
     }
     .suit-item-check:last-child {
         border-bottom: none;
     }
 
     .suit-item-check input[type="checkbox"] {
-        width: 17px;
-        height: 17px;
-        accent-color: #C5A059;
+        width: 16px;
+        height: 16px;
+        accent-color: var(--adm-gold);
         cursor: pointer;
     }
 
@@ -362,33 +412,33 @@
         height: 38px;
         border-radius: 6px;
         object-fit: cover;
-        border: 1px solid #333;
+        border: 1px solid var(--adm-border);
     }
 
     .suit-picker-info {
         flex: 1;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
     }
 
     .suit-picker-name {
-        color: #eee;
+        color: var(--adm-text-main);
         font-weight: 600;
     }
 
     .suit-picker-meta {
-        font-size: 0.76rem;
-        color: #888;
+        font-size: 0.74rem;
+        color: var(--adm-text-muted);
     }
 
     .btn-submit-gold {
         width: 100%;
-        padding: 12px;
-        background: linear-gradient(135deg, #d4af37, #c19b2f);
+        padding: 11px;
+        background: linear-gradient(135deg, var(--adm-gold-light), var(--adm-gold));
         color: #000;
         font-weight: 700;
         border: none;
         border-radius: 8px;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
         cursor: pointer;
         margin-top: 15px;
         transition: all 0.2s;
@@ -399,60 +449,33 @@
     }
 
     /* Modal Xóa */
-    .del-center {
-        text-align: center;
-    }
-    .del-icon {
-        font-size: 3.2rem;
-        color: #e74c3c;
-        margin-bottom: 12px;
-    }
-    .del-btn-group {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        margin-top: 20px;
-    }
-    .btn-cancel {
-        padding: 9px 20px;
-        background: #333;
-        color: #ccc;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-    .btn-confirm-del {
-        padding: 9px 22px;
-        background: #e74c3c;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-    }
+    .del-center { text-align: center; }
+    .del-icon { font-size: 3rem; color: #f43f5e; margin-bottom: 12px; }
+    .del-btn-group { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+    .btn-cancel { padding: 9px 20px; background: var(--adm-bg-card); color: var(--adm-text-muted); border: 1px solid var(--adm-border); border-radius: 6px; cursor: pointer; }
+    .btn-cancel:hover { color: #fff; }
+    .btn-confirm-del { padding: 9px 22px; background: #f43f5e; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
 </style>
 
-<div class="bst-wrap">
+<div class="bst-container">
 
-    <div class="bst-header">
-        <h2 class="bst-title">
-            <i class="bi bi-collection-play-fill"></i> Quản Lý Bộ Sưu Tập Thời Trang
-        </h2>
-        <button class="btn-gold-add" onclick="openModal('modal-add-bst')">
+    <!-- TOP TOOLBAR -->
+    <div class="bst-top-bar">
+        <div>
+            <h2 class="bst-header-title">
+                <i class="bi bi-collection-play-fill"></i> Quản Lý Bộ Sưu Tập Thời Trang
+            </h2>
+            <div class="bst-subtitle">Thiết kế và tuyển chọn các chủ đề vest cưới, dạ tiệc, quý ông Savile Row</div>
+        </div>
+        <button class="btn-gold-action" onclick="openModal('modal-add-bst')">
             <i class="bi bi-plus-circle-fill"></i> Tạo Bộ Sưu Tập Mới
         </button>
     </div>
 
-    @if(session('success'))
-    <div class="bst-alert bst-alert-success">
-        <i class="bi bi-check-circle-fill"></i>
-        <span>{{ session('success') }}</span>
-    </div>
-    @endif
-
+    <!-- VALIDATION ERRORS -->
     @if(isset($errors) && $errors->any())
-    <div class="bst-alert" style="background:rgba(231,76,60,0.15); border:1px solid rgba(231,76,60,0.4); color:#e74c3c;">
-        <i class="bi bi-exclamation-triangle-fill"></i>
+    <div class="admin-alert admin-alert-error" style="margin-bottom: 20px;">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
         <div>
             @foreach($errors->all() as $err)
             <div>{{ $err }}</div>
@@ -461,13 +484,46 @@
     </div>
     @endif
 
+    <!-- KPI STATS -->
+    <div class="bst-kpi-grid">
+        <div class="bst-kpi-card">
+            <div>
+                <div class="bst-kpi-label">Tổng Bộ Sưu Tập</div>
+                <div class="bst-kpi-val">{{ $boSuuTaps->count() }}</div>
+            </div>
+            <div class="bst-kpi-icon">
+                <i class="bi bi-collection"></i>
+            </div>
+        </div>
+
+        <div class="bst-kpi-card">
+            <div>
+                <div class="bst-kpi-label">Tổng Áo Vest Trong BST</div>
+                <div class="bst-kpi-val">{{ $boSuuTaps->sum('san_phams_count') }}</div>
+            </div>
+            <div class="bst-kpi-icon">
+                <i class="bi bi-suit-heart"></i>
+            </div>
+        </div>
+
+        <div class="bst-kpi-card">
+            <div>
+                <div class="bst-kpi-label">Mẫu Vest Sẵn Có</div>
+                <div class="bst-kpi-val">{{ $sanPhams->count() }}</div>
+            </div>
+            <div class="bst-kpi-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+        </div>
+    </div>
+
     {{-- LƯỚI DANH SÁCH BỘ SƯU TẬP --}}
     @if($boSuuTaps->isEmpty())
-    <div style="text-align:center; padding: 60px 20px; background:#141414; border:1px dashed #333; border-radius:14px;">
-        <i class="bi bi-folder-x" style="font-size: 3.5rem; color:#555;"></i>
-        <h4 style="color:#aaa; margin-top:15px;">Chưa có bộ sưu tập nào</h4>
-        <p style="color:#777; font-size:0.9rem;">Hãy tạo bộ sưu tập đầu tiên để gắn kết các mẫu vest theo chủ đề (Vest Cưới, Quý Ông Công Sở, Dạ Tiệc)!</p>
-        <button class="btn-gold-add" onclick="openModal('modal-add-bst')" style="margin-top:10px;">
+    <div style="text-align:center; padding: 60px 20px; background: var(--adm-bg-surface); border:1px dashed var(--adm-border); border-radius:12px;">
+        <i class="bi bi-folder-x" style="font-size: 3.5rem; color: var(--adm-text-dim);"></i>
+        <h4 style="color: var(--adm-text-main); margin-top:15px; font-family: var(--adm-font-heading);">Chưa có bộ sưu tập nào</h4>
+        <p style="color: var(--adm-text-muted); font-size:0.88rem;">Hãy tạo bộ sưu tập đầu tiên để gắn kết các mẫu vest theo chủ đề (Vest Cưới, Quý Ông Công Sở, Dạ Tiệc)!</p>
+        <button class="btn-gold-action" onclick="openModal('modal-add-bst')" style="margin-top:10px;">
             <i class="bi bi-plus-circle-fill"></i> Tạo Ngay
         </button>
     </div>
@@ -480,7 +536,7 @@
             @else
                 <div class="bst-banner-placeholder">
                     <i class="bi bi-gem"></i>
-                    <span style="font-size:0.85rem; font-family:sans-serif; margin-top:6px; opacity:0.8;">KINGSMAN COLLECTION</span>
+                    <span style="font-size:0.75rem; font-family: var(--adm-font-body); letter-spacing: 2px; margin-top:6px; opacity:0.8;">KINGSMAN BESPOKE</span>
                 </div>
             @endif
 
@@ -489,21 +545,21 @@
                 <p class="bst-desc">{{ $bst->mo_ta ?: 'Chưa có phần mô tả cảm hứng cho bộ sưu tập này.' }}</p>
 
                 <div class="bst-stats">
-                    <span style="color:#aaa; font-size:0.82rem;"><i class="bi bi-suit-heart-fill" style="color:#C5A059;"></i> Số lượng mẫu vest:</span>
+                    <span style="color: var(--adm-text-muted); font-size:0.82rem;"><i class="bi bi-suit-heart-fill" style="color: var(--adm-gold);"></i> Số mẫu vest:</span>
                     <span class="bst-count">{{ $bst->san_phams_count }} sản phẩm</span>
                 </div>
 
                 <div class="bst-suits-list">
                     @forelse($bst->sanPhams as $sp)
-                        <span class="suit-tag"><i class="bi bi-tag-fill" style="color:#C5A059;"></i> {{ $sp->ten_sp }}</span>
+                        <span class="suit-tag"><i class="bi bi-tag-fill" style="color: var(--adm-gold);"></i> {{ $sp->ten_sp }}</span>
                     @empty
-                        <span style="color:#666; font-size:0.78rem; font-style:italic;">Chưa gắn sản phẩm nào vào BST.</span>
+                        <span style="color: var(--adm-text-dim); font-size:0.78rem; font-style:italic;">Chưa gắn sản phẩm nào vào BST.</span>
                     @endforelse
                 </div>
 
                 <div class="bst-actions">
                     <a href="{{ route('bosuutap.chitiet', $bst->id) }}" target="_blank" class="btn-card-action btn-act-view">
-                        <i class="bi bi-eye"></i> Xem web
+                        <i class="bi bi-globe2"></i> Xem web
                     </a>
                     <button type="button" class="btn-card-action btn-act-edit"
                         data-id="{{ $bst->id }}"
@@ -539,13 +595,13 @@
             @csrf
             <div class="form-group">
                 <label class="form-label">Tên Bộ Sưu Tập *</label>
-                <input type="text" name="ten_bo_suu_tap" class="form-control" placeholder="VD: Bộ Sưu Tập Vest Cưới Hoàng Gia 2025" required>
+                <input type="text" name="ten_bo_suu_tap" class="form-control" placeholder="VD: Bộ Sưu Tập Vest Cưới Hoàng Gia 2026" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Hình Banner Đại Diện</label>
                 <input type="file" name="hinh_banner" class="form-control" accept="image/*">
-                <small style="color:#888; font-size:0.78rem;">Khuyên dùng kích thước ngang tỷ lệ 16:9 hoặc ảnh phong cảnh chất lượng cao.</small>
+                <small style="color: var(--adm-text-dim); font-size:0.76rem;">Khuyên dùng kích thước ngang tỷ lệ 16:9 hoặc ảnh phong cảnh chất lượng cao.</small>
             </div>
 
             <div class="form-group">
@@ -593,7 +649,7 @@
             <div class="form-group">
                 <label class="form-label">Thay Đổi Hình Banner (nếu muốn)</label>
                 <input type="file" name="hinh_banner" class="form-control" accept="image/*">
-                <div id="edit_banner_preview" style="margin-top:8px; font-size:0.8rem; color:#C5A059;"></div>
+                <div id="edit_banner_preview" style="margin-top:8px; font-size:0.8rem; color: var(--adm-gold);"></div>
             </div>
 
             <div class="form-group">
@@ -631,8 +687,8 @@
         <button class="bst-modal-close" onclick="closeModal('modal-del-bst')">&times;</button>
         <div class="del-center">
             <i class="bi bi-exclamation-triangle-fill del-icon"></i>
-            <h4 style="color:#f0f0f0; margin-bottom:10px;">Xác Nhận Xóa</h4>
-            <p id="del-bst-text" style="color:#aaa; font-size:0.9rem; line-height:1.5;">Bạn có chắc muốn xóa bộ sưu tập này không?</p>
+            <h4 style="color: var(--adm-text-main); margin-bottom:10px; font-family: var(--adm-font-heading);">Xác Nhận Xóa</h4>
+            <p id="del-bst-text" style="color: var(--adm-text-muted); font-size:0.88rem; line-height:1.5;">Bạn có chắc muốn xóa bộ sưu tập này không?</p>
             <form id="form-del-bst" action="" method="POST">
                 @csrf
                 <div class="del-btn-group">
@@ -685,7 +741,6 @@
             preview.innerHTML = 'Chưa có ảnh banner.';
         }
 
-        // Bật/tắt các checkbox theo sản phẩm đã có trong BST
         document.querySelectorAll('.edit-suit-checkbox').forEach(function(cb) {
             var val = parseInt(cb.value);
             cb.checked = spIds.includes(val);
@@ -699,7 +754,7 @@
         var ten = btn.getAttribute('data-ten');
 
         document.getElementById('form-del-bst').action = '{{ url("/bo-suu-tap") }}/' + id + '/xoa';
-        document.getElementById('del-bst-text').innerHTML = 'Bạn có chắc chắn muốn xóa bộ sưu tập <strong style="color:#C5A059;">"' + ten + '"</strong>?<br><span style="font-size:0.8rem; color:#777;">Các sản phẩm áo vest bên trong sẽ không bị xóa, chỉ hủy liên kết khỏi bộ sưu tập này.</span>';
+        document.getElementById('del-bst-text').innerHTML = 'Bạn có chắc chắn muốn xóa bộ sưu tập <strong style="color:var(--adm-gold);">"' + ten + '"</strong>?<br><span style="font-size:0.8rem; color:var(--adm-text-dim);">Các sản phẩm áo vest bên trong sẽ không bị xóa, chỉ hủy liên kết khỏi bộ sưu tập này.</span>';
 
         openModal('modal-del-bst');
     }

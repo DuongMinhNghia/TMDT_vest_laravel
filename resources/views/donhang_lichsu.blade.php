@@ -5,55 +5,160 @@
 @section('content')
 @php
     $mauTrangThai = [
-        'Chờ xử lý'    => ['#f39c12', '⏳'],
-        'Đang may/gói' => ['#3498db', '🧵'],
-        'Đang giao'    => ['#9b59b6', '🚚'],
-        'Hoàn Thành'   => ['#2ecc71', '✅'],
-        'Đã hủy'       => ['#e74c3c', '❌'],
+        'Chờ xử lý'    => ['rgba(234, 179, 8, 0.12)', '#eab308', 'rgba(234, 179, 8, 0.3)', '⏳'],
+        'Đang may/gói' => ['rgba(168, 85, 247, 0.12)', '#a855f7', 'rgba(168, 85, 247, 0.3)', '🧵'],
+        'Đang giao'    => ['rgba(56, 189, 248, 0.12)', '#38bdf8', 'rgba(56, 189, 248, 0.3)', '🚚'],
+        'Hoàn Thành'   => ['rgba(34, 197, 94, 0.12)', '#22c55e', 'rgba(34, 197, 94, 0.3)', '✅'],
+        'Đã hủy'       => ['rgba(244, 63, 94, 0.12)', '#f43f5e', 'rgba(244, 63, 94, 0.3)', '❌'],
     ];
 @endphp
-<div class="container" style="padding:40px 0;">
-    <h2 style="font-family:'Playfair Display',serif; color:#C5A059; font-weight:700; text-transform:uppercase; letter-spacing:2px; margin-bottom:30px;">
-        <i class="bi bi-receipt"></i> Đơn Hàng Của Tôi
+<style>
+    .order-history-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px 15px 60px;
+    }
+
+    .order-history-title {
+        font-family: 'Playfair Display', Georgia, serif;
+        color: #D4B26F;
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .order-table-card {
+        background: #141720;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .order-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #F1F5F9;
+        font-size: 0.88rem;
+    }
+
+    .order-table thead th {
+        background: #181B24;
+        color: #D4B26F;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 14px 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+
+    .order-table tbody tr {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        transition: background 0.15s;
+    }
+
+    .order-table tbody tr:hover {
+        background: rgba(212, 178, 111, 0.06);
+    }
+
+    .order-table tbody td {
+        padding: 16px 20px;
+        vertical-align: middle;
+    }
+
+    .order-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    .btn-view-order {
+        color: #D4B26F;
+        text-decoration: none;
+        border: 1px solid rgba(212, 178, 111, 0.35);
+        background: rgba(212, 178, 111, 0.1);
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-view-order:hover {
+        background: #D4B26F;
+        color: #000;
+    }
+</style>
+
+<div class="order-history-wrap">
+    <h2 class="order-history-title">
+        <i class="bi bi-receipt"></i> Lịch Sử Đơn Hàng Của Tôi
     </h2>
 
     @if(session('error'))
-    <div class="alert" style="background:rgba(255,68,68,0.12); border:1px solid #ff4444; color:#ff6b6b; border-radius:10px;">{{ session('error') }}</div>
+    <div class="alert" style="background:rgba(244,63,94,0.12); border:1px solid rgba(244,63,94,0.3); color:#f43f5e; border-radius:8px; margin-bottom:20px;">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+    </div>
     @endif
     @if(session('success'))
-    <div class="alert" style="background:rgba(197,160,89,0.15); border:1px solid #C5A059; color:#C5A059; border-radius:10px;">{{ session('success') }}</div>
+    <div class="alert" style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); color:#22c55e; border-radius:8px; margin-bottom:20px;">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+    </div>
     @endif
 
     @if($donHangs->isEmpty())
-    <div style="text-align:center; padding:80px 20px; color:#777;">
-        <i class="bi bi-inbox" style="font-size:4rem; display:block; margin-bottom:15px;"></i>
-        <p>Bạn chưa có đơn hàng nào.</p>
-        <a href="{{ route('sanpham.index') }}" style="color:#C5A059;">Bắt đầu mua sắm</a>
+    <div style="text-align:center; padding:80px 20px; background:#141720; border:1px dashed rgba(255,255,255,0.1); border-radius:12px; color:#94A3B8;">
+        <i class="bi bi-inbox" style="font-size:3.5rem; display:block; margin-bottom:15px; color:#64748B;"></i>
+        <h4 style="color:#F1F5F9; font-family:'Playfair Display',serif;">Bạn chưa có đơn hàng nào</h4>
+        <p style="font-size:0.9rem; color:#94A3B8;">Khám phá bộ sưu tập âu phục may đo cao cấp của Kingsman và đặt hàng ngay.</p>
+        <a href="{{ route('sanpham.index') }}" class="btn-view-order" style="padding:10px 22px; font-size:0.88rem; margin-top:8px;">
+            <i class="bi bi-bag"></i> Bắt đầu mua sắm
+        </a>
     </div>
     @else
-    <div style="background:#1a1a1a; border:1px solid #333; border-radius:16px; overflow:hidden;">
-        <table style="width:100%; color:#e0e0e0;">
+    <div class="order-table-card">
+        <table class="order-table">
             <thead>
-                <tr style="background:linear-gradient(135deg,#C5A059,#a08045); color:#000;">
-                    <th style="padding:14px 20px;">Mã đơn</th>
-                    <th style="padding:14px 20px;">Ngày đặt</th>
-                    <th style="padding:14px 20px;" class="text-center">Số món</th>
-                    <th style="padding:14px 20px;" class="text-end">Tổng tiền</th>
-                    <th style="padding:14px 20px;" class="text-center">Trạng thái</th>
-                    <th style="padding:14px 20px;"></th>
+                <tr>
+                    <th>Mã Đơn Hàng</th>
+                    <th>Ngày Đặt</th>
+                    <th class="text-center">Số Mẫu</th>
+                    <th class="text-end">Tổng Giá Trị</th>
+                    <th class="text-center">Trạng Thái Đơn</th>
+                    <th class="text-end">Chi Tiết</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($donHangs as $dh)
-                @php [$mau, $icon] = $mauTrangThai[$dh->trang_thai] ?? ['#aaa', '•']; @endphp
-                <tr style="border-bottom:1px solid #2a2a2a;">
-                    <td style="padding:14px 20px; color:#C5A059; font-weight:700;">{{ $dh->ma_don_hang }}</td>
-                    <td style="padding:14px 20px;">{{ $dh->ngay_dat->format('d/m/Y H:i') }}</td>
-                    <td style="padding:14px 20px;" class="text-center">{{ $dh->chi_tiets_count }}</td>
-                    <td style="padding:14px 20px; color:#C5A059; font-weight:700;" class="text-end">{{ number_format($dh->tong_tien, 0, ',', '.') }} VNĐ</td>
-                    <td style="padding:14px 20px;" class="text-center"><span style="color:{{ $mau }}; font-weight:600;">{{ $icon }} {{ $dh->trang_thai }}</span></td>
-                    <td style="padding:14px 20px;" class="text-end">
-                        <a href="{{ route('donhang.chitiet', $dh->id) }}" style="color:#C5A059; text-decoration:none; border:1px solid #C5A059; padding:6px 14px; border-radius:20px;">Xem chi tiết</a>
+                @php [$bg, $color, $border, $icon] = $mauTrangThai[$dh->trang_thai] ?? ['rgba(255,255,255,0.05)', '#94A3B8', 'rgba(255,255,255,0.1)', '•']; @endphp
+                <tr>
+                    <td>
+                        <strong style="color:#D4B26F;">{{ $dh->ma_don_hang }}</strong>
+                    </td>
+                    <td style="color:#94A3B8;">{{ $dh->ngay_dat->format('d/m/Y H:i') }}</td>
+                    <td class="text-center" style="color:#CBD5E1;">{{ $dh->chi_tiets_count }}</td>
+                    <td style="color:#D4B26F; font-weight:700;" class="text-end">{{ number_format($dh->tong_tien, 0, ',', '.') }} VNĐ</td>
+                    <td class="text-center">
+                        <span class="order-status-pill" style="background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $border }};">
+                            {{ $icon }} {{ $dh->trang_thai }}
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <a href="{{ route('donhang.chitiet', $dh->id) }}" class="btn-view-order">
+                            <i class="bi bi-eye"></i> Xem Đơn
+                        </a>
                     </td>
                 </tr>
                 @endforeach

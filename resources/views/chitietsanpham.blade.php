@@ -5,64 +5,49 @@
 @section('content')
 <style>
     .product-detail-container {
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+        background: #111317;
         min-height: 600px;
-        padding: 60px 0;
+        padding: 50px 0 80px;
+        color: #F1F5F9;
     }
 
     .product-image-wrapper {
         position: relative;
         overflow: hidden;
-        border-radius: 20px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-        border: 2px solid #333;
-        background: #1a1a1a;
-    }
-
-    .product-image-wrapper::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(197, 160, 89, 0.1), transparent);
-        transition: left 0.7s;
-    }
-
-    .product-image-wrapper:hover::before {
-        left: 100%;
+        border-radius: 16px;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: #141720;
     }
 
     .product-image-wrapper img {
         width: 100%;
-        height: 500px;
+        height: 520px;
         object-fit: cover;
-        transition: transform 0.5s ease;
+        transition: transform 0.6s ease;
     }
 
     .product-image-wrapper:hover img {
-        transform: scale(1.05);
+        transform: scale(1.04);
     }
 
     .product-info-section {
-        padding: 40px 50px;
-        background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
-        border-radius: 20px;
-        border: 1px solid #333;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        padding: 36px 42px;
+        background: #141720;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
     }
 
     .product-title {
-        font-family: 'Playfair Display', serif;
-        color: #C5A059;
-        font-size: 2.5rem;
+        font-family: 'Playfair Display', Georgia, serif;
+        color: #D4B26F;
+        font-size: 2.1rem;
         font-weight: 700;
-        margin-bottom: 25px;
-        letter-spacing: 1px;
-        text-transform: uppercase;
+        margin-bottom: 20px;
+        letter-spacing: 0.5px;
         position: relative;
-        padding-bottom: 15px;
+        padding-bottom: 14px;
     }
 
     .product-title::after {
@@ -70,66 +55,84 @@
         position: absolute;
         bottom: 0;
         left: 0;
-        width: 80px;
-        height: 3px;
-        background: linear-gradient(90deg, #C5A059, transparent);
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, #D4B26F, transparent);
     }
 
-    .product-price {
-        font-size: 2rem;
-        color: #C5A059;
+    .product-price-box {
+        font-size: 1.8rem;
+        color: #D4B26F;
         font-weight: 700;
-        margin: 25px 0;
-        padding: 15px 25px;
-        background: rgba(197, 160, 89, 0.1);
-        border-left: 4px solid #C5A059;
-        border-radius: 8px;
-        display: inline-block;
+        margin: 20px 0 25px;
+        padding: 14px 22px;
+        background: #181B24;
+        border: 1px solid rgba(212, 178, 111, 0.25);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .flash-sale-badge {
+        font-size: 0.8rem;
+        color: #EF4444;
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
     }
 
     .product-detail-item {
-        margin: 20px 0;
-        padding: 15px 0;
-        border-bottom: 1px solid #333;
+        margin: 14px 0;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         display: flex;
         align-items: flex-start;
     }
 
-    .product-detail-item:last-child {
+    .product-detail-item:last-of-type {
         border-bottom: none;
     }
 
     .detail-label {
-        color: #C5A059;
-        font-size: 1.1rem;
+        color: #D4B26F;
+        font-size: 0.92rem;
         font-weight: 600;
         min-width: 120px;
-        margin-right: 15px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .detail-value {
-        color: #e0e0e0;
-        font-size: 1rem;
+        color: #CBD5E1;
+        font-size: 0.92rem;
         line-height: 1.6;
         flex: 1;
     }
 
     .size-selection {
-        margin: 30px 0;
+        margin: 26px 0;
+        padding-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .size-label {
-        color: #C5A059;
-        font-size: 1.2rem;
+        color: #D4B26F;
+        font-size: 1.05rem;
         font-weight: 600;
-        margin-bottom: 15px;
-        display: block;
+        margin: 0;
     }
 
     .size-options {
         display: flex;
-        gap: 15px;
+        gap: 12px;
         flex-wrap: wrap;
+        margin-top: 14px;
         margin-bottom: 20px;
     }
 
@@ -143,157 +146,111 @@
 
     .size-option label {
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
-        width: 70px;
-        height: 70px;
-        background: #2a2a2a;
-        border: 2px solid #444;
-        border-radius: 12px;
-        color: #e0e0e0;
+        width: 64px;
+        height: 64px;
+        background: #181B24;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 10px;
+        color: #CBD5E1;
         font-weight: 600;
-        font-size: 1.1rem;
+        font-size: 1rem;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.25s ease;
         position: relative;
-        overflow: hidden;
     }
 
     .size-option label:hover {
-        border-color: #C5A059;
-        background: rgba(197, 160, 89, 0.05);
-        transform: translateY(-3px);
-        box-shadow: 0 5px 20px rgba(197, 160, 89, 0.3);
+        border-color: #D4B26F;
+        background: rgba(212, 178, 111, 0.08);
+        transform: translateY(-2px);
     }
 
     .size-option input[type="radio"]:checked+label {
-        background: linear-gradient(135deg, #C5A059, #a08045);
-        border-color: #C5A059;
-        color: #000;
+        background: linear-gradient(135deg, #D4B26F, #B89246);
+        border-color: #D4B26F;
+        color: #0c0e12;
         font-weight: 700;
-        box-shadow: 0 8px 25px rgba(197, 160, 89, 0.5);
-        transform: scale(1.05);
+        box-shadow: 0 6px 18px rgba(212, 178, 111, 0.35);
+        transform: translateY(-2px);
     }
 
-    .size-option input[type="radio"]:checked+label::after {
-        content: '✓';
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        background: #000;
-        color: #C5A059;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.9rem;
-        font-weight: 700;
-        border: 2px solid #C5A059;
+    .size-option input[type="radio"]:checked+label span {
+        color: #0c0e12 !important;
     }
 
     .custom-size-container {
         display: none;
-        margin-top: 20px;
-        padding: 25px;
-        background: #2a2a2a;
-        border: 2px solid #C5A059;
-        border-radius: 15px;
-        animation: slideDown 0.4s ease;
+        margin-top: 18px;
+        padding: 22px;
+        background: #181B24;
+        border: 1px solid rgba(212, 178, 111, 0.4);
+        border-radius: 12px;
+        animation: fadeIn 0.3s ease;
     }
 
-    @keyframes slideDown {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .custom-size-container.active {
         display: block;
     }
 
-    .custom-size-title {
-        color: #C5A059;
-        font-weight: 600;
-        margin-bottom: 20px;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
     .custom-measurements {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-
-    .measurement-input {
-        position: relative;
+        gap: 14px;
     }
 
     .measurement-input label {
         display: block;
-        color: #e0e0e0;
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-        font-weight: 500;
+        color: #CBD5E1;
+        font-size: 0.82rem;
+        margin-bottom: 6px;
+        font-weight: 600;
     }
 
-    .measurement-input input[type="number"],
-    .measurement-input input[type="date"] {
+    .measurement-input input {
         width: 100%;
-        padding: 12px 15px;
-        background: #1a1a1a;
-        border: 2px solid #444;
+        padding: 10px 14px;
+        background: #111317;
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 8px;
-        color: #e0e0e0;
-        font-size: 1rem;
-        transition: all 0.3s;
+        color: #F1F5F9;
+        font-size: 0.92rem;
+        transition: all 0.25s;
     }
 
     .measurement-input input:focus {
         outline: none;
-        border-color: #C5A059;
-        background: #222;
-        box-shadow: 0 0 15px rgba(197, 160, 89, 0.2);
-    }
-
-    .measurement-input input::placeholder {
-        color: #555;
+        border-color: #D4B26F;
+        box-shadow: 0 0 0 3px rgba(212, 178, 111, 0.2);
     }
 
     .measurement-guide {
-        margin-top: 15px;
-        padding: 15px;
-        background: rgba(197, 160, 89, 0.05);
+        margin-top: 14px;
+        padding: 12px 16px;
+        background: rgba(212, 178, 111, 0.08);
         border-radius: 8px;
-        border-left: 3px solid #C5A059;
+        border-left: 3px solid #D4B26F;
     }
 
     .measurement-guide p {
-        color: #aaa;
-        font-size: 0.85rem;
-        margin: 5px 0;
+        color: #94A3B8;
+        font-size: 0.82rem;
+        margin: 4px 0;
         display: flex;
         align-items: center;
         gap: 8px;
     }
 
-    .measurement-guide p i {
-        color: #C5A059;
-    }
-
     .action-buttons {
         display: flex;
-        gap: 15px;
+        gap: 12px;
         margin-top: 30px;
         flex-wrap: wrap;
     }
@@ -301,64 +258,71 @@
     .btn-luxury {
         display: inline-flex;
         align-items: center;
-        gap: 10px;
-        padding: 15px 35px;
-        border-radius: 50px;
+        gap: 8px;
+        padding: 13px 26px;
+        border-radius: 8px;
         font-weight: 700;
-        font-size: 1rem;
-        letter-spacing: 1px;
+        font-size: 0.92rem;
+        letter-spacing: 0.3px;
         text-decoration: none;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
+        transition: all 0.25s ease;
         cursor: pointer;
         border: none;
     }
 
     .btn-add-cart {
-        background: linear-gradient(135deg, #C5A059, #a08045);
-        color: #000;
-        box-shadow: 0 10px 30px rgba(197, 160, 89, 0.4);
+        background: linear-gradient(135deg, #D4B26F, #B89246);
+        color: #0c0e12;
     }
 
     .btn-add-cart:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(197, 160, 89, 0.6);
-        background: linear-gradient(135deg, #d4b36a, #C5A059);
+        background: linear-gradient(135deg, #E8CA8C, #C9A458);
         color: #000;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(212, 178, 111, 0.35);
+    }
+
+    .btn-appointment {
+        background: #181B24;
+        border: 1px solid rgba(212, 178, 111, 0.4);
+        color: #D4B26F;
+    }
+
+    .btn-appointment:hover {
+        background: rgba(212, 178, 111, 0.15);
+        color: #E8CA8C;
+        border-color: #D4B26F;
+        transform: translateY(-2px);
     }
 
     .btn-back {
         background: transparent;
-        color: #C5A059;
-        border: 2px solid #C5A059;
+        color: #94A3B8;
+        border: 1px solid rgba(255, 255, 255, 0.12);
     }
 
     .btn-back:hover {
-        background: #C5A059;
-        color: #000;
-        transform: translateY(-3px);
-        box-shadow: 0 10px 25px rgba(197, 160, 89, 0.4);
+        background: rgba(255, 255, 255, 0.06);
+        color: #F1F5F9;
+        border-color: rgba(255, 255, 255, 0.2);
     }
 
     .related-products {
-        margin-top: 80px;
-        padding: 50px 0;
-        background: #0a0a0a;
-        border-top: 1px solid #333;
+        padding: 60px 0;
+        background: #111317;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     .related-products h4 {
-        font-family: 'Playfair Display', serif;
-        color: #C5A059;
-        font-size: 2rem;
+        font-family: 'Playfair Display', Georgia, serif;
+        color: #D4B26F;
+        font-size: 1.8rem;
         font-weight: 700;
-        margin-bottom: 40px;
+        margin-bottom: 35px;
         text-align: center;
-        text-transform: uppercase;
-        letter-spacing: 2px;
+        letter-spacing: 1px;
         position: relative;
-        padding-bottom: 20px;
+        padding-bottom: 16px;
     }
 
     .related-products h4::after {
@@ -367,19 +331,19 @@
         bottom: 0;
         left: 50%;
         transform: translateX(-50%);
-        width: 100px;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, #C5A059, transparent);
+        width: 80px;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #D4B26F, transparent);
     }
 
     @media (max-width: 992px) {
         .product-info-section {
-            margin-top: 30px;
-            padding: 30px 25px;
+            margin-top: 25px;
+            padding: 24px 20px;
         }
 
         .product-title {
-            font-size: 2rem;
+            font-size: 1.7rem;
         }
 
         .custom-measurements {
@@ -399,7 +363,7 @@
 
 <div class="product-detail-container">
     <div class="container">
-        <div class="row">
+        <div class="row g-4 align-items-start">
 
             {{-- ẢNH SẢN PHẨM --}}
             <div class="col-lg-5">
@@ -413,59 +377,60 @@
                 <div class="product-info-section">
                     <h1 class="product-title">{{ $sanPham->ten_sp }}</h1>
 
-                    <div class="product-price" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                    <div class="product-price-box">
                         <div>
-                            <i class="bi bi-tag-fill"></i>
+                            <i class="bi bi-tag-fill me-1"></i>
                             <span id="vnd_price" data-val="{{ $sanPham->gia_khuyen_mai }}">
                                 {{ number_format($sanPham->gia_khuyen_mai, 0, ',', '.') }}
                             </span> VNĐ
                         </div>
 
                         @if($sanPham->phan_tram_giam > 0)
-                        <div style="font-size: 0.95rem; color: #ff4444; background: rgba(255, 68, 68, 0.15); border: 1px solid rgba(255, 68, 68, 0.4); padding: 4px 10px; border-radius: 6px; font-weight: 700;">
+                        <div class="flash-sale-badge">
                             -{{ $sanPham->phan_tram_giam }}% FLASH SALE
                         </div>
-                        <div style="font-size: 1.1rem; color: #777; text-decoration: line-through;">
+                        <div style="font-size: 1.05rem; color: #64748B; text-decoration: line-through; font-weight: 500;">
                             {{ number_format($sanPham->gia_ban, 0, ',', '.') }} VNĐ
                         </div>
                         @endif
 
-                        <div style="font-size: 1.2rem; color: #a0a0a0; font-weight: 500; border-left: 1px solid #555; padding-left: 15px; display: flex; align-items: center; gap: 5px;">
-                            <i class="bi bi-arrow-left-right" style="font-size: 1rem;"></i>
+                        <div style="font-size: 1.05rem; color: #94A3B8; font-weight: 500; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 14px; display: flex; align-items: center; gap: 5px;">
+                            <i class="bi bi-arrow-left-right" style="font-size: 0.9rem;"></i>
                             <span id="usd_price">Đang tính...</span> USD
                         </div>
                     </div>
+
                     @php
                         $activeSale = $sanPham->giamGias()->dangChay()->first() ?? \App\Models\GiamGia::dangChay()->where('ap_dung_tat_ca', true)->first();
                     @endphp
                     @if($activeSale)
-                    <div class="flash-sale-timer-box" style="margin: 15px 0 25px; padding: 14px 20px; background: linear-gradient(135deg, #241010 0%, #151515 100%); border: 1px solid rgba(231, 76, 60, 0.45); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px; color: #e74c3c; font-weight: 700; font-size: 0.95rem;">
-                            <i class="bi bi-fire" style="font-size: 1.3rem;"></i>
+                    <div class="flash-sale-timer-box" style="margin: 15px 0 25px; padding: 14px 20px; background: #181B24; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 10px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #EF4444; font-weight: 700; font-size: 0.92rem;">
+                            <i class="bi bi-fire" style="font-size: 1.25rem;"></i>
                             <span>{{ $activeSale->tieu_de }}:</span>
                         </div>
                         <div id="flash-sale-countdown" data-end="{{ $activeSale->thoi_gian_ket_thuc ? $activeSale->thoi_gian_ket_thuc->timestamp : 0 }}" style="display: flex; gap: 6px; color: #fff; font-size: 0.85rem; font-weight: 700;">
-                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-days">00</span> <span style="color: #aaa; align-self: center;">ngày</span>
-                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-hours">00</span> <span style="color: #aaa; align-self: center;">giờ</span>
-                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-mins">00</span> <span style="color: #aaa; align-self: center;">phút</span>
-                            <span style="background: #e74c3c; padding: 4px 8px; border-radius: 6px;" id="fs-secs">00</span> <span style="color: #aaa; align-self: center;">giây</span>
+                            <span style="background: #EF4444; padding: 4px 8px; border-radius: 6px;" id="fs-days">00</span> <span style="color: #94A3B8; align-self: center;">ngày</span>
+                            <span style="background: #EF4444; padding: 4px 8px; border-radius: 6px;" id="fs-hours">00</span> <span style="color: #94A3B8; align-self: center;">giờ</span>
+                            <span style="background: #EF4444; padding: 4px 8px; border-radius: 6px;" id="fs-mins">00</span> <span style="color: #94A3B8; align-self: center;">phút</span>
+                            <span style="background: #EF4444; padding: 4px 8px; border-radius: 6px;" id="fs-secs">00</span> <span style="color: #94A3B8; align-self: center;">giây</span>
                         </div>
                     </div>
                     @endif
 
                     <div class="product-detail-item">
                         <span class="detail-label"><i class="bi bi-globe"></i> Xuất xứ:</span>
-                        <span class="detail-value">{{ $sanPham->xuat_xu ?? 'Chính hãng' }}</span>
+                        <span class="detail-value">{{ $sanPham->xuat_xu ?? 'Chính hãng Kingsman' }}</span>
                     </div>
 
                     <div class="product-detail-item">
                         <span class="detail-label"><i class="bi bi-stars"></i> Chất liệu:</span>
-                        <span class="detail-value">{{ $sanPham->chat_lieu ?? 'Vải cao cấp' }}</span>
+                        <span class="detail-value">{{ $sanPham->chat_lieu ?? 'Vải len cừu Ý cao cấp' }}</span>
                     </div>
 
                     <div class="product-detail-item">
                         <span class="detail-label"><i class="bi bi-person-badge"></i> Form dáng:</span>
-                        <span class="detail-value">{{ $sanPham->form_dang ?? 'Slim-fit' }}</span>
+                        <span class="detail-value">{{ $sanPham->form_dang ?? 'Slim-fit chuẩn quý ông' }}</span>
                     </div>
 
                     <div class="product-detail-item">
@@ -475,11 +440,11 @@
 
                     {{-- CHỌN SIZE --}}
                     <div class="size-selection">
-                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
-                            <label class="size-label" style="margin: 0;">
-                                <i class="bi bi-rulers"></i> Chọn Kích Thước (Tổng kho: <strong style="color:#C5A059;">{{ $sanPham->tongTonKho() }}</strong> chiếc)
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                            <label class="size-label">
+                                <i class="bi bi-rulers me-1"></i> Chọn Kích Thước (Tổng kho: <strong style="color:#D4B26F;">{{ $sanPham->tongTonKho() }}</strong> chiếc)
                             </label>
-                            <button type="button" onclick="openSizeGuideModal()" style="background: transparent; border: none; color: #C5A059; font-size: 0.85rem; font-weight: 600; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center; gap: 5px;">
+                            <button type="button" onclick="openSizeGuideModal()" style="background: transparent; border: none; color: #D4B26F; font-size: 0.84rem; font-weight: 600; cursor: pointer; text-decoration: underline; display: inline-flex; align-items: center; gap: 5px;">
                                 <i class="bi bi-info-circle-fill"></i> Bảng gợi ý chọn size
                             </button>
                         </div>
@@ -494,14 +459,14 @@
                                         $firstAvailable = true;
                                     }
                                 @endphp
-                                <div class="size-option" style="{{ !$isAvail ? 'opacity: 0.45;' : '' }}">
+                                <div class="size-option" style="{{ !$isAvail ? 'opacity: 0.4;' : '' }}">
                                     <input type="radio" name="size" id="size-{{ strtolower($s->ten_size) }}" value="{{ $s->ten_size }}" {{ $checkAttr }} {{ !$isAvail ? 'disabled' : '' }} />
                                     <label for="size-{{ strtolower($s->ten_size) }}" title="{{ $s->chieu_cao_goi_y }} | {{ $s->can_nang_goi_y }}" style="{{ !$isAvail ? 'cursor: not-allowed; text-decoration: line-through;' : '' }}">
                                         {{ $s->ten_size }}
                                         @if(!$isAvail)
-                                            <span style="font-size: 0.65rem; display: block; color: #ff5555;">Hết</span>
+                                            <span style="font-size: 0.65rem; display: block; color: #EF4444;">Hết</span>
                                         @else
-                                            <span style="font-size: 0.65rem; display: block; color: #aaa;">({{ $s->so_luong_ton }})</span>
+                                            <span style="font-size: 0.65rem; display: block; color: #94A3B8;">({{ $s->so_luong_ton }})</span>
                                         @endif
                                     </label>
                                 </div>
@@ -522,30 +487,31 @@
 
                             <div class="size-option">
                                 <input type="radio" name="size" id="size-custom" value="Custom" />
-                                <label for="size-custom" title="Đặt may đo theo số đo riêng"><i class="bi bi-pencil-square"></i></label>
+                                <label for="size-custom" title="Đặt may đo theo số đo riêng"><i class="bi bi-pencil-square"></i><span style="font-size:0.65rem; color:#94A3B8;">Đo riêng</span></label>
                             </div>
                         </div>
+
                         {{-- CUSTOM SIZE --}}
                         @php
                             $userSoDo = Auth::check() ? optional(Auth::user()->khachHang)->soDoMacDinh() : null;
                         @endphp
                         <div class="custom-size-container" id="customSizeContainer">
                             @if($userSoDo)
-                            <div class="mb-2 p-2 rounded" style="background: rgba(212,175,55,0.1); border: 1px dashed #d4af37; font-size: 0.8rem; color: #d4af37;">
+                            <div class="mb-3 p-2 rounded" style="background: rgba(212,178,111,0.12); border: 1px dashed #D4B26F; font-size: 0.84rem; color: #D4B26F;">
                                 <i class="bi bi-magic me-1"></i> Đã tự động điền thông số từ hồ sơ: <strong>{{ $userSoDo->ten_ho_so }}</strong> của bạn.
                             </div>
                             @endif
                             <div class="custom-measurements">
                                 <div class="measurement-input">
-                                    <label><i class="bi bi-arrows-expand"></i> Vai (cm)</label>
+                                    <label><i class="bi bi-arrows-expand"></i> Rộng vai (cm)</label>
                                     <input type="number" id="shoulder" placeholder="VD: 45" min="0" step="0.5" value="{{ $userSoDo?->rong_vai }}" />
                                 </div>
                                 <div class="measurement-input">
-                                    <label><i class="bi bi-arrows-expand"></i> Ngực (cm)</label>
+                                    <label><i class="bi bi-arrows-expand"></i> Vòng ngực (cm)</label>
                                     <input type="number" id="chest" placeholder="VD: 96" min="0" step="0.5" value="{{ $userSoDo?->vong_nguc }}" />
                                 </div>
                                 <div class="measurement-input">
-                                    <label><i class="bi bi-arrows-expand"></i> Eo (cm)</label>
+                                    <label><i class="bi bi-arrows-expand"></i> Vòng eo (cm)</label>
                                     <input type="number" id="waist" placeholder="VD: 84" min="0" step="0.5" value="{{ $userSoDo?->vong_eo }}" />
                                 </div>
                                 <div class="measurement-input">
@@ -554,50 +520,50 @@
                                 </div>
                             </div>
                             <div class="measurement-guide">
-                                <p><i class="bi bi-info-circle-fill"></i> Vui lòng nhập số đo hoặc quản lý tại trang <a href="{{ route('khachhang.dashboard', ['#sodo']) }}" style="color:#d4af37; text-decoration:underline;">Hồ Sơ & VIP</a>.</p>
-                                <p><i class="bi bi-telephone-fill"></i> Liên hệ hotline <strong style="color:#C5A059;">1900-xxxx</strong> để được hướng dẫn đo size chi tiết.</p>
+                                <p><i class="bi bi-info-circle-fill" style="color:#D4B26F;"></i> Quý khách có thể quản lý trọn bộ số đo tại trang <a href="{{ route('khachhang.dashboard') }}#sodo" style="color:#D4B26F; text-decoration:underline;">Hồ Sơ & Thẻ VIP</a>.</p>
+                                <p><i class="bi bi-telephone-fill" style="color:#D4B26F;"></i> Liên hệ chuyên viên tư vấn may đo: <strong style="color:#D4B26F;">1900 8888</strong>.</p>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {{-- ACTION BUTTONS --}}
-                <div class="action-buttons" style="display: flex; flex-wrap: wrap; gap: 10px;">
-                    <a href="#" class="btn-luxury btn-add-cart" id="addToCartBtn">
-                        <i class="bi bi-cart-plus-fill"></i> Thêm vào giỏ
-                    </a>
-                    <a href="{{ route('lichhen.create', ['san_pham_id' => $sanPham->id]) }}" class="btn-luxury" style="background: linear-gradient(135deg, #1f4e79, #15324e); border: 1px solid #3270a6; color: #fff;">
-                        <i class="bi bi-calendar2-check-fill"></i> Đặt lịch thử tại tiệm
-                    </a>
-                    <a href="{{ route('sanpham.index') }}" class="btn-luxury btn-back">
-                        <i class="bi bi-arrow-left-circle-fill"></i> Quay lại
-                    </a>
-                </div>
+                    {{-- ACTION BUTTONS --}}
+                    <div class="action-buttons">
+                        <a href="#" class="btn-luxury btn-add-cart" id="addToCartBtn">
+                            <i class="bi bi-cart-plus-fill"></i> Thêm Vào Giỏ Hàng
+                        </a>
+                        <a href="{{ route('lichhen.create', ['san_pham_id' => $sanPham->id]) }}" class="btn-luxury btn-appointment">
+                            <i class="bi bi-calendar2-check-fill"></i> Đặt Lịch Thử Tại Showroom
+                        </a>
+                        <a href="{{ route('sanpham.index') }}" class="btn-luxury btn-back">
+                            <i class="bi bi-arrow-left-circle-fill"></i> Quay Lại
+                        </a>
+                    </div>
 
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- ĐÁNH GIÁ SẢN PHẨM (Task 3.4 - TV3) --}}
+{{-- ĐÁNH GIÁ SẢN PHẨM --}}
 @include('partials.danhgia', ['sanPham' => $sanPham])
 
 {{-- SẢN PHẨM LIÊN QUAN --}}
 <div class="related-products">
     <div class="container">
-        <h4><i class="bi bi-grid-3x3-gap-fill"></i> Sản Phẩm Liên Quan</h4>
+        <h4><i class="bi bi-grid-3x3-gap-fill me-2"></i>Sản Phẩm Cùng Phong Cách</h4>
         <div class="row g-4">
             @foreach($sanPhamLienQuan as $sp)
             <div class="col-6 col-md-4 col-lg-3">
                 <a href="{{ route('sanpham.chitiet', $sp->id) }}" style="text-decoration:none;">
-                    <div style="background:#1a1a1a; border:1px solid #333; border-radius:12px; overflow:hidden; transition:all 0.3s;"
-                        onmouseover="this.style.borderColor='#C5A059'; this.style.transform='translateY(-5px)'"
-                        onmouseout="this.style.borderColor='#333'; this.style.transform='translateY(0)'">
+                    <div style="background:#141720; border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; transition:all 0.3s;"
+                        onmouseover="this.style.borderColor='#D4B26F'; this.style.transform='translateY(-4px)'"
+                        onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'; this.style.transform='none'">
                         <img src="{{ asset('images/' . $sp->hinh_anh) }}"
-                            style="width:100%; height:200px; object-fit:cover;" />
-                        <div style="padding:15px;">
-                            <p style="color:#e0e0e0; font-weight:600; margin-bottom:8px; font-size:0.9rem;">{{ $sp->ten_sp }}</p>
-                            <p style="color:#C5A059; font-weight:700; margin:0;">{{ number_format($sp->gia, 0, ',', '.') }} VNĐ</p>
+                            style="width:100%; height:220px; object-fit:cover;" />
+                        <div style="padding:14px 16px;">
+                            <p style="color:#F1F5F9; font-weight:600; margin-bottom:6px; font-size:0.9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $sp->ten_sp }}</p>
+                            <p style="color:#D4B26F; font-weight:700; margin:0; font-size:0.95rem;">{{ number_format($sp->gia, 0, ',', '.') }} VNĐ</p>
                         </div>
                     </div>
                 </a>
@@ -665,7 +631,7 @@
                 const length = document.getElementById('length').value;
 
                 if (!shoulder || !chest || !waist || !length) {
-                    alert('Vui lòng nhập đầy đủ số đo custom!');
+                    alert('Vui lòng nhập đầy đủ 4 chỉ số may đo riêng!');
                     return;
                 }
 
@@ -707,7 +673,7 @@
 
             const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const minutes = Math.floor((distance % (1000 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
             document.getElementById('fs-days').innerText = String(days).padStart(2, '0');
@@ -721,67 +687,67 @@
 </script>
 
 {{-- MODAL BẢNG GỢI Ý SIZE MAY ĐO --}}
-<div class="sp-modal-overlay" id="modal-size-guide" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1060; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(5px);">
-    <div style="background:#181818; border:1px solid #333; border-radius:16px; width:100%; max-width:620px; padding:28px; position:relative; box-shadow:0 15px 40px rgba(0,0,0,0.8);">
-        <button onclick="closeSizeGuideModal()" style="position:absolute; top:18px; right:20px; background:none; border:none; color:#888; font-size:1.6rem; cursor:pointer;">&times;</button>
-        <h4 style="font-family:'Playfair Display', serif; color:#C5A059; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-            <i class="bi bi-rulers"></i> Bảng Thông Số & Gợi Ý Thể Hình Vest Nam
+<div class="sp-modal-overlay" id="modal-size-guide" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:1060; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(6px);">
+    <div style="background:#141720; border:1px solid rgba(212,178,111,0.3); border-radius:16px; width:100%; max-width:640px; padding:28px; position:relative; box-shadow:0 20px 50px rgba(0,0,0,0.8);">
+        <button onclick="closeSizeGuideModal()" style="position:absolute; top:18px; right:20px; background:none; border:none; color:#94A3B8; font-size:1.6rem; cursor:pointer;">&times;</button>
+        <h4 style="font-family:'Playfair Display', serif; color:#D4B26F; margin-bottom:12px; font-weight:700; display:flex; align-items:center; gap:8px;">
+            <i class="bi bi-rulers"></i> Bảng Thông Số Thể Hình Vest Nam
         </h4>
-        <p style="color:#aaa; font-size:0.86rem; line-height:1.5;">Thông số chuẩn may đo cho phom áo vest Kingsman. Nếu chiều cao và cân nặng nằm giữa 2 size, quý khách nên chọn size lớn hơn để mặc thoải mái.</p>
+        <p style="color:#94A3B8; font-size:0.86rem; line-height:1.5;">Thông số chuẩn may đo cho phom áo vest Kingsman. Nếu chiều cao và cân nặng nằm giữa 2 size, quý khách nên chọn size lớn hơn để có độ cử động thoải mái nhất.</p>
         
         <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; color:#ddd; font-size:0.86rem; margin-top:14px;">
+            <table style="width:100%; border-collapse:collapse; color:#F1F5F9; font-size:0.86rem; margin-top:14px;">
                 <thead>
-                    <tr style="background:#222; color:#C5A059; text-align:left;">
-                        <th style="padding:10px 14px; border:1px solid #333;">Size</th>
-                        <th style="padding:10px 14px; border:1px solid #333;">Chiều cao</th>
-                        <th style="padding:10px 14px; border:1px solid #333;">Cân nặng</th>
-                        <th style="padding:10px 14px; border:1px solid #333;">Vòng ngực</th>
-                        <th style="padding:10px 14px; border:1px solid #333;">Dài áo</th>
+                    <tr style="background:#181B24; color:#D4B26F; text-align:left;">
+                        <th style="padding:10px 14px; border:1px solid rgba(255,255,255,0.08);">Size</th>
+                        <th style="padding:10px 14px; border:1px solid rgba(255,255,255,0.08);">Chiều cao</th>
+                        <th style="padding:10px 14px; border:1px solid rgba(255,255,255,0.08);">Cân nặng</th>
+                        <th style="padding:10px 14px; border:1px solid rgba(255,255,255,0.08);">Vòng ngực</th>
+                        <th style="padding:10px 14px; border:1px solid rgba(255,255,255,0.08);">Dài áo</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size S</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">1m60 - 1m68</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">52kg - 60kg</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">88 - 92 cm</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">68 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06); font-weight:700; color:#D4B26F;">Size S</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">1m60 - 1m68</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">52kg - 60kg</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">88 - 92 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">68 cm</td>
                     </tr>
                     <tr style="background:rgba(255,255,255,0.02);">
-                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size M</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">1m68 - 1m74</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">60kg - 68kg</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">92 - 96 cm</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">70 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06); font-weight:700; color:#D4B26F;">Size M</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">1m68 - 1m74</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">60kg - 68kg</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">92 - 96 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">70 cm</td>
                     </tr>
                     <tr>
-                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size L</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">1m74 - 1m78</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">68kg - 75kg</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">96 - 100 cm</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">72 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06); font-weight:700; color:#D4B26F;">Size L</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">1m74 - 1m78</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">68kg - 75kg</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">96 - 100 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">72 cm</td>
                     </tr>
                     <tr style="background:rgba(255,255,255,0.02);">
-                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size XL</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">1m78 - 1m83</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">75kg - 82kg</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">100 - 104 cm</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">74 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06); font-weight:700; color:#D4B26F;">Size XL</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">1m78 - 1m83</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">75kg - 82kg</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">100 - 104 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">74 cm</td>
                     </tr>
                     <tr>
-                        <td style="padding:9px 14px; border:1px solid #282828; font-weight:700; color:#fff;">Size XXL</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">1m80 - 1m88</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">82kg - 90kg</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">104 - 110 cm</td>
-                        <td style="padding:9px 14px; border:1px solid #282828;">76 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06); font-weight:700; color:#D4B26F;">Size XXL</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">1m80 - 1m88</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">82kg - 90kg</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">104 - 110 cm</td>
+                        <td style="padding:9px 14px; border:1px solid rgba(255,255,255,0.06);">76 cm</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
-        <div style="margin-top:18px; padding:12px; background:#1f190e; border:1px solid #C5A059; border-radius:8px; color:#C5A059; font-size:0.82rem;">
-            <i class="bi bi-lightbulb-fill"></i> <strong>Tư vấn may đo:</strong> Quý khách cũng có thể chọn mục <strong>[May đo riêng]</strong> hoặc đặt lịch hẹn để nghệ nhân may đo của Kingsman hỗ trợ lấy số đo chuẩn xác nhất.
+        <div style="margin-top:16px; padding:12px 16px; background:#181B24; border:1px solid rgba(212,178,111,0.3); border-radius:8px; color:#D4B26F; font-size:0.82rem;">
+            <i class="bi bi-lightbulb-fill me-1"></i> <strong>Tư vấn may đo:</strong> Quý khách cũng có thể chọn mục <strong>[Đo riêng]</strong> hoặc đặt lịch hẹn để nghệ nhân may đo của Kingsman trực tiếp hỗ trợ lấy số đo chuẩn xác nhất.
         </div>
     </div>
 </div>

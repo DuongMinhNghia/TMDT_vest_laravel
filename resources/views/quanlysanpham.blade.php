@@ -1,613 +1,752 @@
-@extends('layouts.default_layout')
-@section('title', 'Quản Lý Sản Phẩm & Kho Size')
-@section('content')
+@extends('layouts.admin_layout')
 
+@section('title', 'Quản Lý Sản Phẩm & Kho Size - Kingsman Admin')
+@section('page_name', 'Quản Lý Sản Phẩm & Kho Size')
+
+@section('styles')
 <style>
-    .sp-wrap {
-        font-family: 'Be Vietnam Pro', sans-serif;
-    }
-
-    .sp-header {
+    /* PAGE HEADER */
+    .admin-page-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 28px;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 16px;
+        margin-bottom: 24px;
     }
 
-    .sp-title {
-        color: #C5A059;
-        font-family: 'Playfair Display', serif;
-        font-size: 1.7rem;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    .admin-page-title h2 {
+        font-family: var(--adm-font-heading);
+        font-size: 1.6rem;
+        color: var(--adm-text-main);
+        margin-bottom: 4px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
     }
 
-    .sp-alert {
-        background: rgba(197, 160, 89, .12);
-        border: 1px solid #C5A059;
-        color: #C5A059;
-        border-radius: 10px;
-        padding: 12px 20px;
-        margin-bottom: 22px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+    .admin-page-title p {
+        color: var(--adm-text-muted);
+        font-size: 0.85rem;
+        margin-bottom: 0;
     }
 
-    .sp-alert-err {
-        background: rgba(255, 68, 68, .10);
-        border-color: #ff4444;
-        color: #ff6b6b;
-    }
-
-    .btn-add {
+    .btn-admin-add {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        padding: 10px 24px;
-        background: linear-gradient(135deg, #C5A059, #a08045);
-        color: #000;
-        border-radius: 25px;
-        font-weight: 700;
-        text-decoration: none;
-        font-size: .9rem;
+        background: var(--adm-gold);
+        color: #111317;
+        padding: 9px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.84rem;
+        letter-spacing: 0.3px;
         border: none;
         cursor: pointer;
-        transition: all .25s;
+        transition: all 0.25s ease;
     }
 
-    .btn-add:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 18px rgba(197, 160, 89, .4);
-        color: #000;
+    .btn-admin-add:hover {
+        background: var(--adm-gold-light);
+        box-shadow: 0 4px 15px rgba(212, 178, 111, 0.3);
+        transform: translateY(-1px);
     }
 
-    .btn-icon {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        display: inline-flex;
+    /* KPI STATS CARDS */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .kpi-card {
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        border-radius: 10px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: border-color 0.2s;
+    }
+
+    .kpi-card:hover {
+        border-color: rgba(212, 178, 111, 0.3);
+    }
+
+    .kpi-info-label {
+        color: var(--adm-text-muted);
+        font-size: 0.78rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin-bottom: 4px;
+    }
+
+    .kpi-info-val {
+        font-family: var(--adm-font-heading);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--adm-text-main);
+        line-height: 1;
+    }
+
+    .kpi-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        display: flex;
         align-items: center;
         justify-content: center;
-        border: none;
+        font-size: 1.3rem;
+    }
+
+    .kpi-icon-gold {
+        background: rgba(212, 178, 111, 0.12);
+        color: var(--adm-gold);
+    }
+
+    .kpi-icon-emerald {
+        background: rgba(16, 185, 129, 0.12);
+        color: #34d399;
+    }
+
+    .kpi-icon-amber {
+        background: rgba(245, 158, 11, 0.12);
+        color: #fbbf24;
+    }
+
+    .kpi-icon-blue {
+        background: rgba(59, 130, 246, 0.12);
+        color: #60a5fa;
+    }
+
+    /* TOOLBAR LỌC & TÌM KIẾM NHANH */
+    .admin-toolbar {
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+
+    .toolbar-search-box {
+        position: relative;
+        min-width: 260px;
+        flex: 1;
+    }
+
+    .toolbar-search-box i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--adm-text-dim);
+        font-size: 0.9rem;
+    }
+
+    .toolbar-search-input {
+        width: 100%;
+        background: var(--adm-bg-main);
+        border: 1px solid var(--adm-border);
+        border-radius: 6px;
+        color: var(--adm-text-main);
+        padding: 8px 14px 8px 38px;
+        font-size: 0.85rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+
+    .toolbar-search-input:focus {
+        border-color: var(--adm-gold);
+        box-shadow: 0 0 0 2px var(--adm-gold-glow);
+    }
+
+    .toolbar-select {
+        background: var(--adm-bg-main);
+        border: 1px solid var(--adm-border);
+        border-radius: 6px;
+        color: var(--adm-text-muted);
+        padding: 8px 14px;
+        font-size: 0.84rem;
+        outline: none;
         cursor: pointer;
-        font-size: .82rem;
-        transition: all .2s;
+        min-width: 160px;
     }
 
-    .btn-icon-edit {
-        background: rgba(197, 160, 89, .15);
-        color: #C5A059;
-        border: 1px solid rgba(197, 160, 89, .35);
+    .toolbar-select:focus {
+        border-color: var(--adm-gold);
     }
 
-    .btn-icon-edit:hover {
-        background: #C5A059;
-        color: #000;
-    }
-
-    .btn-icon-del {
-        background: rgba(255, 68, 68, .12);
-        color: #ff5555;
-        border: 1px solid rgba(255, 68, 68, .3);
-    }
-
-    .btn-icon-del:hover {
-        background: #ff4444;
-        color: #fff;
-    }
-
-    .admin-table {
-        background: #1a1a1a;
-        border: 1px solid #2e2e2e;
-        border-radius: 14px;
+    /* DATA TABLE */
+    .admin-table-card {
+        background: var(--adm-bg-card);
+        border: 1px solid var(--adm-border);
+        border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 4px 24px rgba(0, 0, 0, .4);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
 
-    .admin-table table {
+    .admin-table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .adm-table {
         width: 100%;
         border-collapse: collapse;
+        text-align: left;
     }
 
-    .admin-table thead {
-        background: linear-gradient(135deg, #C5A059, #8c6e35);
+    .adm-table thead {
+        background: #141720;
+        border-bottom: 1px solid var(--adm-border);
     }
 
-    .admin-table thead th {
+    .adm-table thead th {
         padding: 14px 18px;
-        font-weight: 700;
-        border: none;
-        color: #000;
-        font-size: .85rem;
-        letter-spacing: .5px;
+        color: var(--adm-text-muted);
+        font-size: 0.78rem;
+        font-weight: 600;
         text-transform: uppercase;
+        letter-spacing: 0.8px;
         white-space: nowrap;
     }
 
-    .admin-table tbody td {
+    .adm-table tbody td {
         padding: 13px 18px;
-        border-bottom: 1px solid #242424;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         vertical-align: middle;
-        font-size: .9rem;
+        font-size: 0.85rem;
     }
 
-    .admin-table tbody tr:last-child td {
+    .adm-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+    .adm-table tbody tr:hover {
+        background-color: var(--adm-bg-hover);
+    }
+
+    .adm-table tbody tr:last-child td {
         border-bottom: none;
     }
 
-    .admin-table tbody tr {
-        transition: background .15s;
-    }
-
-    .admin-table tbody tr:hover {
-        background: rgba(197, 160, 89, .04);
-    }
-
-    .sp-img {
-        width: 56px;
-        height: 56px;
+    /* PHẦN TỬ TRONG BẢNG */
+    .sp-thumb {
+        width: 52px;
+        height: 52px;
         object-fit: cover;
-        border-radius: 8px;
-        border: 1px solid #333;
-    }
-
-    .sp-name {
-        font-weight: 600;
-        color: #f0f0f0;
-        display: block;
-    }
-
-    .sp-code {
-        font-size: 0.78rem;
-        color: #C5A059;
-        font-family: monospace;
-    }
-
-    .sp-price {
-        color: #C5A059;
-        font-weight: 700;
-        white-space: nowrap;
-    }
-
-    .sp-sub {
-        color: #888;
-        font-size: .85rem;
-    }
-
-    .badge-form {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #ddd;
-        padding: 3px 8px;
         border-radius: 6px;
-        font-size: 0.78rem;
+        border: 1px solid var(--adm-border);
+        background: #111317;
     }
 
-    /* Size badges trong bảng */
-    .size-badge {
-        display: inline-block;
-        padding: 2px 7px;
-        font-size: 0.75rem;
+    .sp-title-cell {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+
+    .sp-name-text {
         font-weight: 600;
+        color: var(--adm-text-main);
+        font-size: 0.88rem;
+    }
+
+    .sp-sku-tag {
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: var(--adm-gold);
+    }
+
+    .sp-cat-badge {
+        color: var(--adm-text-muted);
+        font-size: 0.82rem;
+    }
+
+    .sp-price-text {
+        font-weight: 700;
+        color: var(--adm-text-main);
+        white-space: nowrap;
+        font-size: 0.88rem;
+    }
+
+    .sp-form-pill {
+        display: inline-block;
+        padding: 3px 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--adm-border);
         border-radius: 4px;
-        margin: 2px;
+        font-size: 0.75rem;
+        color: var(--adm-text-muted);
     }
 
-    .size-badge-in {
-        background: rgba(46, 204, 113, 0.15);
-        color: #2ecc71;
-        border: 1px solid rgba(46, 204, 113, 0.35);
+    /* SIZE BADGES */
+    .size-inventory-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        max-width: 240px;
     }
 
-    .size-badge-out {
-        background: rgba(231, 76, 60, 0.15);
-        color: #e74c3c;
-        border: 1px solid rgba(231, 76, 60, 0.35);
-        opacity: 0.7;
+    .size-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.72rem;
+        font-weight: 600;
     }
 
-    .td-actions {
+    .size-pill-in {
+        background: rgba(16, 185, 129, 0.12);
+        color: #34d399;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .size-pill-out {
+        background: rgba(239, 68, 68, 0.12);
+        color: #f87171;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        opacity: 0.8;
+    }
+
+    .stock-summary {
+        font-size: 0.75rem;
+        color: var(--adm-text-dim);
+        margin-bottom: 4px;
+    }
+
+    /* ACTION BUTTONS */
+    .action-group {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         justify-content: center;
     }
 
-    .empty-row td {
-        text-align: center;
-        padding: 40px;
-        color: #555;
+    .btn-act {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-size: 0.82rem;
+        transition: all 0.2s;
     }
 
-    /* Modal Styling */
-    .sp-modal-overlay {
-        display: none;
+    .btn-act-edit {
+        background: rgba(212, 178, 111, 0.1);
+        color: var(--adm-gold);
+        border-color: rgba(212, 178, 111, 0.3);
+    }
+
+    .btn-act-edit:hover {
+        background: var(--adm-gold);
+        color: #111317;
+    }
+
+    .btn-act-del {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-act-del:hover {
+        background: #ef4444;
+        color: #fff;
+    }
+
+    /* MODAL STYLING */
+    .adm-modal-backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, .82);
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(5px);
         z-index: 1050;
+        display: none;
         align-items: center;
         justify-content: center;
         padding: 20px;
-        backdrop-filter: blur(5px);
     }
 
-    .sp-modal-overlay.active {
+    .adm-modal-backdrop.active {
         display: flex;
     }
 
-    .sp-modal {
-        background: #181818;
-        border: 1px solid #333;
-        border-radius: 18px;
+    .adm-modal-card {
+        background: var(--adm-bg-card);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
         width: 100%;
         max-width: 680px;
         max-height: 90vh;
         overflow-y: auto;
-        padding: 30px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
         position: relative;
-        animation: modalIn .22s ease;
+        padding: 28px;
     }
 
-    @keyframes modalIn {
-        from {
-            opacity: 0;
-            transform: translateY(-18px) scale(.97);
-        }
-        to {
-            opacity: 1;
-            transform: none;
-        }
-    }
-
-    .sp-modal h3 {
-        color: #C5A059;
-        font-family: 'Playfair Display', serif;
-        font-size: 1.4rem;
-        margin: 0 0 20px;
+    .adm-modal-header {
         display: flex;
         align-items: center;
-        gap: 10px;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--adm-border);
+        padding-bottom: 14px;
     }
 
-    .sp-modal-close {
-        position: absolute;
-        top: 16px;
-        right: 18px;
-        background: none;
+    .adm-modal-title {
+        font-family: var(--adm-font-heading);
+        font-size: 1.35rem;
+        color: var(--adm-text-main);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .adm-modal-title i {
+        color: var(--adm-gold);
+    }
+
+    .adm-modal-close {
+        background: transparent;
         border: none;
-        color: #777;
-        font-size: 1.5rem;
+        color: var(--adm-text-dim);
+        font-size: 1.4rem;
         cursor: pointer;
-        transition: color .2s;
         line-height: 1;
+        transition: color 0.2s;
     }
 
-    .sp-modal-close:hover {
-        color: #ff5555;
+    .adm-modal-close:hover {
+        color: #fff;
     }
 
-    .form-group {
+    .form-group-adm {
         margin-bottom: 16px;
     }
 
-    .form-label {
-        color: #C5A059;
-        font-weight: 600;
-        font-size: .85rem;
-        margin-bottom: 6px;
+    .form-label-adm {
         display: block;
-        letter-spacing: .3px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--adm-text-muted);
+        margin-bottom: 6px;
+        letter-spacing: 0.3px;
     }
 
-    .form-control,
-    .form-select {
-        background: #111;
-        border: 2px solid #363636;
-        color: #e0e0e0;
-        border-radius: 9px;
-        padding: 9px 13px;
+    .form-ctrl-adm {
         width: 100%;
-        font-size: .92rem;
-        transition: border-color .25s, box-shadow .25s;
-        box-sizing: border-box;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #C5A059;
-        background: #161616;
+        background: var(--adm-bg-main);
+        border: 1px solid var(--adm-border);
+        border-radius: 6px;
+        padding: 8px 14px;
+        color: var(--adm-text-main);
+        font-size: 0.85rem;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(197, 160, 89, .15);
-        color: #e0e0e0;
+        transition: all 0.2s;
     }
 
-    .form-control::placeholder {
-        color: #555;
+    .form-ctrl-adm:focus {
+        border-color: var(--adm-gold);
+        box-shadow: 0 0 0 2px var(--adm-gold-glow);
     }
 
-    .form-select option {
-        background: #1a1a1a;
-    }
-
-    textarea.form-control {
-        resize: vertical;
-        min-height: 80px;
-    }
-
-    .form-row {
+    .form-row-2 {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 14px;
     }
 
-    /* Box quản lý số lượng tồn theo từng Size */
-    .sizes-box {
-        background: #131313;
-        border: 1px solid #2e2e2e;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 18px;
+    @media (max-width: 576px) {
+        .form-row-2 {
+            grid-template-columns: 1fr;
+        }
     }
 
-    .sizes-box-title {
-        color: #C5A059;
-        font-size: 0.9rem;
-        font-weight: 700;
+    /* MATRIX NHẬP SIZE */
+    .sizes-matrix-wrap {
+        background: var(--adm-bg-main);
+        border: 1px solid var(--adm-border);
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+
+    .sizes-matrix-title {
+        color: var(--adm-gold);
+        font-size: 0.82rem;
+        font-weight: 600;
         margin-bottom: 12px;
         display: flex;
         align-items: center;
         gap: 6px;
     }
 
-    .sizes-grid {
+    .sizes-matrix-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         gap: 10px;
     }
 
-    .size-col {
-        background: #1c1c1c;
-        border: 1px solid #383838;
-        border-radius: 8px;
-        padding: 8px;
-        text-align: center;
+    @media (max-width: 576px) {
+        .sizes-matrix-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
     }
 
-    .size-col label {
-        color: #f0f0f0;
-        font-weight: 700;
-        font-size: 0.85rem;
+    .size-input-col label {
         display: block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--adm-text-main);
+        text-align: center;
         margin-bottom: 4px;
     }
 
-    .size-col input {
+    .size-input-col input {
         text-align: center;
-        padding: 6px;
-        font-weight: 600;
-        color: #C5A059;
+        padding: 6px 4px;
     }
 
-    .size-col .size-note {
-        font-size: 0.7rem;
-        color: #777;
+    .size-input-col span {
+        display: block;
+        font-size: 0.68rem;
+        color: var(--adm-text-dim);
+        text-align: center;
         margin-top: 4px;
     }
 
-    @media(max-width:560px) {
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-        .sizes-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    .form-errors {
-        background: rgba(255, 68, 68, .08);
-        border: 1px solid rgba(255, 68, 68, .35);
-        border-radius: 9px;
-        padding: 12px 16px;
-        margin-bottom: 18px;
-    }
-
-    .form-errors div {
-        color: #ff6b6b;
-        font-size: .86rem;
+    .adm-modal-actions {
         display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 24px;
+        padding-top: 16px;
+        border-top: 1px solid var(--adm-border);
+    }
+
+    .btn-modal-cancel {
+        background: transparent;
+        border: 1px solid var(--adm-border);
+        color: var(--adm-text-muted);
+        padding: 8px 18px;
+        border-radius: 6px;
+        font-size: 0.84rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-modal-cancel:hover {
+        color: #fff;
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-modal-submit {
+        background: var(--adm-gold);
+        color: #111317;
+        border: none;
+        padding: 8px 22px;
+        border-radius: 6px;
+        font-size: 0.84rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
         align-items: center;
         gap: 6px;
-        margin-bottom: 4px;
+        transition: all 0.2s;
     }
 
-    .current-img {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 10px;
+    .btn-modal-submit:hover {
+        background: var(--adm-gold-light);
+        box-shadow: 0 4px 15px rgba(212, 178, 111, 0.3);
     }
 
-    .current-img img {
-        width: 70px;
-        height: 70px;
-        object-fit: cover;
-        border-radius: 8px;
-        border: 1px solid #333;
-    }
-
-    .current-img span {
-        color: #888;
-        font-size: .82rem;
-    }
-
-    .modal-footer {
-        display: flex;
-        gap: 12px;
-        margin-top: 14px;
-        flex-wrap: wrap;
-    }
-
-    .btn-save {
-        padding: 10px 28px;
-        background: linear-gradient(135deg, #C5A059, #a08045);
-        color: #000;
-        border: none;
-        border-radius: 25px;
-        font-weight: 700;
-        cursor: pointer;
-        font-size: .9rem;
-        transition: all .25s;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-    }
-
-    .btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 16px rgba(197, 160, 89, .4);
-    }
-
-    .btn-cancel-modal {
-        padding: 10px 28px;
-        background: transparent;
-        color: #C5A059;
-        border: 2px solid #C5A059;
-        border-radius: 25px;
-        font-weight: 700;
-        font-size: .9rem;
-        cursor: pointer;
-        transition: all .25s;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-    }
-
-    .btn-cancel-modal:hover {
-        background: #C5A059;
-        color: #000;
-    }
-
-    .del-modal {
+    /* MODAL XÓA */
+    .adm-modal-delete {
         max-width: 420px;
         text-align: center;
     }
 
-    .del-modal .del-icon {
-        font-size: 3rem;
-        margin-bottom: 14px;
-        color: #ff5555;
-    }
-
-    .del-modal h3 {
-        justify-content: center;
-    }
-
-    .del-modal p {
-        color: #aaa;
-        margin-bottom: 24px;
-        font-size: .95rem;
-        line-height: 1.6;
-    }
-
-    .btn-del-confirm {
-        padding: 11px 30px;
-        background: linear-gradient(135deg, #ff4444, #cc2222);
-        color: #fff;
-        border: none;
-        border-radius: 25px;
-        font-weight: 700;
-        cursor: pointer;
-        font-size: .9rem;
-        transition: all .25s;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-    }
-
-    .btn-del-confirm:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 16px rgba(255, 68, 68, .4);
+    .del-alert-icon {
+        font-size: 2.8rem;
+        color: #ef4444;
+        margin-bottom: 12px;
     }
 </style>
+@endsection
 
+@section('content')
 <meta name="base-img-url" content="{{ asset('images/') }}/">
-<meta name="has-add-errors" content="{{ $errors->getBag('add')->any()  ? '1' : '0' }}">
-<meta name="has-edit-errors" content="{{ $errors->getBag('edit')->any() ? '1' : '0' }}">
+<meta name="has-add-errors" content="{{ (isset($errors) && $errors->hasBag('add') && $errors->getBag('add')->any()) ? '1' : '0' }}">
+<meta name="has-edit-errors" content="{{ (isset($errors) && $errors->hasBag('edit') && $errors->getBag('edit')->any()) ? '1' : '0' }}">
 
-<div class="sp-wrap">
-
-    <div class="sp-header">
-        <h2 class="sp-title">
-            <i class="bi bi-box-seam-fill"></i> Quản Lý Sản Phẩm & Kho Size
-        </h2>
-        <button class="btn-add" onclick="openModal('modal-add')">
-            <i class="bi bi-plus-circle-fill"></i> Thêm Sản Phẩm Mới
+<!-- TẦNG 1: PAGE HEADER -->
+<div class="admin-page-header">
+    <div class="admin-page-title">
+        <h2>Quản Lý Sản Phẩm & Kho Size</h2>
+        <p>Kiểm soát danh mục âu phục vest, theo dõi ma trận số lượng tồn theo từng size (S, M, L, XL, XXL)</p>
+    </div>
+    <div>
+        <button type="button" class="btn-admin-add" onclick="openAdminModal('modal-add')">
+            <i class="bi bi-plus-lg"></i>
+            <span>Thêm Sản Phẩm Mới</span>
         </button>
     </div>
+</div>
 
-    @if(session('success'))
-    <div class="sp-alert">
-        <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+<!-- TẦNG 2: 4 THẺ KPI CHỈ SỐ NHANH -->
+@php
+    $totalCount = $sanPhams->count();
+    $totalInventory = $sanPhams->sum(fn($sp) => $sp->tongTonKho());
+    $lowStockCount = $sanPhams->filter(fn($sp) => $sp->tongTonKho() <= 5)->count();
+    $categoriesCount = $danhMucs->count();
+@endphp
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-info-label">Tổng Mẫu Vest</div>
+            <div class="kpi-info-val">{{ $totalCount }}</div>
+        </div>
+        <div class="kpi-icon-box kpi-icon-gold">
+            <i class="bi bi-box-seam"></i>
+        </div>
     </div>
-    @endif
 
-    @if(session('error'))
-    <div class="sp-alert sp-alert-err">
-        <i class="bi bi-x-circle-fill"></i> {{ session('error') }}
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-info-label">Tổng Tồn Kho (Bộ)</div>
+            <div class="kpi-info-val">{{ number_format($totalInventory, 0, ',', '.') }}</div>
+        </div>
+        <div class="kpi-icon-box kpi-icon-emerald">
+            <i class="bi bi-stack"></i>
+        </div>
     </div>
-    @endif
 
-    <div class="admin-table">
-        <table>
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-info-label">Sắp Hết / Hết Kho</div>
+            <div class="kpi-info-val" style="color: {{ $lowStockCount > 0 ? '#fbbf24' : '#34d399' }};">{{ $lowStockCount }}</div>
+        </div>
+        <div class="kpi-icon-box kpi-icon-amber">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div>
+            <div class="kpi-info-label">Danh Mục Âu Phục</div>
+            <div class="kpi-info-val">{{ $categoriesCount }}</div>
+        </div>
+        <div class="kpi-icon-box kpi-icon-blue">
+            <i class="bi bi-tags"></i>
+        </div>
+    </div>
+</div>
+
+<!-- TẦNG 3: TOOLBAR TÌM KIẾM & LỌC TỨC THÌ (CLIENT-SIDE) -->
+<div class="admin-toolbar">
+    <div class="toolbar-search-box">
+        <i class="bi bi-search"></i>
+        <input type="text" id="liveSearchInput" placeholder="Tìm theo tên vest, mã SKU, chất liệu vải..." class="toolbar-search-input" onkeyup="filterProductTable()">
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <select id="filterCategorySelect" class="toolbar-select" onchange="filterProductTable()">
+            <option value="">Tất cả danh mục</option>
+            @foreach($danhMucs as $dm)
+            <option value="{{ strtolower($dm->ten_danh_muc) }}">{{ $dm->ten_danh_muc }}</option>
+            @endforeach
+        </select>
+
+        <select id="filterStockSelect" class="toolbar-select" onchange="filterProductTable()">
+            <option value="">Tất cả trạng thái tồn</option>
+            <option value="in_stock">Còn hàng (> 5 bộ)</option>
+            <option value="low_stock">Sắp hết / Hết kho (<= 5)</option>
+        </select>
+    </div>
+</div>
+
+<!-- TẦNG 4: BẢNG DỮ LIỆU DATA TABLE -->
+<div class="admin-table-card">
+    <div class="admin-table-responsive">
+        <table class="adm-table" id="productTable">
             <thead>
                 <tr>
-                    <th>Ảnh</th>
-                    <th>Sản phẩm & Mã</th>
-                    <th>Danh mục</th>
-                    <th>Giá bán</th>
-                    <th>Dáng áo</th>
-                    <th>Tồn kho theo Size</th>
-                    <th class="text-center">Thao tác</th>
+                    <th style="width: 70px;">Ảnh</th>
+                    <th>Mã & Tên Sản Phẩm</th>
+                    <th>Danh Mục</th>
+                    <th>Giá Niêm Yết</th>
+                    <th>Form Dáng</th>
+                    <th>Tồn Kho Từng Size</th>
+                    <th class="text-center" style="width: 100px;">Thao Tác</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($sanPhams as $sp)
-                <tr>
+                @php
+                    $tongKho = $sp->tongTonKho();
+                    $sku = $sp->ma_sp ?: 'VS-' . str_pad($sp->id, 3, '0', STR_PAD_LEFT);
+                @endphp
+                <tr class="product-row"
+                    data-name="{{ strtolower($sp->ten_sp) }}"
+                    data-sku="{{ strtolower($sku) }}"
+                    data-cat="{{ strtolower($sp->danhMuc->ten_danh_muc ?? '') }}"
+                    data-material="{{ strtolower($sp->chat_lieu ?? '') }}"
+                    data-stock="{{ $tongKho }}">
                     <td>
                         @if($sp->hinh_anh)
-                        <img class="sp-img" src="{{ asset('images/'.$sp->hinh_anh) }}" alt="{{ $sp->ten_sp }}">
+                        <img src="{{ asset('images/' . $sp->hinh_anh) }}" alt="{{ $sp->ten_sp }}" class="sp-thumb" loading="lazy">
                         @else
-                        <img class="sp-img" src="https://via.placeholder.com/56x56/1a1a1a/555?text=?" alt="no image">
+                        <div class="sp-thumb d-flex align-items-center justify-content-center text-muted">
+                            <i class="bi bi-image"></i>
+                        </div>
                         @endif
                     </td>
                     <td>
-                        <span class="sp-name">{{ $sp->ten_sp }}</span>
-                        <span class="sp-code">{{ $sp->ma_sp ?? '—' }}</span>
-                    </td>
-                    <td><span class="sp-sub">{{ $sp->danhMuc->ten_danh_muc ?? '—' }}</span></td>
-                    <td><span class="sp-price">{{ number_format($sp->gia_ban ?? $sp->gia, 0, ',', '.') }} VNĐ</span></td>
-                    <td><span class="badge-form">{{ $sp->form_dang ?? 'Slim-fit' }}</span></td>
-                    <td>
-                        <div style="font-size:0.85rem; color:#aaa; margin-bottom:4px;">
-                            Tổng kho: <strong style="color:#C5A059;">{{ $sp->tongTonKho() }}</strong> cái
+                        <div class="sp-title-cell">
+                            <span class="sp-name-text">{{ $sp->ten_sp }}</span>
+                            <span class="sp-sku-tag">{{ $sku }}</span>
                         </div>
-                        <div>
+                    </td>
+                    <td>
+                        <span class="sp-cat-badge">{{ $sp->danhMuc->ten_danh_muc ?? 'Chưa phân loại' }}</span>
+                    </td>
+                    <td>
+                        <span class="sp-price-text">{{ number_format($sp->gia_ban ?? $sp->gia, 0, ',', '.') }} ₫</span>
+                    </td>
+                    <td>
+                        <span class="sp-form-pill">{{ $sp->form_dang ?: 'Slim-fit' }}</span>
+                    </td>
+                    <td>
+                        <div class="stock-summary">
+                            Tổng tồn: <strong style="color: {{ $tongKho <= 5 ? '#f87171' : 'var(--adm-gold)' }};">{{ $tongKho }}</strong> bộ
+                        </div>
+                        <div class="size-inventory-box">
                             @foreach($sp->sizes as $s)
-                                <span class="size-badge {{ $s->so_luong_ton > 0 ? 'size-badge-in' : 'size-badge-out' }}">
-                                    {{ $s->ten_size }}: {{ $s->so_luong_ton }}
-                                </span>
+                            <span class="size-pill {{ $s->so_luong_ton > 0 ? 'size-pill-in' : 'size-pill-out' }}" title="Size {{ $s->ten_size }}: {{ $s->so_luong_ton }} cái">
+                                {{ $s->ten_size }}: {{ $s->so_luong_ton }}
+                            </span>
                             @endforeach
                         </div>
                     </td>
                     <td>
-                        <div class="td-actions">
-                            <button class="btn-icon btn-icon-edit" title="Sửa & Cập nhật tồn kho"
+                        <div class="action-group">
+                            <button type="button" class="btn-act btn-act-edit" title="Chỉnh sửa sản phẩm & kho size"
                                 data-id="{{ $sp->id }}"
                                 data-masp="{{ $sp->ma_sp }}"
                                 data-ten="{{ $sp->ten_sp }}"
@@ -619,66 +758,72 @@
                                 data-mota="{{ $sp->mo_ta }}"
                                 data-hinhanh="{{ $sp->hinh_anh }}"
                                 data-sizes="{{ json_encode($sp->sizes->pluck('so_luong_ton', 'ten_size')) }}"
-                                onclick="openEditModal(this)">
-                                <i class="bi bi-pencil-fill"></i>
+                                onclick="openAdminEditModal(this)">
+                                <i class="bi bi-pencil"></i>
                             </button>
 
-                            <button class="btn-icon btn-icon-del" title="Xóa"
+                            <button type="button" class="btn-act btn-act-del" title="Xóa sản phẩm"
                                 data-id="{{ $sp->id }}"
                                 data-ten="{{ $sp->ten_sp }}"
-                                onclick="openDeleteModal(this)">
-                                <i class="bi bi-trash3-fill"></i>
+                                onclick="openAdminDeleteModal(this)">
+                                <i class="bi bi-trash"></i>
                             </button>
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr class="empty-row">
-                    <td colspan="7">
-                        <i class="bi bi-inbox" style="font-size:2rem;display:block;margin-bottom:10px;"></i>
-                        Chưa có sản phẩm nào trong kho
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-2 d-block mb-2" style="color: var(--adm-gold); opacity: 0.4;"></i>
+                        Chưa có sản phẩm nào trong kho dữ liệu.
                     </td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-
 </div>
 
 <!-- ================= MODAL THÊM SẢN PHẨM ================= -->
-<div class="sp-modal-overlay" id="modal-add">
-    <div class="sp-modal">
-        <button class="sp-modal-close" onclick="closeModal('modal-add')">&times;</button>
-        <h3><i class="bi bi-plus-circle-fill"></i> Thêm Sản Phẩm Mới</h3>
+<div class="adm-modal-backdrop" id="modal-add">
+    <div class="adm-modal-card">
+        <div class="adm-modal-header">
+            <h3 class="adm-modal-title">
+                <i class="bi bi-plus-circle"></i> Thêm Sản Phẩm Mới
+            </h3>
+            <button type="button" class="adm-modal-close" onclick="closeAdminModal('modal-add')">&times;</button>
+        </div>
 
-        @if($errors->getBag('add')->any())
-        <div class="form-errors">
-            @foreach($errors->getBag('add')->all() as $err)
-            <div><i class="bi bi-exclamation-circle-fill"></i> {{ $err }}</div>
-            @endforeach
+        @if(isset($errors) && $errors->hasBag('add') && $errors->getBag('add')->any())
+        <div class="admin-alert admin-alert-error mb-3">
+            <i class="bi bi-exclamation-circle-fill fs-5"></i>
+            <div>
+                <ul class="mb-0 ps-3">
+                    @foreach($errors->getBag('add')->all() as $err)
+                    <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
         @endif
 
         <form action="{{ route('sanpham.luuthem') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Tên sản phẩm *</label>
-                    <input type="text" name="ten_sp" class="form-control"
-                        value="{{ old('ten_sp') }}" placeholder="VD: Áo Vest Classic Navy 2 Cúc" required>
+            <div class="form-row-2">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Tên sản phẩm vest *</label>
+                    <input type="text" name="ten_sp" class="form-ctrl-adm" value="{{ old('ten_sp') }}" placeholder="VD: Vest Classic Navy 2 Cúc" required>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Mã SKU (tự sinh nếu để trống)</label>
-                    <input type="text" name="ma_sp" class="form-control"
-                        value="{{ old('ma_sp') }}" placeholder="VD: VEST-NAVY-01">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Mã SKU (tự sinh nếu để trống)</label>
+                    <input type="text" name="ma_sp" class="form-ctrl-adm" value="{{ old('ma_sp') }}" placeholder="VD: VEST-NAVY-01">
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Danh mục *</label>
-                    <select name="danh_muc_id" class="form-select" required>
+            <div class="form-row-2">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Danh mục *</label>
+                    <select name="danh_muc_id" class="form-ctrl-adm" required>
                         <option value="">-- Chọn danh mục --</option>
                         @foreach($danhMucs as $dm)
                         <option value="{{ $dm->id }}" {{ old('danh_muc_id') == $dm->id ? 'selected' : '' }}>
@@ -687,83 +832,80 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Giá bán niêm yết (VNĐ) *</label>
-                    <input type="number" name="gia" class="form-control"
-                        value="{{ old('gia') }}" placeholder="VD: 3200000" required>
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Giá niêm yết (VNĐ) *</label>
+                    <input type="number" name="gia" class="form-ctrl-adm" value="{{ old('gia') }}" placeholder="VD: 3200000" min="0" required>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Form dáng áo</label>
-                    <select name="form_dang" class="form-select">
+            <div class="form-row-2">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Form dáng áo</label>
+                    <select name="form_dang" class="form-ctrl-adm">
                         <option value="Slim-fit" {{ old('form_dang') == 'Slim-fit' ? 'selected' : '' }}>Slim-fit (Ôm dáng hiện đại)</option>
                         <option value="Regular" {{ old('form_dang') == 'Regular' ? 'selected' : '' }}>Regular (Vừa vặn thoải mái)</option>
                         <option value="Classic" {{ old('form_dang') == 'Classic' ? 'selected' : '' }}>Classic (Cổ điển phong độ)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Chất liệu vải</label>
-                    <input type="text" name="chat_lieu" class="form-control"
-                        value="{{ old('chat_lieu') }}" placeholder="VD: Wool Ý 100%, Tuytsi Hàn">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Chất liệu vải</label>
+                    <input type="text" name="chat_lieu" class="form-ctrl-adm" value="{{ old('chat_lieu') }}" placeholder="VD: Wool Ý 100%, Tuytsi Hàn">
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Xuất xứ</label>
-                <input type="text" name="xuat_xu" class="form-control"
-                    value="{{ old('xuat_xu') }}" placeholder="VD: Nhập khẩu Italy, May đo Việt Nam">
+            <div class="form-group-adm">
+                <label class="form-label-adm">Xuất xứ sản phẩm</label>
+                <input type="text" name="xuat_xu" class="form-ctrl-adm" value="{{ old('xuat_xu') }}" placeholder="VD: Nhập khẩu Italy, May đo thủ công Việt Nam">
             </div>
 
-            <!-- PHẦN NHẬP TỒN KHO TỪNG SIZE -->
-            <div class="sizes-box">
-                <div class="sizes-box-title">
-                    <i class="bi bi-stack"></i> Nhập số lượng tồn kho theo từng Size:
+            <!-- MA TRẬN NHẬP TỒN KHO TỪNG SIZE -->
+            <div class="sizes-matrix-wrap">
+                <div class="sizes-matrix-title">
+                    <i class="bi bi-stack"></i> Thiết lập số lượng tồn kho từng Size:
                 </div>
-                <div class="sizes-grid">
-                    <div class="size-col">
+                <div class="sizes-matrix-grid">
+                    <div class="size-input-col">
                         <label>Size S</label>
-                        <input type="number" name="sizes[S]" class="form-control" min="0" value="{{ old('sizes.S', 0) }}">
-                        <div class="size-note">1m60-1m68</div>
+                        <input type="number" name="sizes[S]" class="form-ctrl-adm" min="0" value="{{ old('sizes.S', 0) }}">
+                        <span>1m60-1m68</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size M</label>
-                        <input type="number" name="sizes[M]" class="form-control" min="0" value="{{ old('sizes.M', 0) }}">
-                        <div class="size-note">1m68-1m74</div>
+                        <input type="number" name="sizes[M]" class="form-ctrl-adm" min="0" value="{{ old('sizes.M', 0) }}">
+                        <span>1m68-1m74</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size L</label>
-                        <input type="number" name="sizes[L]" class="form-control" min="0" value="{{ old('sizes.L', 0) }}">
-                        <div class="size-note">1m74-1m78</div>
+                        <input type="number" name="sizes[L]" class="form-ctrl-adm" min="0" value="{{ old('sizes.L', 0) }}">
+                        <span>1m74-1m78</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size XL</label>
-                        <input type="number" name="sizes[XL]" class="form-control" min="0" value="{{ old('sizes.XL', 0) }}">
-                        <div class="size-note">1m78-1m83</div>
+                        <input type="number" name="sizes[XL]" class="form-ctrl-adm" min="0" value="{{ old('sizes.XL', 0) }}">
+                        <span>1m78-1m83</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size XXL</label>
-                        <input type="number" name="sizes[XXL]" class="form-control" min="0" value="{{ old('sizes.XXL', 0) }}">
-                        <div class="size-note">1m80-1m88</div>
+                        <input type="number" name="sizes[XXL]" class="form-ctrl-adm" min="0" value="{{ old('sizes.XXL', 0) }}">
+                        <span>1m80-1m88</span>
                     </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Mô tả sản phẩm</label>
-                <textarea name="mo_ta" class="form-control" placeholder="Mô tả ve áo, lớp lót, phong cách mặc...">{{ old('mo_ta') }}</textarea>
+            <div class="form-group-adm">
+                <label class="form-label-adm">Mô tả sản phẩm</label>
+                <textarea name="mo_ta" class="form-ctrl-adm" rows="3" placeholder="Mô tả ve áo, ve xếch, lớp lót lụa, dịp mặc phù hợp...">{{ old('mo_ta') }}</textarea>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Hình ảnh áo vest</label>
-                <input type="file" name="hinh_anh" class="form-control" accept="image/*">
+            <div class="form-group-adm">
+                <label class="form-label-adm">Hình ảnh trang phục</label>
+                <input type="file" name="hinh_anh" class="form-ctrl-adm" accept="image/*">
             </div>
 
-            <div class="modal-footer">
-                <button type="submit" class="btn-save"><i class="bi bi-save-fill"></i> Lưu Sản Phẩm</button>
-                <button type="button" class="btn-cancel-modal" onclick="closeModal('modal-add')">
-                    <i class="bi bi-x-circle"></i> Hủy
+            <div class="adm-modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeAdminModal('modal-add')">Hủy bỏ</button>
+                <button type="submit" class="btn-modal-submit">
+                    <i class="bi bi-save"></i> Lưu Sản Phẩm
                 </button>
             </div>
         </form>
@@ -771,120 +913,127 @@
 </div>
 
 <!-- ================= MODAL SỬA SẢN PHẨM & TỒN KHO ================= -->
-<div class="sp-modal-overlay" id="modal-edit">
-    <div class="sp-modal">
-        <button class="sp-modal-close" onclick="closeModal('modal-edit')">&times;</button>
-        <h3><i class="bi bi-pencil-fill"></i> Sửa Sản Phẩm & Tồn Kho</h3>
+<div class="adm-modal-backdrop" id="modal-edit">
+    <div class="adm-modal-card">
+        <div class="adm-modal-header">
+            <h3 class="adm-modal-title">
+                <i class="bi bi-pencil-square"></i> Cập Nhật Sản Phẩm & Kho Size
+            </h3>
+            <button type="button" class="adm-modal-close" onclick="closeAdminModal('modal-edit')">&times;</button>
+        </div>
 
-        @if($errors->getBag('edit')->any())
-        <div class="form-errors">
-            @foreach($errors->getBag('edit')->all() as $err)
-            <div><i class="bi bi-exclamation-circle-fill"></i> {{ $err }}</div>
-            @endforeach
+        @if(isset($errors) && $errors->hasBag('edit') && $errors->getBag('edit')->any())
+        <div class="admin-alert admin-alert-error mb-3">
+            <i class="bi bi-exclamation-circle-fill fs-5"></i>
+            <div>
+                <ul class="mb-0 ps-3">
+                    @foreach($errors->getBag('edit')->all() as $err)
+                    <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
         </div>
         @endif
 
         <form id="form-edit" action="" method="POST" enctype="multipart/form-data">
             @csrf
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Tên sản phẩm *</label>
-                    <input type="text" id="edit_ten_sp" name="ten_sp" class="form-control" required>
+            <div class="form-row-2">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Tên sản phẩm *</label>
+                    <input type="text" id="edit_ten_sp" name="ten_sp" class="form-ctrl-adm" required>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Mã SKU</label>
-                    <input type="text" id="edit_ma_sp" name="ma_sp" class="form-control">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Mã SKU</label>
+                    <input type="text" id="edit_ma_sp" name="ma_sp" class="form-ctrl-adm">
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Danh mục *</label>
-                    <select id="edit_danh_muc_id" name="danh_muc_id" class="form-select" required>
+            <div class="form-row-2">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Danh mục *</label>
+                    <select id="edit_danh_muc_id" name="danh_muc_id" class="form-ctrl-adm" required>
                         <option value="">-- Chọn danh mục --</option>
                         @foreach($danhMucs as $dm)
                         <option value="{{ $dm->id }}">{{ $dm->ten_danh_muc }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Giá bán (VNĐ) *</label>
-                    <input type="number" id="edit_gia" name="gia" class="form-control" required>
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Giá niêm yết (VNĐ) *</label>
+                    <input type="number" id="edit_gia" name="gia" class="form-ctrl-adm" min="0" required>
                 </div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label class="form-label">Form dáng áo</label>
-                    <select id="edit_form_dang" name="form_dang" class="form-select">
-                        <option value="Slim-fit">Slim-fit (Ôm dáng)</option>
-                        <option value="Regular">Regular (Vừa vặn)</option>
+            <div class="form-row-2">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Form dáng áo</label>
+                    <select id="edit_form_dang" name="form_dang" class="form-ctrl-adm">
+                        <option value="Slim-fit">Slim-fit (Ôm dáng hiện đại)</option>
+                        <option value="Regular">Regular (Vừa vặn thoải mái)</option>
                         <option value="Classic">Classic (Cổ điển)</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label class="form-label">Chất liệu vải</label>
-                    <input type="text" id="edit_chat_lieu" name="chat_lieu" class="form-control">
+                <div class="form-group-adm">
+                    <label class="form-label-adm">Chất liệu vải</label>
+                    <input type="text" id="edit_chat_lieu" name="chat_lieu" class="form-ctrl-adm">
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Xuất xứ</label>
-                <input type="text" id="edit_xuat_xu" name="xuat_xu" class="form-control">
+            <div class="form-group-adm">
+                <label class="form-label-adm">Xuất xứ</label>
+                <input type="text" id="edit_xuat_xu" name="xuat_xu" class="form-ctrl-adm">
             </div>
 
-            <!-- SỬA TỒN KHO THEO SIZE -->
-            <div class="sizes-box">
-                <div class="sizes-box-title">
-                    <i class="bi bi-stack"></i> Cập nhật số lượng tồn kho theo từng Size:
+            <!-- MA TRẬN SỬA TỒN KHO TỪNG SIZE -->
+            <div class="sizes-matrix-wrap">
+                <div class="sizes-matrix-title">
+                    <i class="bi bi-stack"></i> Cập nhật tồn kho theo từng Size:
                 </div>
-                <div class="sizes-grid">
-                    <div class="size-col">
+                <div class="sizes-matrix-grid">
+                    <div class="size-input-col">
                         <label>Size S</label>
-                        <input type="number" id="edit_size_S" name="sizes[S]" class="form-control" min="0" value="0">
-                        <div class="size-note">1m60-1m68</div>
+                        <input type="number" id="edit_size_S" name="sizes[S]" class="form-ctrl-adm" min="0" value="0">
+                        <span>1m60-1m68</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size M</label>
-                        <input type="number" id="edit_size_M" name="sizes[M]" class="form-control" min="0" value="0">
-                        <div class="size-note">1m68-1m74</div>
+                        <input type="number" id="edit_size_M" name="sizes[M]" class="form-ctrl-adm" min="0" value="0">
+                        <span>1m68-1m74</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size L</label>
-                        <input type="number" id="edit_size_L" name="sizes[L]" class="form-control" min="0" value="0">
-                        <div class="size-note">1m74-1m78</div>
+                        <input type="number" id="edit_size_L" name="sizes[L]" class="form-ctrl-adm" min="0" value="0">
+                        <span>1m74-1m78</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size XL</label>
-                        <input type="number" id="edit_size_XL" name="sizes[XL]" class="form-control" min="0" value="0">
-                        <div class="size-note">1m78-1m83</div>
+                        <input type="number" id="edit_size_XL" name="sizes[XL]" class="form-ctrl-adm" min="0" value="0">
+                        <span>1m78-1m83</span>
                     </div>
-                    <div class="size-col">
+                    <div class="size-input-col">
                         <label>Size XXL</label>
-                        <input type="number" id="edit_size_XXL" name="sizes[XXL]" class="form-control" min="0" value="0">
-                        <div class="size-note">1m80-1m88</div>
+                        <input type="number" id="edit_size_XXL" name="sizes[XXL]" class="form-ctrl-adm" min="0" value="0">
+                        <span>1m80-1m88</span>
                     </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Mô tả</label>
-                <textarea id="edit_mo_ta" name="mo_ta" class="form-control"></textarea>
+            <div class="form-group-adm">
+                <label class="form-label-adm">Mô tả</label>
+                <textarea id="edit_mo_ta" name="mo_ta" class="form-ctrl-adm" rows="3"></textarea>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Hình ảnh hiện tại</label>
-                <div class="current-img" id="edit_img_preview"></div>
-                <label class="form-label" style="color:#888;font-weight:400">
-                    Đổi ảnh mới <span style="color:#555">(bỏ trống nếu giữ nguyên)</span>
-                </label>
-                <input type="file" name="hinh_anh" class="form-control" accept="image/*">
+            <div class="form-group-adm">
+                <label class="form-label-adm">Hình ảnh hiện tại</label>
+                <div id="edit_img_preview" class="d-flex align-items-center gap-3 mb-2 p-2 rounded" style="background: var(--adm-bg-main); border: 1px solid var(--adm-border);"></div>
+                <label class="form-label-adm" style="color: var(--adm-text-dim);">Tải ảnh mới thay thế (để trống nếu giữ nguyên):</label>
+                <input type="file" name="hinh_anh" class="form-ctrl-adm" accept="image/*">
             </div>
 
-            <div class="modal-footer">
-                <button type="submit" class="btn-save"><i class="bi bi-save-fill"></i> Cập Nhật</button>
-                <button type="button" class="btn-cancel-modal" onclick="closeModal('modal-edit')">
-                    <i class="bi bi-x-circle"></i> Hủy
+            <div class="adm-modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeAdminModal('modal-edit')">Hủy bỏ</button>
+                <button type="submit" class="btn-modal-submit">
+                    <i class="bi bi-check-lg"></i> Cập Nhật
                 </button>
             </div>
         </form>
@@ -892,68 +1041,78 @@
 </div>
 
 <!-- ================= MODAL XÁC NHẬN XÓA ================= -->
-<div class="sp-modal-overlay" id="modal-delete">
-    <div class="sp-modal del-modal">
-        <button class="sp-modal-close" onclick="closeModal('modal-delete')">&times;</button>
-        <div class="del-icon"><i class="bi bi-trash3-fill"></i></div>
-        <h3>Xác nhận xóa</h3>
-        <p id="del-confirm-text"></p>
+<div class="adm-modal-backdrop" id="modal-delete">
+    <div class="adm-modal-card adm-modal-delete">
+        <button type="button" class="adm-modal-close position-absolute top-0 end-0 m-3" onclick="closeAdminModal('modal-delete')">&times;</button>
+        <div class="del-alert-icon">
+            <i class="bi bi-trash3"></i>
+        </div>
+        <h3 class="adm-modal-title justify-content-center mb-2">Xác Nhận Xóa</h3>
+        <p id="del-confirm-text" class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.6;"></p>
         <form id="form-delete" action="" method="POST">
             @csrf
-            <div class="modal-footer" style="justify-content:center">
-                <button type="submit" class="btn-del-confirm">
-                    <i class="bi bi-trash3-fill"></i> Xóa
-                </button>
-                <button type="button" class="btn-cancel-modal" onclick="closeModal('modal-delete')">
-                    <i class="bi bi-x-circle"></i> Hủy
+            <div class="d-flex justify-content-center gap-3">
+                <button type="button" class="btn-modal-cancel" onclick="closeAdminModal('modal-delete')">Hủy</button>
+                <button type="submit" class="btn-modal-submit" style="background:#ef4444; color:#fff;">
+                    <i class="bi bi-trash"></i> Xóa Vĩnh Viễn
                 </button>
             </div>
         </form>
     </div>
 </div>
+@endsection
 
+@section('scripts')
 <script>
-    var BASE_IMG_URL = document.querySelector('meta[name="base-img-url"]').getAttribute('content');
-    var HAS_ADD_ERRORS = document.querySelector('meta[name="has-add-errors"]').getAttribute('content') === '1';
-    var HAS_EDIT_ERRORS = document.querySelector('meta[name="has-edit-errors"]').getAttribute('content') === '1';
+    const BASE_IMG_URL = document.querySelector('meta[name="base-img-url"]').getAttribute('content');
+    const HAS_ADD_ERRORS = document.querySelector('meta[name="has-add-errors"]').getAttribute('content') === '1';
+    const HAS_EDIT_ERRORS = document.querySelector('meta[name="has-edit-errors"]').getAttribute('content') === '1';
 
-    function openModal(id) {
-        document.getElementById(id).classList.add('active');
-        document.body.style.overflow = 'hidden';
+    function openAdminModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
     }
 
-    function closeModal(id) {
-        document.getElementById(id).classList.remove('active');
-        document.body.style.overflow = '';
+    function closeAdminModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
     }
 
-    document.querySelectorAll('.sp-modal-overlay').forEach(function(el) {
-        el.addEventListener('click', function(e) {
-            if (e.target === el) closeModal(el.id);
+    // Đóng modal khi bấm ra ngoài vùng card
+    document.querySelectorAll('.adm-modal-backdrop').forEach(el => {
+        el.addEventListener('click', e => {
+            if (e.target === el) closeAdminModal(el.id);
         });
     });
 
-    document.addEventListener('keydown', function(e) {
+    // Đóng khi bấm phím ESC
+    document.addEventListener('keydown', e => {
         if (e.key === 'Escape') {
-            document.querySelectorAll('.sp-modal-overlay.active').forEach(function(el) {
-                closeModal(el.id);
+            document.querySelectorAll('.adm-modal-backdrop.active').forEach(el => {
+                closeAdminModal(el.id);
             });
         }
     });
 
-    // Mở Modal Sửa sản phẩm & đổ dữ liệu size hiện có
-    function openEditModal(btn) {
-        var id       = btn.getAttribute('data-id');
-        var masp     = btn.getAttribute('data-masp') || '';
-        var ten      = btn.getAttribute('data-ten');
-        var danhMuc  = btn.getAttribute('data-danhmuc');
-        var gia      = btn.getAttribute('data-gia');
-        var formDang = btn.getAttribute('data-formdang') || 'Slim-fit';
-        var xuatXu   = btn.getAttribute('data-xuatxu') || '';
-        var chatLieu = btn.getAttribute('data-chatlieu') || '';
-        var moTa     = btn.getAttribute('data-mota') || '';
-        var hinhAnh  = btn.getAttribute('data-hinhanh') || '';
-        var sizes    = {};
+    // Mở modal sửa và đổ dữ liệu
+    function openAdminEditModal(btn) {
+        const id       = btn.getAttribute('data-id');
+        const masp     = btn.getAttribute('data-masp') || '';
+        const ten      = btn.getAttribute('data-ten');
+        const danhMuc  = btn.getAttribute('data-danhmuc');
+        const gia      = btn.getAttribute('data-gia');
+        const formDang = btn.getAttribute('data-formdang') || 'Slim-fit';
+        const xuatXu   = btn.getAttribute('data-xuatxu') || '';
+        const chatLieu = btn.getAttribute('data-chatlieu') || '';
+        const moTa     = btn.getAttribute('data-mota') || '';
+        const hinhAnh  = btn.getAttribute('data-hinhanh') || '';
+        let sizes = {};
 
         try {
             sizes = JSON.parse(btn.getAttribute('data-sizes') || '{}');
@@ -970,45 +1129,80 @@
         document.getElementById('edit_chat_lieu').value = chatLieu;
         document.getElementById('edit_mo_ta').value = moTa;
 
-        var sel = document.getElementById('edit_danh_muc_id');
-        for (var i = 0; i < sel.options.length; i++) {
+        const sel = document.getElementById('edit_danh_muc_id');
+        for (let i = 0; i < sel.options.length; i++) {
             sel.options[i].selected = (sel.options[i].value === danhMuc);
         }
 
-        // Đổ số lượng tồn kho từng size vào form
-        var standardSizes = ['S', 'M', 'L', 'XL', 'XXL'];
-        standardSizes.forEach(function(s) {
-            var input = document.getElementById('edit_size_' + s);
+        // Điền số lượng từng size
+        ['S', 'M', 'L', 'XL', 'XXL'].forEach(s => {
+            const input = document.getElementById('edit_size_' + s);
             if (input) {
                 input.value = (sizes[s] !== undefined) ? sizes[s] : 0;
             }
         });
 
-        var preview = document.getElementById('edit_img_preview');
+        // Ảnh preview
+        const preview = document.getElementById('edit_img_preview');
         if (hinhAnh) {
-            preview.innerHTML = '<img src="' + BASE_IMG_URL + hinhAnh + '" alt="anh hien tai"><span>' + hinhAnh + '</span>';
+            preview.innerHTML = `
+                <img src="${BASE_IMG_URL + hinhAnh}" alt="${ten}" style="width:48px;height:48px;object-fit:cover;border-radius:4px;border:1px solid rgba(255,255,255,0.1);">
+                <span class="text-muted" style="font-size:0.8rem;">${hinhAnh}</span>
+            `;
         } else {
-            preview.innerHTML = '<span style="color:#555">Chưa có ảnh</span>';
+            preview.innerHTML = `<span class="text-muted" style="font-size:0.8rem;">Chưa có ảnh</span>`;
         }
 
-        openModal('modal-edit');
+        openAdminModal('modal-edit');
     }
 
-    // Mở Modal Xóa sản phẩm
-    function openDeleteModal(btn) {
-        var id  = btn.getAttribute('data-id');
-        var ten = btn.getAttribute('data-ten');
+    // Mở modal xóa
+    function openAdminDeleteModal(btn) {
+        const id  = btn.getAttribute('data-id');
+        const ten = btn.getAttribute('data-ten');
 
         document.getElementById('form-delete').action = '{{ url("/san-pham") }}/' + id + '/xoa';
-        document.getElementById('del-confirm-text').innerHTML =
-            'Bạn có chắc muốn xóa sản phẩm <strong style="color:#f0f0f0">"' + ten + '"</strong>?<br>' +
-            '<span style="color:#666;font-size:.88rem">Hành động này không thể hoàn tác.</span>';
-
-        openModal('modal-delete');
+        document.getElementById('del-confirm-text').innerHTML = `
+            Bạn có chắc muốn xóa trang phục <strong style="color:var(--adm-gold)">"${ten}"</strong>?<br>
+            <span style="color:var(--adm-text-dim);font-size:0.8rem;">Toàn bộ dữ liệu kho size liên quan sẽ bị xóa khỏi hệ thống.</span>
+        `;
+        openAdminModal('modal-delete');
     }
 
-    if (HAS_ADD_ERRORS) openModal('modal-add');
-    if (HAS_EDIT_ERRORS) openModal('modal-edit');
-</script>
+    // Tự động mở lại modal nếu có validation errors từ backend
+    if (HAS_ADD_ERRORS) openAdminModal('modal-add');
+    if (HAS_EDIT_ERRORS) openAdminModal('modal-edit');
 
+    // Lọc dữ liệu tức thì không cần tải lại trang (Client-side instant filter)
+    function filterProductTable() {
+        const searchVal = document.getElementById('liveSearchInput').value.toLowerCase().trim();
+        const catVal = document.getElementById('filterCategorySelect').value.toLowerCase().trim();
+        const stockVal = document.getElementById('filterStockSelect').value;
+        const rows = document.querySelectorAll('#productTable tbody tr.product-row');
+
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name') || '';
+            const sku = row.getAttribute('data-sku') || '';
+            const cat = row.getAttribute('data-cat') || '';
+            const mat = row.getAttribute('data-material') || '';
+            const stock = parseInt(row.getAttribute('data-stock') || '0', 10);
+
+            let matchSearch = !searchVal || name.includes(searchVal) || sku.includes(searchVal) || mat.includes(searchVal);
+            let matchCat = !catVal || cat.includes(catVal);
+            let matchStock = true;
+
+            if (stockVal === 'in_stock') {
+                matchStock = stock > 5;
+            } else if (stockVal === 'low_stock') {
+                matchStock = stock <= 5;
+            }
+
+            if (matchSearch && matchCat && matchStock) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
 @endsection
