@@ -442,10 +442,13 @@
                 <span>{{ Auth::user()->name ?: 'Quản trị viên' }}</span>
             </div>
 
-            <a href="{{ url('/dang-xuat') }}" class="btn-admin-logout" title="Đăng xuất khỏi hệ thống">
+            <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                @csrf
+                <button type="submit" class="btn-admin-logout" title="Đăng xuất khỏi hệ thống">
                 <i class="bi bi-box-arrow-right"></i>
                 <span class="d-none d-sm-inline">Đăng xuất</span>
-            </a>
+                </button>
+            </form>
             @endif
         </div>
     </header>

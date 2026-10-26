@@ -27,18 +27,18 @@ class Phan3Test extends TestCase
         $tonM  = $this->ton(1, 'M');
 
         // 1. Thêm vào giỏ (DB)
-        $this->actingAs($khach)->get('/gio-hang/them?id=1&size=M')->assertRedirect();
-        $this->actingAs($khach)->get('/gio-hang/them?id=1&size=M')->assertRedirect();
+        $this->actingAs($khach)->post('/gio-hang/them', ['id' => 1, 'size' => 'M'])->assertRedirect();
+        $this->actingAs($khach)->post('/gio-hang/them', ['id' => 1, 'size' => 'M'])->assertRedirect();
         $this->assertEquals(2, ChiTietGioHang::sum('so_luong'));
 
         // size Custom bị từ chối, không tạo dòng
-        $this->actingAs($khach)->get('/gio-hang/them?id=1&size=' . urlencode('Custom (Vai:45)'))->assertSessionHas('error');
+        $this->actingAs($khach)->post('/gio-hang/them', ['id' => 1, 'size' => 'Custom (Vai:45)'])->assertSessionHas('error');
         $this->assertEquals(1, ChiTietGioHang::count());
 
         // Vượt tồn kho bị chặn (XL còn 3)
         $tonXL = $this->ton(2, 'XL');
         for ($i = 0; $i < $tonXL + 2; $i++) {
-            $this->actingAs($khach)->get('/gio-hang/them?id=2&size=XL');
+            $this->actingAs($khach)->post('/gio-hang/them', ['id' => 2, 'size' => 'XL']);
         }
         $this->assertEquals($tonXL, ChiTietGioHang::where('san_pham_id', 2)->value('so_luong'));
         ChiTietGioHang::where('san_pham_id', 2)->delete();
@@ -68,7 +68,7 @@ class Phan3Test extends TestCase
         $this->assertEquals($tonM, $this->ton(1, 'M'));
 
         // 6. Đơn mới -> admin duyệt theo luồng
-        $this->actingAs($khach)->get('/gio-hang/them?id=1&size=M');
+        $this->actingAs($khach)->post('/gio-hang/them', ['id' => 1, 'size' => 'M']);
         $this->actingAs($khach)->post('/gio-hang/checkout', ['dia_chi' => '1 Lê Lợi', 'phuong_thuc' => 'COD']);
         $hd2 = HoaDon::latest('id')->first();
         $admin = $this->admin();
@@ -106,7 +106,7 @@ class Phan3Test extends TestCase
         $khach = $this->khach();
         KhachHang::where('tai_khoan_id', $khach->id)->update(['hang_thanh_vien_id' => 3, 'diem_tich_luy' => 2000]); // Vàng -10%
 
-        $this->actingAs($khach)->get('/gio-hang/them?id=4&size=M'); // 4.500.000, không sale
+        $this->actingAs($khach)->post('/gio-hang/them', ['id' => 4, 'size' => 'M']); // 4.500.000, không sale
         $this->actingAs($khach)->get('/gio-hang')->assertOk()->assertSee('Ưu đãi hạng');
         $this->actingAs($khach)->post('/gio-hang/checkout', ['dia_chi' => 'x', 'phuong_thuc' => 'COD']);
 
@@ -126,7 +126,7 @@ class Phan3Test extends TestCase
     public function test_danh_gia_co_anh(): void
     {
         $khach = $this->khach();
-        $this->actingAs($khach)->get('/gio-hang/them?id=1&size=M');
+        $this->actingAs($khach)->post('/gio-hang/them', ['id' => 1, 'size' => 'M']);
         $this->actingAs($khach)->post('/gio-hang/checkout', ['dia_chi' => 'x', 'phuong_thuc' => 'COD']);
         $hd = HoaDon::first();
         foreach (['Đang may/gói', 'Đang giao', 'Hoàn Thành'] as $tt) {

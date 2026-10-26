@@ -532,23 +532,35 @@
                             </td>
                             <td class="text-center">
                                 <div class="qty-control">
-                                    <a href="{{ route('giohang.update', ['key' => $key, 'type' => -1]) }}"
-                                        class="qty-btn" title="Giảm">−</a>
+                                    <form method="POST" action="{{ route('giohang.update') }}" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="key" value="{{ $key }}">
+                                        <input type="hidden" name="type" value="-1">
+                                        <button type="submit" class="qty-btn" title="Giảm">−</button>
+                                    </form>
                                     <span class="qty-num">{{ $item['so_luong'] }}</span>
-                                    <a href="{{ route('giohang.update', ['key' => $key, 'type' => 1]) }}"
-                                        class="qty-btn" title="Tăng">+</a>
+                                    <form method="POST" action="{{ route('giohang.update') }}" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <input type="hidden" name="key" value="{{ $key }}">
+                                        <input type="hidden" name="type" value="1">
+                                        <button type="submit" class="qty-btn" title="Tăng">+</button>
+                                    </form>
                                 </div>
                             </td>
                             <td class="text-end price-col">
                                 {{ number_format($item['gia'] * $item['so_luong'], 0, ',', '.') }} VNĐ
                             </td>
                             <td class="text-center">
-                                <a href="{{ route('giohang.remove', ['key' => $key]) }}"
-                                    class="remove-btn"
-                                    onclick="return confirm('Xác nhận xóa sản phẩm này khỏi giỏ hàng?')"
-                                    title="Xóa">
-                                    <i class="bi bi-trash3"></i>
-                                </a>
+                                <form method="POST" action="{{ route('giohang.remove') }}" class="d-inline" onsubmit="return confirm('Xác nhận xóa sản phẩm này khỏi giỏ hàng?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="key" value="{{ $key }}">
+                                    <button type="submit" class="remove-btn" title="Xóa">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @endforeach

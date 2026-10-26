@@ -683,19 +683,19 @@
                         <div class="vip-perk-icon-wrap"><i class="bi bi-geo-alt-fill"></i></div>
                         <div>
                             <div class="vip-perk-title">Địa Điểm Showroom</div>
-                            <p class="vip-perk-desc">Tòa nhà Kingsman, Số 123 Đường Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh.</p>
+                            <p class="vip-perk-desc">Thông tin địa điểm showroom đang chờ chủ sở hữu xác nhận.</p>
                         </div>
                     </div>
 
                     <div class="showroom-contact-box">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <span style="color:#D4B26F; font-weight:700; font-size:0.88rem;">
-                                <i class="bi bi-telephone-fill me-1"></i> Hotline Hỗ Trợ 24/7:
+                                <i class="bi bi-info-circle-fill me-1"></i> Liên hệ showroom:
                             </span>
-                            <strong style="color:#F1F5F9; font-size:0.95rem;">1900 8888</strong>
+                            <strong style="color:#F1F5F9; font-size:0.95rem;">Đang chờ xác nhận</strong>
                         </div>
                         <div style="font-size:0.78rem; color:#94A3B8; line-height:1.5;">
-                            <i class="bi bi-clock-history text-warning me-1"></i> Quý khách có thể tự do thay đổi hoặc hủy lịch hẹn trước 2 tiếng tại trang <a href="{{ route('khachhang.dashboard') }}#lichhen" style="color:#D4B26F; text-decoration:underline; font-weight:600;">Hồ sơ & Thẻ VIP</a>.
+                            <i class="bi bi-clock-history text-warning me-1"></i> Quý khách có thể hủy lịch hẹn khi lịch vẫn ở trạng thái chờ xác nhận tại trang <a href="{{ route('khachhang.dashboard') }}#lichhen" style="color:#D4B26F; text-decoration:underline; font-weight:600;">Hồ sơ & Thẻ VIP</a>. Vui lòng liên hệ showroom để thay đổi lịch đã xác nhận.
                         </div>
                     </div>
 

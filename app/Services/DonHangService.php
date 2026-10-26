@@ -50,7 +50,14 @@ class DonHangService
     public function taoDonTuGioHang(KhachHang $khachHang, GioHang $gioHang, array $thongTin): HoaDon
     {
         return DB::transaction(function () use ($khachHang, $gioHang, $thongTin) {
-            $chiTiets = $gioHang->chiTiets()->with(['sanPham', 'size'])->get();
+            // MySQL serializes checkout requests for one cart with this row lock.
+            // SQLite ignores FOR UPDATE, but its write transaction plus conditional
+            // stock updates below still prevent inventory from going negative.
+            $gioHangDaKhoa = GioHang::whereKey($gioHang->id)->lockForUpdate()->firstOrFail();
+            $chiTiets = $gioHangDaKhoa->chiTiets()
+                ->lockForUpdate()
+                ->with(['sanPham', 'size'])
+                ->get();
 
             if ($chiTiets->isEmpty()) {
                 throw new RuntimeException('Giỏ hàng trống!');
@@ -73,10 +80,15 @@ class DonHangService
             ]);
 
             foreach ($chiTiets as $ct) {
-                // Khóa dòng size để 2 khách mua cùng lúc không làm tồn kho bị âm
                 $size = Size::whereKey($ct->size_id)->lockForUpdate()->first();
 
-                if (!$size || !$size->truKho($ct->so_luong)) { // TV1: Size::truKho()
+                // The WHERE condition is the integrity guard for both MySQL and
+                // SQLite: an affected-row count of zero means stock is insufficient.
+                $daTruKho = $size && Size::whereKey($size->id)
+                    ->where('so_luong_ton', '>=', $ct->so_luong)
+                    ->decrement('so_luong_ton', $ct->so_luong);
+
+                if (!$daTruKho) {
                     throw new RuntimeException(
                         "Sản phẩm \"{$ct->sanPham->ten_sp}\" size {$ct->size->ten_size} không đủ hàng trong kho!"
                     );
@@ -86,16 +98,19 @@ class DonHangService
                     'hoa_don_id'  => $hoaDon->id,
                     'san_pham_id' => $ct->san_pham_id,
                     'size_id'     => $ct->size_id,
+                    'ten_san_pham' => $ct->sanPham->ten_sp,
+                    'ten_size' => $size->ten_size,
+                    'hinh_anh_san_pham' => $ct->sanPham->hinh_anh,
                     'don_gia'     => $ct->sanPham->gia_khuyen_mai, // chốt giá tại thời điểm mua
                     'so_luong'    => $ct->so_luong,
                     'thanh_tien'  => $ct->sanPham->tinhGiaBan($ct->so_luong),
                 ]);
             }
 
-            $gioHang->chiTiets()->delete();
+            $gioHangDaKhoa->chiTiets()->delete();
 
             return $hoaDon;
-        });
+        }, 3);
     }
 
     /**
@@ -132,13 +147,21 @@ class DonHangService
     /** Khách tự hủy: chỉ khi đơn còn "Chờ xử lý" và là đơn của chính mình */
     public function khachHuyDon(int $hoaDonId, KhachHang $khachHang): HoaDon
     {
-        $hoaDon = HoaDon::where('khach_hang_id', $khachHang->id)->findOrFail($hoaDonId);
+        return DB::transaction(function () use ($hoaDonId, $khachHang) {
+            $hoaDon = HoaDon::where('khach_hang_id', $khachHang->id)
+                ->whereKey($hoaDonId)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        if ($hoaDon->trang_thai !== HoaDon::CHO_XU_LY) {
-            throw new RuntimeException('Chỉ có thể hủy đơn khi đang ở trạng thái "Chờ xử lý".');
-        }
+            if ($hoaDon->trang_thai !== HoaDon::CHO_XU_LY) {
+                throw new RuntimeException('Chỉ có thể hủy đơn khi đang ở trạng thái "Chờ xử lý".');
+            }
 
-        return $this->capNhatTrangThai($hoaDon->id, HoaDon::DA_HUY);
+            $hoaDon->update(['trang_thai' => HoaDon::DA_HUY]);
+            $this->hoanKho($hoaDon);
+
+            return $hoaDon;
+        }, 3);
     }
 
     private function hoanKho(HoaDon $hoaDon): void

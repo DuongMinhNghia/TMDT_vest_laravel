@@ -24,7 +24,7 @@ class DangNhapController extends Controller
             'password.required' => 'Vui lòng nhập mật khẩu.'
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt([...$credentials, 'trang_thai' => true])) {
             $request->session()->regenerate();
             return redirect('/');
         }

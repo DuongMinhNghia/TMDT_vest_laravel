@@ -53,8 +53,11 @@ class DonHangController extends Controller
 
     public function huy($id)
     {
+        $khachHang = Auth::user()?->khachHang;
+        abort_unless($khachHang, 403);
+
         try {
-            $this->donHangService->khachHuyDon((int) $id, Auth::user()->khachHang);
+            $this->donHangService->khachHuyDon((int) $id, $khachHang);
         } catch (RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }

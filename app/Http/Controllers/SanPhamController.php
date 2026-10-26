@@ -14,24 +14,50 @@ class SanPhamController extends Controller
 
     public function index(Request $request)
     {
+        $keyword = trim((string) $request->input('tim_kiem', ''));
+
+        $request->merge([
+            'tim_kiem' => $keyword !== '' ? $keyword : null,
+            'danh_muc' => filled($request->input('danh_muc')) ? $request->input('danh_muc') : null,
+            'gia_min' => filled($request->input('gia_min')) ? $request->input('gia_min') : null,
+            'gia_max' => filled($request->input('gia_max')) ? $request->input('gia_max') : null,
+        ]);
+
+        $filters = $request->validate([
+            'tim_kiem' => ['nullable', 'string', 'max:255'],
+            'danh_muc' => ['nullable', 'integer', 'exists:danh_mucs,id'],
+            'gia_min' => ['nullable', 'numeric', 'min:0'],
+            'gia_max' => ['nullable', 'numeric', 'min:0'],
+        ]);
+
+        if (isset($filters['gia_min'], $filters['gia_max']) && $filters['gia_min'] > $filters['gia_max']) {
+            return back()
+                ->withErrors(['gia_max' => 'Giá tối đa phải lớn hơn hoặc bằng giá tối thiểu.'])
+                ->withInput();
+        }
+
         $danhMucs = DanhMuc::all();
 
         $sanPhams = SanPham::with('danhMuc')
-            ->when($request->danh_muc, function ($query) use ($request) {
-                $query->where('danh_muc_id', $request->danh_muc);
+            ->when($filters['danh_muc'] ?? null, function ($query, $danhMucId) {
+                $query->where('danh_muc_id', $danhMucId);
             })
-            ->when($request->tim_kiem, function ($query) use ($request) {
-                $query->where('ten_sp', 'like', '%' . $request->tim_kiem . '%')
-                    ->orWhere('xuat_xu', 'like', '%' . $request->tim_kiem . '%')
-                    ->orWhere('chat_lieu', 'like', '%' . $request->tim_kiem . '%');
+            ->when($filters['tim_kiem'] ?? null, function ($query, $keyword) {
+                $query->where(function ($searchQuery) use ($keyword) {
+                    $searchQuery->where('ten_sp', 'like', '%' . $keyword . '%')
+                        ->orWhere('chat_lieu', 'like', '%' . $keyword . '%')
+                        ->orWhere('xuat_xu', 'like', '%' . $keyword . '%');
+                });
             })
-            ->when($request->gia_min, function ($query) use ($request) {
-                $query->where('gia', '>=', $request->gia_min);
+            ->when(isset($filters['gia_min']), function ($query) use ($filters) {
+                $query->where('gia_ban', '>=', $filters['gia_min']);
             })
-            ->when($request->gia_max, function ($query) use ($request) {
-                $query->where('gia', '<=', $request->gia_max);
+            ->when(isset($filters['gia_max']), function ($query) use ($filters) {
+                $query->where('gia_ban', '<=', $filters['gia_max']);
             })
-            ->paginate(8);
+            ->orderBy('id')
+            ->paginate(8)
+            ->withQueryString();
 
         return view('sanpham', compact('sanPhams', 'danhMucs'));
     }
@@ -53,7 +79,7 @@ class SanPhamController extends Controller
 
     public function danhSach()
     {
-        $sanPhams = SanPham::with(['danhMuc', 'sizes'])->latest()->get();
+        $sanPhams = SanPham::withTrashed()->with(['danhMuc', 'sizes'])->latest()->get();
         $danhMucs = DanhMuc::all();
         return view('quanlysanpham', compact('sanPhams', 'danhMucs'));
     }
@@ -152,8 +178,8 @@ class SanPhamController extends Controller
         ];
 
         if ($request->hasFile('hinh_anh')) {
-            // Xóa ảnh cũ nếu tồn tại
-            if ($sanPham->hinh_anh && file_exists(public_path('images/' . $sanPham->hinh_anh))) {
+            // Keep images referenced by invoices so historical orders remain renderable.
+            if ($sanPham->hinh_anh && !$sanPham->chiTietHoaDons()->exists() && file_exists(public_path('images/' . $sanPham->hinh_anh))) {
                 unlink(public_path('images/' . $sanPham->hinh_anh));
             }
             $file    = $request->file('hinh_anh');
@@ -193,10 +219,7 @@ class SanPhamController extends Controller
     {
         $sanPham = SanPham::findOrFail($id);
 
-        if ($sanPham->hinh_anh && file_exists(public_path('images/' . $sanPham->hinh_anh))) {
-            unlink(public_path('images/' . $sanPham->hinh_anh));
-        }
-
+        // Soft deletion retains the product, sizes, image, and invoice relationships.
         $sanPham->delete();
 
         return redirect()->route('sanpham.danhsach')->with('success', 'Xóa sản phẩm thành công!');

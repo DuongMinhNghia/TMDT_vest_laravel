@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\HangThanhVien;
+use Illuminate\Validation\Rule;
 
 class HangThanhVienController extends Controller
 {
@@ -18,7 +19,7 @@ class HangThanhVienController extends Controller
         $hang = HangThanhVien::findOrFail($id);
 
         $request->validate([
-            'diem_toi_thieu'       => 'required|integer|min:0',
+            'diem_toi_thieu'       => ['required', 'integer', 'min:0', Rule::unique('hang_thanh_viens', 'diem_toi_thieu')->ignore($hang->id)],
             'phan_tram_chiet_khau' => 'required|integer|min:0|max:100',
             'mo_ta'                => 'nullable|string|max:500',
         ]);

@@ -16,6 +16,7 @@ class KhachHangDashboardController extends Controller
     protected function getKhachHangHienTai(): KhachHang
     {
         $user = Auth::user();
+        abort_unless($user?->isCustomer(), 403);
         $khachHang = $user->khachHang;
 
         if (!$khachHang) {

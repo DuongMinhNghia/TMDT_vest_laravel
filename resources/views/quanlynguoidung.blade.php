@@ -344,6 +344,7 @@
                 <select name="quyen" class="user-form-select">
                     <option value="">-- Tất cả quyền --</option>
                     <option value="Admin" {{ request('quyen')=='Admin'?'selected':'' }}>Admin</option>
+                    <option value="Nhân viên" {{ request('quyen')=='Nhân viên'?'selected':'' }}>Nhân viên</option>
                     <option value="Khách hàng" {{ request('quyen')=='Khách hàng'?'selected':'' }}>Khách hàng</option>
                 </select>
             </div>
@@ -386,6 +387,8 @@
                     <td>
                         @if($user->quyen === 'Admin')
                             <span class="badge-admin-role"><i class="bi bi-shield-shaded"></i> Admin</span>
+                        @elseif($user->quyen === 'Nhân viên')
+                            <span class="badge-admin-role"><i class="bi bi-person-gear"></i> Nhân viên</span>
                         @else
                             <span class="badge-customer-role"><i class="bi bi-person"></i> Khách hàng</span>
                         @endif
@@ -445,6 +448,7 @@
                 <label style="color:var(--adm-text-main); font-size:0.84rem; font-weight:600; display:block; margin-bottom:6px;">PHÂN QUYỀN VAI TRÒ *</label>
                 <select name="quyen" id="sua_quyen" class="user-form-select">
                     <option value="Khách hàng">Khách hàng</option>
+                    <option value="Nhân viên">Nhân viên</option>
                     <option value="Admin">Admin</option>
                 </select>
             </div>

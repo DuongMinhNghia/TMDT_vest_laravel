@@ -332,8 +332,7 @@
                     <span><i class="bi bi-clock"></i> Thời gian làm việc: Hàng ngày từ 9h - 21h</span>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <a href="tel:0901234567"><i class="bi bi-telephone"></i> 0901 234 567</a>
-                    <a href="mailto:vip@kingsman.vn"><i class="bi bi-envelope"></i> vip@kingsman.vn</a>
+                    <span><i class="bi bi-info-circle"></i> Thông tin liên hệ showroom đang chờ chủ sở hữu xác nhận</span>
                 </div>
             </div>
         </div>
@@ -437,16 +436,19 @@
                         <i class="bi bi-person-circle"></i>
                         <span>Xin chào, <strong>{{ Auth::user()->name }}</strong></span>
                     </div>
-                    <a href="{{ url('/dang-xuat') }}" class="btn-action-gold ms-1">
-                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                    </a>
+                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn-action-gold ms-1">
+                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                        </button>
+                    </form>
                     @else
                     <a href="{{ url('/dang-nhap') }}" class="btn-action-gold">
                         <i class="bi bi-person"></i> Đăng nhập
                     </a>
                     @endif
 
-                    @if(Auth::check() && Auth::user()->quyen != 'Admin')
+                    @if(Auth::check() && Auth::user()->isCustomer())
                     <a href="{{ route('khachhang.dashboard') }}" class="btn-action-gold">
                         <i class="bi bi-person-badge"></i> Hồ Sơ & VIP
                     </a>
@@ -510,9 +512,7 @@
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5>LIÊN HỆ</h5>
-                    <p><i class="bi bi-geo-alt-fill" style="color:#d4af37;"></i> 123 Đồng Khởi, Quận 1, TP.HCM</p>
-                    <p><i class="bi bi-telephone-fill" style="color:#d4af37;"></i> 0901 234 567</p>
-                    <p><i class="bi bi-envelope-fill" style="color:#d4af37;"></i> vip@kingsman.vn</p>
+                    <p><i class="bi bi-info-circle-fill" style="color:#d4af37;"></i> Địa chỉ, điện thoại và email showroom đang chờ chủ sở hữu xác nhận.</p>
                 </div>
             </div>
             <hr>

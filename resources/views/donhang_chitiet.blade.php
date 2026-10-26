@@ -205,14 +205,28 @@
                     </thead>
                     <tbody>
                         @foreach($donHang->chiTiets as $ct)
+                        @php
+                            $tenSanPham = $ct->ten_san_pham ?? $ct->sanPham?->ten_sp ?? 'Sản phẩm đã ngừng kinh doanh';
+                            $tenSize = $ct->ten_size ?? $ct->size?->ten_size ?? 'N/A';
+                            $hinhAnh = $ct->hinh_anh_san_pham ?? $ct->sanPham?->hinh_anh;
+                            $conBan = $ct->sanPham && !$ct->sanPham->trashed();
+                        @endphp
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center gap-3">
-                                    <img src="{{ asset('images/' . $ct->sanPham->hinh_anh) }}" style="width:55px; height:55px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
+                                    @if($hinhAnh)
+                                    <img src="{{ asset('images/' . $hinhAnh) }}" style="width:55px; height:55px; object-fit:cover; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
+                                    @else
+                                    <div style="width:55px; height:55px; display:grid; place-items:center; border-radius:6px; border:1px solid rgba(255,255,255,0.08); color:#94A3B8;"><i class="bi bi-image"></i></div>
+                                    @endif
                                     <div>
-                                        <a href="{{ route('sanpham.chitiet', $ct->san_pham_id) }}" style="color:#F1F5F9; text-decoration:none; font-weight:600;">{{ $ct->sanPham->ten_sp }}</a>
-                                        <div style="color:#D4B26F; font-size:0.78rem;">Size {{ $ct->size->ten_size }}</div>
-                                        @if($laChuDon && $donHang->trang_thai === 'Hoàn Thành')
+                                        @if($conBan)
+                                        <a href="{{ route('sanpham.chitiet', $ct->san_pham_id) }}" style="color:#F1F5F9; text-decoration:none; font-weight:600;">{{ $tenSanPham }}</a>
+                                        @else
+                                        <span style="color:#F1F5F9; font-weight:600;">{{ $tenSanPham }}</span>
+                                        @endif
+                                        <div style="color:#D4B26F; font-size:0.78rem;">Size {{ $tenSize }}</div>
+                                        @if($laChuDon && $conBan && $donHang->trang_thai === 'Hoàn Thành')
                                         <a href="{{ route('sanpham.chitiet', $ct->san_pham_id) }}#danh-gia" style="color:#94A3B8; font-size:0.75rem; text-decoration:none;"><i class="bi bi-star"></i> Viết đánh giá</a>
                                         @endif
                                     </div>

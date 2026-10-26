@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SanPham extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'san_phams';
 
@@ -83,6 +84,11 @@ class SanPham extends Model
     public function danhGias()
     {
         return $this->hasMany(DanhGia::class, 'san_pham_id');
+    }
+
+    public function chiTietHoaDons()
+    {
+        return $this->hasMany(ChiTietHoaDon::class, 'san_pham_id');
     }
 
     /**

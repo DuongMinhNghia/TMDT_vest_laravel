@@ -24,6 +24,10 @@ class TaiKhoan extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_STAFF = 'nhan_vien';
+    public const ROLE_CUSTOMER = 'khach_hang';
+
     protected $table = 'tai_khoans';
 
     protected $fillable = [
@@ -43,6 +47,7 @@ class TaiKhoan extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'trang_thai' => 'boolean',
         ];
     }
 
@@ -69,8 +74,11 @@ class TaiKhoan extends Authenticatable
 
     public function getQuyenAttribute()
     {
-        if ($this->vai_tro === 'admin') {
+        if ($this->isAdmin()) {
             return 'Admin';
+        }
+        if ($this->isStaff()) {
+            return 'Nhân viên';
         }
         return 'Khách hàng';
     }
@@ -87,6 +95,21 @@ class TaiKhoan extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return strtolower($this->vai_tro ?? '') === 'admin';
+        return $this->vai_tro === self::ROLE_ADMIN;
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->vai_tro === self::ROLE_STAFF;
+    }
+
+    public function isCustomer(): bool
+    {
+        return $this->vai_tro === self::ROLE_CUSTOMER;
+    }
+
+    public function hasAnyRole(array $roles): bool
+    {
+        return in_array($this->vai_tro, $roles, true);
     }
 }

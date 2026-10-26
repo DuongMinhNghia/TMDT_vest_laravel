@@ -520,17 +520,36 @@
                                 </div>
                             </div>
                             <div class="measurement-guide">
-                                <p><i class="bi bi-info-circle-fill" style="color:#D4B26F;"></i> Quý khách có thể quản lý trọn bộ số đo tại trang <a href="{{ route('khachhang.dashboard') }}#sodo" style="color:#D4B26F; text-decoration:underline;">Hồ Sơ & Thẻ VIP</a>.</p>
-                                <p><i class="bi bi-telephone-fill" style="color:#D4B26F;"></i> Liên hệ chuyên viên tư vấn may đo: <strong style="color:#D4B26F;">1900 8888</strong>.</p>
+                                <p><i class="bi bi-info-circle-fill" style="color:#D4B26F;"></i> Số đo riêng được xác nhận trong buổi tư vấn; sản phẩm may đo không được thêm trực tiếp vào giỏ hàng.</p>
+                                @if(Auth::check() && Auth::user()->isCustomer())
+                                <p><i class="bi bi-rulers" style="color:#D4B26F;"></i> Quản lý số đo tại <a href="{{ route('khachhang.dashboard') }}#sodo" style="color:#D4B26F; text-decoration:underline;">Hồ Sơ & Thẻ VIP</a> hoặc đặt lịch tại showroom.</p>
+                                @else
+                                <p><i class="bi bi-person-lock" style="color:#D4B26F;"></i> Vui lòng <a href="{{ route('login') }}" style="color:#D4B26F; text-decoration:underline;">đăng nhập</a> để lưu số đo và đặt lịch tư vấn.</p>
+                                @endif
+                            </div>
+                            <div id="customSizeNotice" class="mt-3 d-none" role="status" style="color:#D4B26F; font-size:0.86rem; border-left:2px solid #D4B26F; padding-left:12px;">
+                                May đo riêng cần được chuyên viên xác nhận. Vui lòng dùng một trong các lựa chọn tư vấn bên dưới.
                             </div>
                         </div>
                     </div>
 
                     {{-- ACTION BUTTONS --}}
                     <div class="action-buttons">
-                        <a href="#" class="btn-luxury btn-add-cart" id="addToCartBtn">
+                        @if(Auth::check() && Auth::user()->isCustomer())
+                        <form method="POST" action="{{ route('giohang.add') }}" id="addToCartForm" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $sanPham->id }}">
+                            <input type="hidden" name="size" id="cartSize">
+                            <input type="hidden" name="url" value="{{ url()->current() }}">
+                            <button type="submit" class="btn-luxury btn-add-cart" id="addToCartBtn">
                             <i class="bi bi-cart-plus-fill"></i> Thêm Vào Giỏ Hàng
+                            </button>
+                        </form>
+                        @elseif(!Auth::check())
+                        <a href="{{ route('login') }}" class="btn-luxury btn-add-cart">
+                            <i class="bi bi-person-lock"></i> Đăng Nhập Để Thêm Giỏ Hàng
                         </a>
+                        @endif
                         <a href="{{ route('lichhen.create', ['san_pham_id' => $sanPham->id]) }}" class="btn-luxury btn-appointment">
                             <i class="bi bi-calendar2-check-fill"></i> Đặt Lịch Thử Tại Showroom
                         </a>
@@ -579,10 +598,9 @@
     document.addEventListener('DOMContentLoaded', function() {
         const sizeRadios = document.querySelectorAll('input[name="size"]');
         const customSizeContainer = document.getElementById('customSizeContainer');
-        const addToCartBtn = document.getElementById('addToCartBtn');
-
-        const addCartUrl = "{{ url('/gio-hang/them') }}?id={{ $sanPham->id }}";
-        const currentUrl = window.location.href;
+        const addToCartForm = document.getElementById('addToCartForm');
+        const cartSize = document.getElementById('cartSize');
+        const customSizeNotice = document.getElementById('customSizeNotice');
 
         // Toggle custom size container
         sizeRadios.forEach(radio => {
@@ -591,6 +609,7 @@
                     customSizeContainer.classList.add('active');
                 } else {
                     customSizeContainer.classList.remove('active');
+                    customSizeNotice.classList.add('d-none');
                 }
             });
         });
@@ -612,12 +631,12 @@
         // =============================================
 
         // Thêm vào giỏ
-        addToCartBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        if (addToCartForm) addToCartForm.addEventListener('submit', function(e) {
 
             const selectedSize = document.querySelector('input[name="size"]:checked');
 
             if (!selectedSize) {
+                e.preventDefault();
                 alert('Vui lòng chọn kích thước trước khi thêm vào giỏ hàng!');
                 return;
             }
@@ -625,22 +644,13 @@
             let sizeInfo = selectedSize.value;
 
             if (selectedSize.value === 'Custom') {
-                const shoulder = document.getElementById('shoulder').value;
-                const chest = document.getElementById('chest').value;
-                const waist = document.getElementById('waist').value;
-                const length = document.getElementById('length').value;
-
-                if (!shoulder || !chest || !waist || !length) {
-                    alert('Vui lòng nhập đầy đủ 4 chỉ số may đo riêng!');
-                    return;
-                }
-
-                sizeInfo = `Custom (Vai:${shoulder} - Ngực:${chest} - Eo:${waist} - Dài:${length})`;
+                e.preventDefault();
+                customSizeNotice.classList.remove('d-none');
+                customSizeNotice.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                return;
             }
 
-            window.location.href = addCartUrl +
-                '&size=' + encodeURIComponent(sizeInfo) +
-                '&url=' + encodeURIComponent(currentUrl);
+            cartSize.value = sizeInfo;
         });
     });
 

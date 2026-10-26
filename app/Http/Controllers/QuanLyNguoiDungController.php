@@ -26,7 +26,11 @@ class QuanLyNguoiDungController extends Controller
         }
 
         if ($request->filled('quyen')) {
-            $vaiTro = $request->quyen === 'Admin' ? 'admin' : 'khach_hang';
+            $vaiTro = match ($request->quyen) {
+                'Admin' => TaiKhoan::ROLE_ADMIN,
+                'Nhân viên' => TaiKhoan::ROLE_STAFF,
+                default => TaiKhoan::ROLE_CUSTOMER,
+            };
             $query->where('vai_tro', $vaiTro);
         }
 
@@ -43,12 +47,16 @@ class QuanLyNguoiDungController extends Controller
         $request->validate([
             'name'    => 'required|string|max:255',
             'email'   => 'required|email|unique:tai_khoans,email,' . $id,
-            'quyen'   => 'required|in:Admin,Khách hàng',
+            'quyen'   => 'required|in:Admin,Nhân viên,Khách hàng',
             'phone'   => 'nullable|string|max:15',
             'address' => 'nullable|string|max:255',
         ]);
 
-        $vaiTro = $request->quyen === 'Admin' ? 'admin' : 'khach_hang';
+        $vaiTro = match ($request->quyen) {
+            'Admin' => TaiKhoan::ROLE_ADMIN,
+            'Nhân viên' => TaiKhoan::ROLE_STAFF,
+            default => TaiKhoan::ROLE_CUSTOMER,
+        };
         $user->update([
             'email'   => $request->email,
             'vai_tro' => $vaiTro,

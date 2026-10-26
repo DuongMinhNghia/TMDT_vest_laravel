@@ -17,6 +17,15 @@ class LichHen extends Model
     public const HOAN_THANH    = 'Hoàn thành';
     public const DA_HUY        = 'Đã hủy';
 
+    /** Valid lifecycle transitions; completed and cancelled appointments are terminal. */
+    public const LUONG_TRANG_THAI = [
+        self::CHO_XAC_NHAN => [self::DA_XAC_NHAN, self::DA_HUY],
+        self::DA_XAC_NHAN => [self::DANG_TIEP_DON, self::DA_HUY],
+        self::DANG_TIEP_DON => [self::HOAN_THANH, self::DA_HUY],
+        self::HOAN_THANH => [],
+        self::DA_HUY => [],
+    ];
+
     protected $fillable = [
         'khach_hang_id',
         'nhan_vien_tiep_don_id',
@@ -47,6 +56,11 @@ class LichHen extends Model
     public function sanPhamQuanTam()
     {
         return $this->belongsTo(SanPham::class, 'san_pham_quan_tam_id');
+    }
+
+    public static function trangThaiCoTheChuyenTu(string $hienTai): array
+    {
+        return self::LUONG_TRANG_THAI[$hienTai] ?? [];
     }
 
     /**
