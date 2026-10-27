@@ -420,8 +420,11 @@
         color: var(--km-gold);
         font-size: 1.15rem;
         font-weight: 700;
-        font-family: var(--km-font-body);
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
         margin-bottom: 14px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.25;
+        white-space: nowrap;
     }
 
     .btn-view-detail {
@@ -566,7 +569,11 @@
                         <div class="carousel-badge">Dịch vụ may đo Bespoke</div>
                         <h2 class="carousel-title">Đặt Lịch May Đo Riêng</h2>
                         <p class="carousel-description">Tư vấn 1-1 cùng chuyên gia phong cách, lấy số đo chuẩn xác theo yêu cầu</p>
-                        <a href="{{ route('lichhen.create') }}" class="btn-carousel"><i class="bi bi-calendar2-heart"></i> Đặt Lịch Hẹn</a>
+                        @if(Auth::check() && !Auth::user()->isCustomer())
+                            <a href="{{ route('lichhen.quanly') }}" class="btn-carousel"><i class="bi bi-calendar2-check"></i> Quản Lý Lịch Hẹn</a>
+                        @else
+                            <a href="{{ route('lichhen.create') }}" class="btn-carousel"><i class="bi bi-calendar2-heart"></i> Đặt Lịch Hẹn</a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -612,23 +619,6 @@
             <a href="{{ url('/san-pham') }}" class="btn-about"><i class="bi bi-arrow-right-circle"></i> Khám Phá Bộ Sưu Tập</a>
         </div>
 
-        <div class="stats-section">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="bi bi-bag-check"></i></div>
-                <div class="stat-number">500+</div>
-                <div class="stat-label">Mẫu Thiết Kế</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="bi bi-award"></i></div>
-                <div class="stat-number">10+</div>
-                <div class="stat-label">Năm Kinh Nghiệm</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="bi bi-stars"></i></div>
-                <div class="stat-number">98%</div>
-                <div class="stat-label">Khách Hàng Hài Lòng</div>
-            </div>
-        </div>
     </div>
 </section>
 

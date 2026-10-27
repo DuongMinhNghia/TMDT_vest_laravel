@@ -184,11 +184,14 @@
     }
 
     .suit-price {
-        font-family: 'Playfair Display', Georgia, serif;
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
         color: #D4B26F;
         font-size: 1.25rem;
         font-weight: 700;
         margin-bottom: 12px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.25;
+        white-space: nowrap;
     }
 
     .suit-sizes {

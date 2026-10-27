@@ -8,6 +8,8 @@ use App\Models\SanPham;
 use App\Models\SoDoKhachHang;
 use App\Models\TaiKhoan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class CustomerPagesTest extends TestCase
@@ -124,5 +126,79 @@ class CustomerPagesTest extends TestCase
         $resReg->assertOk();
         $resReg->assertSee('ĐĂNG KÝ THÀNH VIÊN');
         $resReg->assertSee('TẠO TÀI KHOẢN MỚI');
+    }
+
+    public function test_registration_requires_matching_password_confirmation(): void
+    {
+        $response = $this->from('/dang-ky')->post('/dang-ky', [
+            'name' => 'New Customer',
+            'email' => 'new-customer@example.test',
+            'password' => 'password123',
+            'password_confirmation' => 'different-password',
+        ]);
+
+        $response->assertRedirect('/dang-ky');
+        $this->get('/dang-ky')
+            ->assertOk()
+            ->assertSee('systemPopupTitle', false);
+
+        $this->assertDatabaseMissing('tai_khoans', ['email' => 'new-customer@example.test']);
+    }
+
+    public function test_registration_requires_a_strong_password(): void
+    {
+        $this->from('/dang-ky')->post('/dang-ky', [
+            'name' => 'New Customer',
+            'email' => 'weak-password@example.test',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertRedirect('/dang-ky')->assertSessionHasErrors('password');
+
+        $this->assertDatabaseMissing('tai_khoans', ['email' => 'weak-password@example.test']);
+    }
+
+    public function test_password_reset_flow_requires_a_verified_otp_before_resetting_password(): void
+    {
+        $customer = $this->khach();
+        Mail::fake();
+        config(['mail.default' => 'smtp']);
+
+        $this->get('/quen-mat-khau')->assertOk()->assertSee('GỬI MÃ XÁC THỰC');
+        $this->post('/quen-mat-khau', ['email' => $customer->email])
+            ->assertRedirect(route('matkhau.xacnhan.form'))
+            ->assertSessionHas('password_reset_otp');
+
+        $this->get('/dat-lai-mat-khau')->assertForbidden();
+
+        $this->withSession(['password_reset_verified_email' => $customer->email])
+            ->post('/dat-lai-mat-khau', [
+                'password' => 'new-password-123',
+                'password_confirmation' => 'new-password-123',
+            ])
+            ->assertRedirect(route('login'));
+
+        $this->assertTrue(Hash::check('new-password-123', $customer->fresh()->password));
+    }
+
+    public function test_password_reset_requires_a_different_strong_password(): void
+    {
+        $customer = $this->khach();
+
+        $this->withSession(['password_reset_verified_email' => $customer->email])
+            ->post('/dat-lai-mat-khau', [
+                'password' => '123456',
+                'password_confirmation' => '123456',
+            ])
+            ->assertSessionHasErrors('password');
+
+        $customer->update(['password' => 'Current@123']);
+        $this->withSession(['password_reset_verified_email' => $customer->email])
+            ->post('/dat-lai-mat-khau', [
+                'password' => 'Current@123',
+                'password_confirmation' => 'Current@123',
+            ])
+            ->assertSessionHasErrors('password');
+
+        $this->assertTrue(Hash::check('Current@123', $customer->fresh()->password));
     }
 }

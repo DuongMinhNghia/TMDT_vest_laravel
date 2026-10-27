@@ -129,7 +129,7 @@ class DatabaseSeeder extends Seeder
         // 7. TẠO CÁC BỘ SƯU TẬP MẪU (Task 1.2)
         $bst1 = DB::table('bo_suu_taps')->insertGetId([
             'ten_bo_suu_tap' => 'BST Vest Cưới Hoàng Gia 2026',
-            'hinh_banner'    => 'skienhe.png',
+            'hinh_banner'    => 'banner-vest-cuoi.jpg',
             'mo_ta'          => 'Tuyển tập các mẫu vest và tuxedo chú rể đẳng cấp, sang trọng bậc nhất cho ngày trọng đại.',
             'created_at'     => now(),
             'updated_at'     => now(),
@@ -143,7 +143,7 @@ class DatabaseSeeder extends Seeder
 
         $bst2 = DB::table('bo_suu_taps')->insertGetId([
             'ten_bo_suu_tap' => 'BST Quý Ông Doanh Nhân 2026',
-            'hinh_banner'    => 'skienhe.png',
+            'hinh_banner'    => 'banner-doanh-nhan.jpg',
             'mo_ta'          => 'Những thiết kế vest 2 mảnh và 3 mảnh mang lại phong thái đỉnh đạc, quyền lực trong mọi cuộc đàm phán.',
             'created_at'     => now(),
             'updated_at'     => now(),

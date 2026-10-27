@@ -61,6 +61,7 @@
     }
 
     .product-price-box {
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
         font-size: 1.8rem;
         color: #D4B26F;
         font-weight: 700;
@@ -73,6 +74,8 @@
         align-items: center;
         gap: 16px;
         flex-wrap: wrap;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.25;
     }
 
     .flash-sale-badge {
@@ -550,9 +553,15 @@
                             <i class="bi bi-person-lock"></i> Đăng Nhập Để Thêm Giỏ Hàng
                         </a>
                         @endif
-                        <a href="{{ route('lichhen.create', ['san_pham_id' => $sanPham->id]) }}" class="btn-luxury btn-appointment">
-                            <i class="bi bi-calendar2-check-fill"></i> Đặt Lịch Thử Tại Showroom
-                        </a>
+                        @if(Auth::check() && !Auth::user()->isCustomer())
+                            <a href="{{ route('lichhen.quanly') }}" class="btn-luxury btn-appointment">
+                                <i class="bi bi-calendar2-check-fill"></i> Quản Lý Lịch Hẹn
+                            </a>
+                        @else
+                            <a href="{{ route('lichhen.create', ['san_pham_id' => $sanPham->id]) }}" class="btn-luxury btn-appointment">
+                                <i class="bi bi-calendar2-check-fill"></i> Đặt Lịch Thử Tại Showroom
+                            </a>
+                        @endif
                         <a href="{{ route('sanpham.index') }}" class="btn-luxury btn-back">
                             <i class="bi bi-arrow-left-circle-fill"></i> Quay Lại
                         </a>

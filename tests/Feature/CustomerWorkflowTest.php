@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Models\HangThanhVien;
+use App\Models\HoaDon;
 use App\Models\KhachHang;
 use App\Models\LichHen;
 use App\Models\SoDoKhachHang;
 use App\Models\TaiKhoan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class CustomerWorkflowTest extends TestCase
@@ -80,6 +82,27 @@ class CustomerWorkflowTest extends TestCase
         $this->assertDatabaseHas('so_do_khach_hangs', ['id' => $otherMeasurement->id, 'ten_ho_so' => 'Private measurements']);
     }
 
+    public function test_customer_can_change_password_from_their_profile(): void
+    {
+        $customer = $this->account('khachhang@gmail.com');
+
+        $this->actingAs($customer)->post('/khach-hang/thong-tin', [
+            'ho_ten' => $customer->khachHang->ho_ten,
+            'current_password' => '123456',
+            'password' => 'NewPassword@2026',
+            'password_confirmation' => 'NewPassword@2026',
+        ])->assertSessionHas('success');
+
+        $this->assertTrue(Hash::check('NewPassword@2026', $customer->fresh()->password));
+
+        $this->actingAs($customer)->post('/khach-hang/thong-tin', [
+            'ho_ten' => $customer->khachHang->ho_ten,
+            'current_password' => 'not-the-current-password',
+            'password' => 'AnotherPassword@2026',
+            'password_confirmation' => 'AnotherPassword@2026',
+        ])->assertSessionHasErrors('current_password');
+    }
+
     public function test_appointment_creation_uses_unique_id_based_codes_and_owner_cancellation(): void
     {
         $customer = $this->account('khachhang@gmail.com');
@@ -103,6 +126,40 @@ class CustomerWorkflowTest extends TestCase
         $other = $this->otherCustomer();
         $otherAppointment = $this->appointment($other);
         $this->actingAs($customer)->post('/lich-hen/' . $otherAppointment->id . '/huy')->assertNotFound();
+    }
+
+    public function test_customer_can_confirm_only_their_delivering_order_as_received(): void
+    {
+        $customer = $this->account('khachhang@gmail.com');
+        $order = HoaDon::create([
+            'khach_hang_id' => $customer->khachHang->id,
+            'ma_don_hang' => 'DH-RECEIVED-001',
+            'ngay_dat' => now(),
+            'trang_thai' => HoaDon::DANG_GIAO,
+            'tong_tien' => 100000,
+            'phuong_thuc_thanh_toan' => 'COD',
+            'dia_chi_giao_hang' => '1 Le Loi',
+        ]);
+
+        $this->actingAs($customer)
+            ->post('/don-hang/' . $order->id . '/xac-nhan-nhan-hang')
+            ->assertSessionHas('success');
+        $this->assertSame(HoaDon::HOAN_THANH, $order->fresh()->trang_thai);
+
+        $other = $this->otherCustomer();
+        $otherOrder = HoaDon::create([
+            'khach_hang_id' => $other->id,
+            'ma_don_hang' => 'DH-RECEIVED-002',
+            'ngay_dat' => now(),
+            'trang_thai' => HoaDon::DANG_GIAO,
+            'tong_tien' => 100000,
+            'phuong_thuc_thanh_toan' => 'COD',
+            'dia_chi_giao_hang' => '2 Le Loi',
+        ]);
+        $this->actingAs($customer)
+            ->post('/don-hang/' . $otherOrder->id . '/xac-nhan-nhan-hang')
+            ->assertNotFound();
+        $this->assertSame(HoaDon::DANG_GIAO, $otherOrder->fresh()->trang_thai);
     }
 
     public function test_staff_can_follow_but_not_skip_or_reopen_appointment_workflow(): void

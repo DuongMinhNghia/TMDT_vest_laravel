@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\KhachHang;
 use App\Models\HangThanhVien;
 use App\Models\SoDoKhachHang;
+use App\Rules\StrongPassword;
 
 class KhachHangDashboardController extends Controller
 {
@@ -57,20 +59,43 @@ class KhachHangDashboardController extends Controller
     public function capNhatThongTin(Request $request)
     {
         $khachHang = $this->getKhachHangHienTai();
+        $doiMatKhau = $request->filled('current_password')
+            || $request->filled('password')
+            || $request->filled('password_confirmation');
 
         $request->validate([
             'ho_ten'        => 'required|string|max:100',
             'so_dien_thoai' => 'nullable|string|max:15',
             'dia_chi'       => 'nullable|string|max:255',
-            'ngay_sinh'     => 'nullable|date',
-            'gioi_tinh'     => 'nullable|in:Nam,Nu,Khac',
         ]);
 
+        if ($doiMatKhau) {
+            $request->validate([
+                'current_password' => 'required|string',
+                'password' => ['required', 'string', 'confirmed', new StrongPassword],
+                'password_confirmation' => 'required|string',
+            ]);
+
+            if (!Hash::check($request->current_password, Auth::user()->password)) {
+                return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không chính xác.'])
+                    ->withInput($request->except(['current_password', 'password', 'password_confirmation']));
+            }
+
+            if (Hash::check($request->password, Auth::user()->password)) {
+                return back()->withErrors(['password' => 'Mật khẩu mới phải khác mật khẩu hiện tại.'])
+                    ->withInput($request->except(['current_password', 'password', 'password_confirmation']));
+            }
+
+            Auth::user()->update(['password' => $request->password]);
+        }
+
         $khachHang->update($request->only([
-            'ho_ten', 'so_dien_thoai', 'dia_chi', 'ngay_sinh', 'gioi_tinh'
+            'ho_ten', 'so_dien_thoai', 'dia_chi'
         ]));
 
-        return back()->with('success', 'Cập nhật thông tin cá nhân thành công!');
+        return back()->with('success', $doiMatKhau
+            ? 'Cập nhật thông tin và mật khẩu thành công!'
+            : 'Cập nhật thông tin cá nhân thành công!');
     }
 
     /**

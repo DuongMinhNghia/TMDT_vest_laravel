@@ -207,6 +207,21 @@
         box-shadow: 0 0 0 3px rgba(212, 178, 111, 0.2) !important;
     }
 
+    .password-field-wrap { position: relative; }
+    .password-field-wrap .form-control-dark { padding-right: 46px; }
+    .password-visibility-toggle {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: #94A3B8;
+        padding: 6px 8px;
+        line-height: 1;
+    }
+    .password-visibility-toggle:hover, .password-visibility-toggle:focus-visible { color: #D4B26F; }
+
     .btn-gold {
         background: linear-gradient(135deg, #D4B26F 0%, #B89246 100%);
         color: #0c0e12;
@@ -304,29 +319,6 @@
 <div class="dashboard-wrap">
     <div class="container">
 
-        {{-- BÁO CÁO THÀNH CÔNG HOẶC LỖI --}}
-        @if(session('success'))
-        <div class="alert mb-4" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#6EE7B7; border-radius:10px; padding:12px 20px;">
-            <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-        </div>
-        @endif
-
-        @if(session('error'))
-        <div class="alert mb-4" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; border-radius:10px; padding:12px 20px;">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
-        </div>
-        @endif
-
-        @if($errors->any())
-        <div class="alert mb-4" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; border-radius:10px; padding:12px 20px;">
-            <ul class="mb-0 ps-3">
-                @foreach($errors->all() as $err)
-                <li>{{ $err }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
         <div class="row g-4">
             {{-- CỘT TRÁI: THẺ VIP & TIẾN ĐỘ THĂNG HẠNG --}}
             <div class="col-lg-5">
@@ -336,7 +328,7 @@
                     <div class="vip-card">
                         <div class="vip-card-header">
                             <div class="vip-card-brand">
-                                <i class="bi bi-suit-diamond-fill me-1"></i> KINGSMAN
+                                <i class="bi bi-gem me-1"></i> KINGSMAN
                             </div>
                             @php
                                 $hang = $khachHang->hangThanhVien;
@@ -458,7 +450,7 @@
                             </h4>
                             <p style="color:#94A3B8; font-size: 0.85rem; margin-bottom:20px;">Cập nhật thông tin để nghệ nhân may đo và tư vấn giao hàng chính xác nhất.</p>
 
-                            <form action="{{ route('khachhang.thongtin.luu') }}" method="POST">
+                            <form action="{{ route('khachhang.thongtin.luu') }}" method="POST" autocomplete="off">
                                 @csrf
                                 <div class="row g-3">
                                     <div class="col-md-6">
@@ -473,21 +465,37 @@
                                         <label class="form-label text-muted" style="font-size:0.82rem;">Email đăng nhập</label>
                                         <input type="text" class="form-control form-control-dark" value="{{ Auth::user()->email }}" disabled style="opacity:0.6;">
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label text-muted" style="font-size:0.82rem;">Giới tính</label>
-                                        <select name="gioi_tinh" class="form-select form-select-dark">
-                                            <option value="Nam" {{ $khachHang->gioi_tinh == 'Nam' ? 'selected' : '' }}>Nam</option>
-                                            <option value="Nu" {{ $khachHang->gioi_tinh == 'Nu' ? 'selected' : '' }}>Nữ</option>
-                                            <option value="Khac" {{ $khachHang->gioi_tinh == 'Khac' ? 'selected' : '' }}>Khác</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label text-muted" style="font-size:0.82rem;">Ngày sinh</label>
-                                        <input type="date" name="ngay_sinh" class="form-control form-control-dark" value="{{ $khachHang->ngay_sinh ? $khachHang->ngay_sinh->format('Y-m-d') : '' }}">
-                                    </div>
                                     <div class="col-12">
                                         <label class="form-label text-muted" style="font-size:0.82rem;">Địa chỉ giao hàng</label>
-                                        <input type="text" name="dia_chi" class="form-control form-control-dark" value="{{ old('dia_chi', $khachHang->dia_chi) }}" placeholder="Số nhà, tên đường, phường/xã, quận/huyện...">
+                                        <input type="text" name="dia_chi" class="form-control form-control-dark" value="{{ old('dia_chi', $khachHang->dia_chi) }}" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." autocomplete="shipping street-address" readonly onfocus="this.removeAttribute('readonly');">
+                                    </div>
+                                    <div class="col-12 mt-4 pt-4" style="border-top:1px solid rgba(212,178,111,0.2);">
+                                        <h5 class="section-title-gold mb-1" style="font-size:1.05rem;"><i class="bi bi-shield-lock me-2"></i>Đổi Mật Khẩu</h5>
+                                        <p class="mb-3" style="color:#94A3B8; font-size:0.82rem;">Để trống cả ba ô nếu Quý khách chưa muốn thay đổi mật khẩu.</p>
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label text-muted" style="font-size:0.82rem;">Mật khẩu hiện tại</label>
+                                                <div class="password-field-wrap">
+                                                    <input id="current_password" type="password" name="current_password" class="form-control form-control-dark" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" data-lpignore="true" data-1p-ignore="true">
+                                                    <button type="button" class="password-visibility-toggle" data-password-target="current_password" aria-label="Hiển thị mật khẩu hiện tại"><i class="bi bi-eye"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label text-muted" style="font-size:0.82rem;">Mật khẩu mới</label>
+                                                <div class="password-field-wrap">
+                                                    <input id="new_password" type="password" name="password" class="form-control form-control-dark" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" data-lpignore="true" data-1p-ignore="true">
+                                                    <button type="button" class="password-visibility-toggle" data-password-target="new_password" aria-label="Hiển thị mật khẩu mới"><i class="bi bi-eye"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label text-muted" style="font-size:0.82rem;">Xác nhận mật khẩu mới</label>
+                                                <div class="password-field-wrap">
+                                                    <input id="password_confirmation" type="password" name="password_confirmation" class="form-control form-control-dark" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" data-lpignore="true" data-1p-ignore="true">
+                                                    <button type="button" class="password-visibility-toggle" data-password-target="password_confirmation" aria-label="Hiển thị xác nhận mật khẩu mới"><i class="bi bi-eye"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <small class="d-block mt-2" style="color:#94A3B8;">Mật khẩu mới cần tối thiểu 8 ký tự, gồm chữ cái, chữ số và ký tự đặc biệt; đồng thời không được trùng mật khẩu hiện tại.</small>
                                     </div>
                                     <div class="col-12 text-end mt-4">
                                         <button type="submit" class="btn btn-gold">
@@ -628,11 +636,17 @@
                                     </div>
 
                                     @if($lh->sanPhamQuanTam)
-                                    <div class="col-12 mt-2 p-2 rounded d-flex align-items-center gap-3" style="background:#111317; border:1px dashed rgba(255,255,255,0.1);">
-                                        <img src="{{ asset('images/' . $lh->sanPhamQuanTam->hinh_anh) }}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px;">
-                                        <div>
-                                            <div class="text-white font-weight-bold" style="font-size: 0.85rem;">Mẫu vest quan tâm: {{ $lh->sanPhamQuanTam->ten_sp }}</div>
-                                            <small style="color:#D4B26F;">{{ number_format($lh->sanPhamQuanTam->gia_khuyen_mai) }} VNĐ</small>
+                                    <div class="col-12 mt-2">
+                                        <div class="p-3 rounded d-flex flex-wrap align-items-center gap-3" style="background:#111317; border:1px dashed rgba(212,178,111,0.28);">
+                                            <img src="{{ asset('images/' . $lh->sanPhamQuanTam->hinh_anh) }}" alt="{{ $lh->sanPhamQuanTam->ten_sp }}" style="width: 58px; height: 58px; object-fit: cover; border-radius: 8px; border:1px solid rgba(255,255,255,0.1);">
+                                            <div class="flex-grow-1" style="min-width:0;">
+                                                <div style="color:#94A3B8; font-size:0.73rem; text-transform:uppercase; letter-spacing:0.7px; margin-bottom:3px;">Mẫu vest quan tâm</div>
+                                                <div class="text-white fw-semibold" style="font-size:0.92rem; line-height:1.35;">{{ $lh->sanPhamQuanTam->ten_sp }}</div>
+                                            </div>
+                                            <div class="text-end" style="padding-left:14px; border-left:1px solid rgba(255,255,255,0.1); white-space:nowrap;">
+                                                <div style="color:#94A3B8; font-size:0.72rem; margin-bottom:2px;">Giá tham khảo</div>
+                                                <strong style="color:#E8CA8C; font-family:'Plus Jakarta Sans', Arial, sans-serif; font-size:1rem; font-variant-numeric:tabular-nums;">{{ number_format($lh->sanPhamQuanTam->gia_khuyen_mai ?: $lh->sanPhamQuanTam->gia_ban, 0, ',', '.') }} VNĐ</strong>
+                                            </div>
                                         </div>
                                     </div>
                                     @endif
@@ -813,6 +827,18 @@
                 }
             }
         }
+
+        document.querySelectorAll('.password-visibility-toggle').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const input = document.getElementById(this.dataset.passwordTarget);
+                if (!input) return;
+
+                const showing = input.type === 'text';
+                input.type = showing ? 'password' : 'text';
+                this.setAttribute('aria-label', showing ? 'Hiển thị mật khẩu' : 'Ẩn mật khẩu');
+                this.querySelector('i').className = showing ? 'bi bi-eye' : 'bi bi-eye-slash';
+            });
+        });
     });
 </script>
 @endsection

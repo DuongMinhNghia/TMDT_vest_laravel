@@ -794,19 +794,6 @@
             <button type="button" class="adm-modal-close" onclick="closeAdminModal('modal-add')">&times;</button>
         </div>
 
-        @if(isset($errors) && $errors->hasBag('add') && $errors->getBag('add')->any())
-        <div class="admin-alert admin-alert-error mb-3">
-            <i class="bi bi-exclamation-circle-fill fs-5"></i>
-            <div>
-                <ul class="mb-0 ps-3">
-                    @foreach($errors->getBag('add')->all() as $err)
-                    <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-        @endif
-
         <form action="{{ route('sanpham.luuthem') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="form-row-2">
@@ -921,19 +908,6 @@
             </h3>
             <button type="button" class="adm-modal-close" onclick="closeAdminModal('modal-edit')">&times;</button>
         </div>
-
-        @if(isset($errors) && $errors->hasBag('edit') && $errors->getBag('edit')->any())
-        <div class="admin-alert admin-alert-error mb-3">
-            <i class="bi bi-exclamation-circle-fill fs-5"></i>
-            <div>
-                <ul class="mb-0 ps-3">
-                    @foreach($errors->getBag('edit')->all() as $err)
-                    <li>{{ $err }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-        @endif
 
         <form id="form-edit" action="" method="POST" enctype="multipart/form-data">
             @csrf

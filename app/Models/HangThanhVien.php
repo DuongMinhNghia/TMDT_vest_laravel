@@ -43,7 +43,7 @@ class HangThanhVien extends Model
     public function getIconAttribute(): string
     {
         return match (mb_strtolower($this->ten_hang, 'UTF-8')) {
-            'đồng', 'dong' => 'bi-shield',
+            'đồng', 'dong' => 'bi-coin',
             'bạc', 'bac' => 'bi-shield-check',
             'vàng', 'vang' => 'bi-award-fill',
             'kim cương (vip)', 'kim cương', 'kim cuong' => 'bi-gem',

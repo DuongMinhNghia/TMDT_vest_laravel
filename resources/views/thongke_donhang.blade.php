@@ -411,15 +411,15 @@
                     </td>
                     <td>
                         @if($dh->trang_thai === 'Hoàn Thành')
-                            <span class="badge-status-pill badge-hoan"><i class="bi bi-check-circle-fill"></i> Hoàn Thành</span>
+                            <span class="badge-status-pill badge-hoan">Hoàn Thành</span>
                         @elseif($dh->trang_thai === 'Đang may/gói')
-                            <span class="badge-status-pill badge-may"><i class="bi bi-scissors"></i> Đang may / gói</span>
+                            <span class="badge-status-pill badge-may">Đang may / gói</span>
                         @elseif($dh->trang_thai === 'Đang giao')
-                            <span class="badge-status-pill badge-giao"><i class="bi bi-truck"></i> Đang giao</span>
+                            <span class="badge-status-pill badge-giao">Đang giao</span>
                         @elseif($dh->trang_thai === 'Chờ xử lý')
-                            <span class="badge-status-pill badge-cho"><i class="bi bi-hourglass-split"></i> Chờ xử lý</span>
+                            <span class="badge-status-pill badge-cho">Chờ xử lý</span>
                         @else
-                            <span class="badge-status-pill badge-huy"><i class="bi bi-x-circle-fill"></i> Đã hủy</span>
+                            <span class="badge-status-pill badge-huy">Đã hủy</span>
                         @endif
 
                         @if($dh->nhanVienDuyet)

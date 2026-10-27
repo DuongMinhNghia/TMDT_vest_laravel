@@ -397,21 +397,32 @@
         color: var(--km-gold);
         font-size: 1.25rem;
         font-weight: 700;
-        font-family: var(--km-font-body);
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
         letter-spacing: -0.3px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.25;
+        white-space: nowrap;
     }
 
     .price-sale-current {
         color: #ef4444;
         font-size: 1.25rem;
         font-weight: 700;
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
         letter-spacing: -0.3px;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.25;
+        white-space: nowrap;
     }
 
     .price-old {
         text-decoration: line-through;
         color: var(--km-text-dim);
         font-size: 0.85rem;
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.25;
+        white-space: nowrap;
     }
 
     /* NÚT THAO TÁC */

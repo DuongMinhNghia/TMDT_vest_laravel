@@ -16,6 +16,7 @@ use App\Http\Controllers\DanhGiaController;
 use App\Http\Controllers\KhachHangDashboardController;
 use App\Http\Controllers\LichHenController;
 use App\Http\Controllers\HangThanhVienController;
+use App\Http\Controllers\QuenMatKhauController;
 
 // 1. Route xác thực (Guest)
 Route::middleware('guest')->group(function () {
@@ -23,6 +24,12 @@ Route::middleware('guest')->group(function () {
     Route::post('/dang-nhap', [DangNhapController::class, 'login']);
     Route::get('/dang-ky', [DangKyController::class, 'index']);
     Route::post('/dang-ky', [DangKyController::class, 'register']);
+    Route::get('/quen-mat-khau', [QuenMatKhauController::class, 'formGuiMa'])->name('matkhau.quen.form');
+    Route::post('/quen-mat-khau', [QuenMatKhauController::class, 'guiMa'])->name('matkhau.quen.gui');
+    Route::get('/quen-mat-khau/xac-nhan', [QuenMatKhauController::class, 'formXacNhan'])->name('matkhau.xacnhan.form');
+    Route::post('/quen-mat-khau/xac-nhan', [QuenMatKhauController::class, 'xacNhan'])->name('matkhau.xacnhan');
+    Route::get('/dat-lai-mat-khau', [QuenMatKhauController::class, 'formDatLai'])->name('matkhau.datlai.form');
+    Route::post('/dat-lai-mat-khau', [QuenMatKhauController::class, 'datLai'])->name('matkhau.datlai');
 });
 
 // 2. Nội dung công khai: chỉ xem, không thay đổi dữ liệu.
@@ -45,6 +52,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/don-hang', [DonHangController::class, 'lichSu'])->middleware('role:khach_hang')->name('donhang.lichsu');
     Route::get('/don-hang/{id}', [DonHangController::class, 'chiTiet'])->name('donhang.chitiet');
     Route::post('/don-hang/{id}/huy', [DonHangController::class, 'huy'])->middleware('role:khach_hang')->name('donhang.huy');
+    Route::post('/don-hang/{id}/xac-nhan-nhan-hang', [DonHangController::class, 'xacNhanNhanHang'])->middleware('role:khach_hang')->name('donhang.xacnhan-nhanhang');
     Route::post('/san-pham/{id}/danh-gia', [DanhGiaController::class, 'luu'])->middleware('role:khach_hang')->name('danhgia.luu');
 
     // =========================================================================

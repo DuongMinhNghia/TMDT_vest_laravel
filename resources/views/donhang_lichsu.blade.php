@@ -5,11 +5,11 @@
 @section('content')
 @php
     $mauTrangThai = [
-        'Chờ xử lý'    => ['rgba(234, 179, 8, 0.12)', '#eab308', 'rgba(234, 179, 8, 0.3)', '⏳'],
-        'Đang may/gói' => ['rgba(168, 85, 247, 0.12)', '#a855f7', 'rgba(168, 85, 247, 0.3)', '🧵'],
-        'Đang giao'    => ['rgba(56, 189, 248, 0.12)', '#38bdf8', 'rgba(56, 189, 248, 0.3)', '🚚'],
-        'Hoàn Thành'   => ['rgba(34, 197, 94, 0.12)', '#22c55e', 'rgba(34, 197, 94, 0.3)', '✅'],
-        'Đã hủy'       => ['rgba(244, 63, 94, 0.12)', '#f43f5e', 'rgba(244, 63, 94, 0.3)', '❌'],
+        'Chờ xử lý'    => ['rgba(234, 179, 8, 0.12)', '#eab308', 'rgba(234, 179, 8, 0.3)'],
+        'Đang may/gói' => ['rgba(168, 85, 247, 0.12)', '#a855f7', 'rgba(168, 85, 247, 0.3)'],
+        'Đang giao'    => ['rgba(56, 189, 248, 0.12)', '#38bdf8', 'rgba(56, 189, 248, 0.3)'],
+        'Hoàn Thành'   => ['rgba(34, 197, 94, 0.12)', '#22c55e', 'rgba(34, 197, 94, 0.3)'],
+        'Đã hủy'       => ['rgba(244, 63, 94, 0.12)', '#f43f5e', 'rgba(244, 63, 94, 0.3)'],
     ];
 @endphp
 <style>
@@ -107,17 +107,6 @@
         <i class="bi bi-receipt"></i> Lịch Sử Đơn Hàng Của Tôi
     </h2>
 
-    @if(session('error'))
-    <div class="alert" style="background:rgba(244,63,94,0.12); border:1px solid rgba(244,63,94,0.3); color:#f43f5e; border-radius:8px; margin-bottom:20px;">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-    </div>
-    @endif
-    @if(session('success'))
-    <div class="alert" style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); color:#22c55e; border-radius:8px; margin-bottom:20px;">
-        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-    </div>
-    @endif
-
     @if($donHangs->isEmpty())
     <div style="text-align:center; padding:80px 20px; background:#141720; border:1px dashed rgba(255,255,255,0.1); border-radius:12px; color:#94A3B8;">
         <i class="bi bi-inbox" style="font-size:3.5rem; display:block; margin-bottom:15px; color:#64748B;"></i>
@@ -142,7 +131,7 @@
             </thead>
             <tbody>
                 @foreach($donHangs as $dh)
-                @php [$bg, $color, $border, $icon] = $mauTrangThai[$dh->trang_thai] ?? ['rgba(255,255,255,0.05)', '#94A3B8', 'rgba(255,255,255,0.1)', '•']; @endphp
+                @php [$bg, $color, $border] = $mauTrangThai[$dh->trang_thai] ?? ['rgba(255,255,255,0.05)', '#94A3B8', 'rgba(255,255,255,0.1)']; @endphp
                 <tr>
                     <td>
                         <strong style="color:#D4B26F;">{{ $dh->ma_don_hang }}</strong>
@@ -152,7 +141,7 @@
                     <td style="color:#D4B26F; font-weight:700;" class="text-end">{{ number_format($dh->tong_tien, 0, ',', '.') }} VNĐ</td>
                     <td class="text-center">
                         <span class="order-status-pill" style="background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $border }};">
-                            {{ $icon }} {{ $dh->trang_thai }}
+                            {{ $dh->trang_thai }}
                         </span>
                     </td>
                     <td class="text-end">

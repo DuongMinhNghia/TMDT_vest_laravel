@@ -464,23 +464,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-    <div class="alert mb-4" style="background:rgba(16,185,129,0.12); border:1px solid rgba(16,185,129,0.3); color:#6EE7B7; border-radius:10px; padding:12px 20px;">
-        <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert mb-4" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; border-radius:10px; padding:12px 20px;">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
-    </div>
-    @endif
-    @if($errors->any())
-    <div class="alert mb-4" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; border-radius:10px; padding:12px 20px;">
-        @foreach($errors->all() as $e)<div><i class="bi bi-x-circle me-1"></i> {{ $e }}</div>@endforeach
-    </div>
-    @endif
-
     @if(empty($gioHang))
     <div class="empty-cart">
         <div class="empty-cart-icon-wrap">

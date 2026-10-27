@@ -188,11 +188,36 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             white-space: nowrap;
+            cursor: pointer;
         }
 
         .user-info strong {
             color: #D4B26F;
             font-weight: 600;
+        }
+
+        .user-info:hover,
+        .user-info:focus-visible {
+            border-color: rgba(212, 178, 111, 0.6);
+            color: #fff;
+            outline: none;
+        }
+
+        .user-info::after {
+            margin-left: 4px;
+            color: #D4B26F;
+        }
+
+        .user-menu {
+            min-width: 190px;
+            margin-top: 8px !important;
+        }
+
+        .user-menu .dropdown-item {
+            border: 0;
+            background: transparent;
+            width: 100%;
+            text-align: left;
         }
 
         /* CART */
@@ -332,7 +357,8 @@
                     <span><i class="bi bi-clock"></i> Thời gian làm việc: Hàng ngày từ 9h - 21h</span>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <span><i class="bi bi-info-circle"></i> Thông tin liên hệ showroom đang chờ chủ sở hữu xác nhận</span>
+                    <a href="tel:0901234567"><i class="bi bi-telephone"></i> 0901 234 567</a>
+                    <a href="mailto:vip@kingsman.vn"><i class="bi bi-envelope"></i> vip@kingsman.vn</a>
                 </div>
             </div>
         </div>
@@ -363,9 +389,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('lichhen.create') }}" class="nav-link nav-link-main">
-                            <i class="bi bi-calendar2-heart"></i> Đặt Lịch Hẹn
-                        </a>
+                        @if(Auth::check() && !Auth::user()->isCustomer())
+                            <a href="{{ route('lichhen.quanly') }}" class="nav-link nav-link-main">
+                                <i class="bi bi-calendar2-check"></i> Quản Lý Lịch Hẹn
+                            </a>
+                        @else
+                            <a href="{{ route('lichhen.create') }}" class="nav-link nav-link-main">
+                                <i class="bi bi-calendar2-heart"></i> Đặt Lịch Hẹn
+                            </a>
+                        @endif
                     </li>
 
                     @if(Auth::check() && (Auth::user()->vai_tro == 'admin' || Auth::user()->quyen == 'Admin'))
@@ -431,30 +463,7 @@
                 </ul>
 
                 <div class="d-flex align-items-center gap-2 ms-auto justify-content-end">
-                    @if(Auth::check())
-                    <div class="user-info">
-                        <i class="bi bi-person-circle"></i>
-                        <span>Xin chào, <strong>{{ Auth::user()->name }}</strong></span>
-                    </div>
-                    <form method="POST" action="{{ route('logout') }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn-action-gold ms-1">
-                            <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                        </button>
-                    </form>
-                    @else
-                    <a href="{{ url('/dang-nhap') }}" class="btn-action-gold">
-                        <i class="bi bi-person"></i> Đăng nhập
-                    </a>
-                    @endif
-
                     @if(Auth::check() && Auth::user()->isCustomer())
-                    <a href="{{ route('khachhang.dashboard') }}" class="btn-action-gold">
-                        <i class="bi bi-person-badge"></i> Hồ Sơ & VIP
-                    </a>
-                    <a href="{{ route('donhang.lichsu') }}" class="btn-action-gold">
-                        <i class="bi bi-receipt"></i> Đơn hàng
-                    </a>
                     <a href="{{ url('/gio-hang') }}" class="btn-action-gold cart-badge">
                         <i class="bi bi-cart3"></i> Giỏ hàng
                         @php
@@ -466,6 +475,47 @@
                         @if($soLuongGioHang > 0)
                         <span class="badge">{{ $soLuongGioHang }}</span>
                         @endif
+                    </a>
+                    @endif
+
+                    @if(Auth::check())
+                    <div class="dropdown">
+                        <button class="user-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                            <span>Xin chào, <strong>{{ Auth::user()->name }}</strong></span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end user-menu">
+                            @if(Auth::user()->isCustomer())
+                            <li>
+                                <a class="dropdown-item" href="{{ route('khachhang.dashboard') }}">
+                                    <i class="bi bi-person-badge me-2"></i>Hồ Sơ & VIP
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('donhang.lichsu') }}">
+                                    <i class="bi bi-receipt me-2"></i>Đơn hàng của tôi
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ route('khachhang.dashboard') }}#lichhen">
+                                    <i class="bi bi-calendar2-heart me-2"></i>Lịch hẹn của tôi
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" style="border-color: rgba(255,255,255,0.08);"></li>
+                            @endif
+                            <li>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="dropdown-item">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                    @else
+                    <a href="{{ url('/dang-nhap') }}" class="btn-action-gold">
+                        <i class="bi bi-person"></i> Đăng nhập
                     </a>
                     @endif
                 </div>
@@ -512,7 +562,9 @@
                 </div>
                 <div class="col-md-4 mb-4">
                     <h5>LIÊN HỆ</h5>
-                    <p><i class="bi bi-info-circle-fill" style="color:#d4af37;"></i> Địa chỉ, điện thoại và email showroom đang chờ chủ sở hữu xác nhận.</p>
+                    <p><i class="bi bi-telephone-fill" style="color:#d4af37;"></i> Hotline: <a href="tel:0901234567" style="display:inline; margin:0;">0901 234 567</a></p>
+                    <p><i class="bi bi-envelope-fill" style="color:#d4af37;"></i> Email: <a href="mailto:vip@kingsman.vn" style="display:inline; margin:0;">vip@kingsman.vn</a></p>
+                    <p><i class="bi bi-clock-fill" style="color:#d4af37;"></i> Phục vụ hằng ngày: 09:00 - 21:00</p>
                 </div>
             </div>
             <hr>
@@ -548,6 +600,7 @@
         });
     </script>
 
+    @include('partials.system-popup')
     @yield('scripts')
 </body>
 

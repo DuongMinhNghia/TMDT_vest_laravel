@@ -164,6 +164,26 @@ class DonHangService
         }, 3);
     }
 
+    /** Khách xác nhận đã nhận hàng, chỉ khi đơn của họ đang được giao. */
+    public function khachXacNhanNhanHang(int $hoaDonId, KhachHang $khachHang): HoaDon
+    {
+        return DB::transaction(function () use ($hoaDonId, $khachHang) {
+            $hoaDon = HoaDon::where('khach_hang_id', $khachHang->id)
+                ->whereKey($hoaDonId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($hoaDon->trang_thai !== HoaDon::DANG_GIAO) {
+                throw new RuntimeException('Chỉ có thể xác nhận nhận hàng khi đơn đang ở trạng thái "Đang giao".');
+            }
+
+            $hoaDon->update(['trang_thai' => HoaDon::HOAN_THANH]);
+            $this->congDiemVaThangHang($hoaDon);
+
+            return $hoaDon;
+        }, 3);
+    }
+
     private function hoanKho(HoaDon $hoaDon): void
     {
         foreach ($hoaDon->chiTiets as $ct) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HoaDon;
 use App\Services\DonHangService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
 
@@ -47,8 +48,9 @@ class DonHangController extends Controller
         $giamHang = max(0, $tamTinh + $phiShip - $donHang->tong_tien); // tong_tien = tạm tính - giảm hạng + ship
 
         $coTheHuy = $laChuDon && $donHang->trang_thai === HoaDon::CHO_XU_LY;
+        $coTheXacNhanNhanHang = $laChuDon && $donHang->trang_thai === HoaDon::DANG_GIAO;
 
-        return view('donhang_chitiet', compact('donHang', 'tamTinh', 'phiShip', 'giamHang', 'coTheHuy', 'laNhanSu'));
+        return view('donhang_chitiet', compact('donHang', 'tamTinh', 'phiShip', 'giamHang', 'coTheHuy', 'coTheXacNhanNhanHang', 'laNhanSu'));
     }
 
     public function huy($id)
@@ -63,5 +65,21 @@ class DonHangController extends Controller
         }
 
         return redirect()->route('donhang.chitiet', $id)->with('success', 'Đã hủy đơn hàng, số lượng đã được hoàn lại kho.');
+    }
+
+    public function xacNhanNhanHang($id)
+    {
+        $khachHang = Auth::user()?->khachHang;
+        abort_unless($khachHang, 403);
+
+        try {
+            $this->donHangService->khachXacNhanNhanHang((int) $id, $khachHang);
+        } catch (ModelNotFoundException $e) {
+            throw $e;
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()->route('donhang.chitiet', $id)->with('success', 'Đã xác nhận nhận hàng. Đơn hàng đã hoàn thành.');
     }
 }

@@ -434,18 +434,6 @@
         </button>
     </div>
 
-    <!-- VALIDATION ERRORS -->
-    @if(isset($errors) && $errors->any())
-    <div class="admin-alert admin-alert-error" style="margin-bottom: 20px;">
-        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-        <div>
-            @foreach($errors->all() as $err)
-            <div>{{ $err }}</div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
     {{-- THỐNG KÊ NHANH --}}
     <div class="sale-stats-grid">
         <div class="sale-stat-card">

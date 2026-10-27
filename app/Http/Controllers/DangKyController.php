@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TaiKhoan;
 use Illuminate\Support\Facades\Hash; // Thư viện mã hóa mật khẩu
+use App\Rules\StrongPassword;
 
 class DangKyController extends Controller
 {
@@ -19,10 +20,10 @@ class DangKyController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:tai_khoans,email',
-            'password' => 'required|min:6'
+            'password' => ['required', 'confirmed', new StrongPassword],
         ], [
             'email.unique' => 'Email này đã được sử dụng!',
-            'password.min' => 'Mật khẩu phải có ít nhất 6 ký tự.'
+            'password.confirmed' => 'Mật khẩu nhập lại không khớp.'
         ]);
 
         // 2. Lưu vào database

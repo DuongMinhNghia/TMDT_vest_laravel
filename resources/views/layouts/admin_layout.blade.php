@@ -456,35 +456,6 @@
     <!-- MAIN CONTENT WRAPPER -->
     <div class="admin-main-wrap">
         <main class="admin-content-body">
-            <!-- HIỂN THỊ CÁC THÔNG BÁO FLASH MESSAGE TỰ ĐỘNG -->
-            @if(session('success'))
-            <div class="admin-alert admin-alert-success">
-                <i class="bi bi-check-circle-fill fs-5"></i>
-                <div>{{ session('success') }}</div>
-            </div>
-            @endif
-
-            @if(session('error'))
-            <div class="admin-alert admin-alert-error">
-                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-                <div>{{ session('error') }}</div>
-            </div>
-            @endif
-
-            @if(isset($errors) && $errors->any())
-            <div class="admin-alert admin-alert-error">
-                <i class="bi bi-exclamation-circle-fill fs-5"></i>
-                <div>
-                    <strong>Có lỗi nhập liệu:</strong>
-                    <ul class="mb-0 ps-3 mt-1">
-                        @foreach($errors->all() as $err)
-                        <li>{{ $err }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            </div>
-            @endif
-
             <!-- NỘI DUNG TRANG CON -->
             @yield('content')
         </main>
@@ -506,6 +477,7 @@
         }
     </script>
 
+    @include('partials.system-popup')
     @yield('scripts')
 </body>
 

@@ -429,20 +429,6 @@
             </p>
         </div>
 
-        {{-- BÁO LỖI NẾU CÓ --}}
-        @if($errors->any())
-        <div class="alert mb-4" style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5; border-radius:10px;">
-            <div class="d-flex align-items-center gap-2 mb-1 fw-bold">
-                <i class="bi bi-exclamation-triangle-fill"></i> Vui lòng kiểm tra lại thông tin:
-            </div>
-            <ul class="mb-0 ps-3">
-                @foreach($errors->all() as $err)
-                <li style="font-size:0.88rem;">{{ $err }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
         <div class="row g-4 align-items-start">
 
             {{-- CỘT TRÁI: FORM ĐẶT LỊCH HẸN --}}

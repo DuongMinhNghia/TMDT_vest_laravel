@@ -38,6 +38,17 @@
         gap: 10px;
     }
 
+    .order-detail-code {
+        color: #E8CA8C;
+        font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+        font-size: 0.72em;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
     .btn-back-link {
         color: #94A3B8;
         text-decoration: none;
@@ -143,28 +154,37 @@
         background: #f43f5e;
         color: #fff;
     }
+
+    .btn-confirm-received {
+        width: 100%;
+        background: linear-gradient(135deg, #E8CA8C, #D4B26F);
+        border: 0;
+        color: #111317;
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-confirm-received:hover {
+        background: #f3d89b;
+        transform: translateY(-1px);
+    }
 </style>
 
 <div class="order-detail-wrap">
     <div class="order-detail-header">
         <h2 class="order-detail-title">
-            <i class="bi bi-receipt"></i> Đơn Hàng #{{ $donHang->ma_don_hang }}
+            <i class="bi bi-receipt"></i>
+            <span>Đơn Hàng</span>
+            <span class="order-detail-code">#{{ $donHang->ma_don_hang }}</span>
         </h2>
         <a href="{{ $laNhanSu && !$laChuDon ? route('thongke.donhang') : route('donhang.lichsu') }}" class="btn-back-link">
             <i class="bi bi-arrow-left"></i> Quay lại danh sách đơn
         </a>
     </div>
-
-    @if(session('error'))
-    <div class="alert" style="background:rgba(244,63,94,0.12); border:1px solid rgba(244,63,94,0.3); color:#f43f5e; border-radius:8px; margin-bottom:20px;">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-    </div>
-    @endif
-    @if(session('success'))
-    <div class="alert" style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); color:#22c55e; border-radius:8px; margin-bottom:20px;">
-        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-    </div>
-    @endif
 
     {{-- TIẾN TRÌNH ĐƠN HÀNG --}}
     <div class="timeline-card">
@@ -273,6 +293,15 @@
                     @csrf
                     <button type="submit" class="btn-cancel-order">
                         <i class="bi bi-x-circle me-1"></i> Hủy đơn hàng này
+                    </button>
+                </form>
+                @endif
+
+                @if($coTheXacNhanNhanHang)
+                <form method="POST" action="{{ route('donhang.xacnhan-nhanhang', $donHang->id) }}" onsubmit="return confirm('Bạn xác nhận đã nhận được hàng và muốn hoàn thành đơn này?')" class="mt-4">
+                    @csrf
+                    <button type="submit" class="btn-confirm-received">
+                        <i class="bi bi-check2-circle me-1"></i> Đã nhận được hàng
                     </button>
                 </form>
                 @endif

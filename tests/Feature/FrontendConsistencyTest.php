@@ -64,4 +64,20 @@ class FrontendConsistencyTest extends TestCase
             ->assertSee('navbar-toggler', false)
             ->assertSee('data-bs-target="#navbarNav"', false);
     }
+
+    public function test_admin_navigation_sends_admin_users_to_appointment_management(): void
+    {
+        $admin = TaiKhoan::where('email', 'admin@gmail.com')->firstOrFail();
+        $product = SanPham::firstOrFail();
+
+        $this->actingAs($admin)->get('/')
+            ->assertOk()
+            ->assertSee(route('lichhen.quanly'), false)
+            ->assertDontSee(route('lichhen.create'), false);
+
+        $this->actingAs($admin)->get('/san-pham/' . $product->id)
+            ->assertOk()
+            ->assertSee(route('lichhen.quanly'), false)
+            ->assertDontSee(route('lichhen.create', ['san_pham_id' => $product->id]), false);
+    }
 }

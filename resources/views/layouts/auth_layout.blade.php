@@ -148,8 +148,52 @@
             color: #fff !important;
         }
 
+        /* Ngăn màu nền sáng mặc định của trình duyệt khi tự điền tài khoản. */
+        .form-control:-webkit-autofill,
+        .form-control:-webkit-autofill:hover,
+        .form-control:-webkit-autofill:focus,
+        .form-control:-webkit-autofill:active {
+            -webkit-text-fill-color: var(--auth-text-main) !important;
+            -webkit-box-shadow: 0 0 0 1000px var(--auth-bg-card) inset !important;
+            box-shadow: 0 0 0 1000px var(--auth-bg-card) inset !important;
+            caret-color: var(--auth-text-main);
+            transition: background-color 9999s ease-out 0s;
+        }
+
+        .form-control:-moz-autofill {
+            background-color: var(--auth-bg-card) !important;
+            color: var(--auth-text-main) !important;
+        }
+
         .form-control::placeholder {
             color: var(--auth-text-dim);
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-field .form-control {
+            padding-right: 48px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            border: 0;
+            background: transparent;
+            color: var(--auth-text-muted);
+            cursor: pointer;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .password-toggle:hover,
+        .password-toggle:focus-visible {
+            color: var(--auth-gold);
+            outline: none;
         }
 
         /* ALERTS */
@@ -257,6 +301,20 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    @include('partials.system-popup')
+    <script>
+        document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const input = document.getElementById(button.dataset.passwordToggle);
+                const isHidden = input.type === 'password';
+
+                input.type = isHidden ? 'text' : 'password';
+                button.setAttribute('aria-label', isHidden ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu');
+                button.setAttribute('title', isHidden ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu');
+                button.querySelector('i').className = isHidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+            });
+        });
+    </script>
     @yield('scripts')
 </body>
 
