@@ -10,7 +10,7 @@
     } elseif (session('info')) {
         $systemPopup = ['type' => 'info', 'title' => 'Thông báo', 'messages' => [session('info')]];
     } else {
-        $validationMessages = collect($errors->getBags())
+        $validationMessages = collect(isset($errors) ? $errors->getBags() : [])
             ->flatMap(fn ($bag) => $bag->all())
             ->unique()
             ->values()

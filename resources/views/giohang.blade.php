@@ -596,7 +596,7 @@
                         <label class="form-label-summary">Phương thức thanh toán *</label>
                         <select name="phuong_thuc" class="form-input-summary">
                             <option value="COD">Thanh toán khi nhận hàng (COD)</option>
-                            <option value="Chuyển khoản" {{ old('phuong_thuc') == 'Chuyển khoản' ? 'selected' : '' }}>Chuyển khoản ngân hàng</option>
+                            <option value="Chuyển khoản QR" {{ old('phuong_thuc') == 'Chuyển khoản QR' ? 'selected' : '' }}>Chuyển khoản QR (Vietcombank/MoMo)</option>
                         </select>
 
                         <label class="form-label-summary">Ghi chú giao hàng (nếu có)</label>

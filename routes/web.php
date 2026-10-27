@@ -51,6 +51,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     // Đơn hàng của khách + Đánh giá sản phẩm (Task 3.3, 3.4 - Thành viên 3)
     Route::get('/don-hang', [DonHangController::class, 'lichSu'])->middleware('role:khach_hang')->name('donhang.lichsu');
     Route::get('/don-hang/{id}', [DonHangController::class, 'chiTiet'])->name('donhang.chitiet');
+    Route::get('/don-hang/{id}/thanh-toan', [DonHangController::class, 'thanhToan'])->middleware('role:khach_hang')->name('donhang.thanhtoan');
     Route::post('/don-hang/{id}/huy', [DonHangController::class, 'huy'])->middleware('role:khach_hang')->name('donhang.huy');
     Route::post('/don-hang/{id}/xac-nhan-nhan-hang', [DonHangController::class, 'xacNhanNhanHang'])->middleware('role:khach_hang')->name('donhang.xacnhan-nhanhang');
     Route::post('/san-pham/{id}/danh-gia', [DanhGiaController::class, 'luu'])->middleware('role:khach_hang')->name('danhgia.luu');

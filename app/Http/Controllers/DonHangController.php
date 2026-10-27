@@ -53,6 +53,18 @@ class DonHangController extends Controller
         return view('donhang_chitiet', compact('donHang', 'tamTinh', 'phiShip', 'giamHang', 'coTheHuy', 'coTheXacNhanNhanHang', 'laNhanSu'));
     }
 
+    /** Hiển thị hướng dẫn chuyển khoản QR thủ công cho chính chủ đơn hàng. */
+    public function thanhToan($id)
+    {
+        $khachHang = Auth::user()?->khachHang;
+        abort_unless($khachHang, 403);
+
+        $donHang = HoaDon::where('khach_hang_id', $khachHang->id)->findOrFail($id);
+        abort_unless($donHang->phuong_thuc_thanh_toan === 'Chuyển khoản QR', 404);
+
+        return view('thanhtoan_qr', compact('donHang'));
+    }
+
     public function huy($id)
     {
         $khachHang = Auth::user()?->khachHang;

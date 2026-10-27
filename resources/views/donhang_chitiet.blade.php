@@ -288,6 +288,12 @@
                     <span>TỔNG CỘNG:</span><span>{{ number_format($donHang->tong_tien, 0, ',', '.') }} VNĐ</span>
                 </div>
 
+                @if($laChuDon && $donHang->phuong_thuc_thanh_toan === 'Chuyển khoản QR' && $donHang->trang_thai === \App\Models\HoaDon::CHO_XU_LY)
+                <a href="{{ route('donhang.thanhtoan', $donHang->id) }}" class="d-block text-center mt-4" style="background:linear-gradient(135deg,#E8CA8C,#D4B26F); color:#111317; border-radius:8px; padding:10px; font-weight:700; text-decoration:none;">
+                    <i class="bi bi-qr-code-scan me-1"></i> Thanh toán bằng QR
+                </a>
+                @endif
+
                 @if($coTheHuy)
                 <form method="POST" action="{{ route('donhang.huy', $donHang->id) }}" onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?')" class="mt-4">
                     @csrf

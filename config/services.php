@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'manual_transfer' => [
+        'bank_id' => env('MANUAL_TRANSFER_BANK_ID', 'VCB'),
+        'account_number' => env('MANUAL_TRANSFER_ACCOUNT_NUMBER'),
+        'account_name' => env('MANUAL_TRANSFER_ACCOUNT_NAME'),
+        'demo_divisor' => max(1, (int) env('MANUAL_TRANSFER_DEMO_DIVISOR', 1)),
+    ],
+
 ];

@@ -162,6 +162,28 @@ class CustomerWorkflowTest extends TestCase
         $this->assertSame(HoaDon::DANG_GIAO, $otherOrder->fresh()->trang_thai);
     }
 
+    public function test_customer_can_only_open_their_own_manual_qr_payment_page(): void
+    {
+        $customer = $this->account('khachhang@gmail.com');
+        $order = HoaDon::create([
+            'khach_hang_id' => $customer->khachHang->id,
+            'ma_don_hang' => 'DH-QR-001',
+            'ngay_dat' => now(),
+            'trang_thai' => HoaDon::CHO_XU_LY,
+            'tong_tien' => 4000000,
+            'phuong_thuc_thanh_toan' => 'Chuyển khoản QR',
+            'dia_chi_giao_hang' => '1 Le Loi',
+        ]);
+
+        $this->actingAs($customer)->get('/don-hang/' . $order->id . '/thanh-toan')
+            ->assertOk()
+            ->assertSee('DH-QR-001')
+            ->assertSee('4.000 VNĐ');
+
+        $other = $this->otherCustomer();
+        $this->actingAs($other->taiKhoan)->get('/don-hang/' . $order->id . '/thanh-toan')->assertNotFound();
+    }
+
     public function test_staff_can_follow_but_not_skip_or_reopen_appointment_workflow(): void
     {
         $customer = $this->account('khachhang@gmail.com')->khachHang;

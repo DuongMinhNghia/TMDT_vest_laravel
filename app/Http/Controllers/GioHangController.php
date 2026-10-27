@@ -147,7 +147,7 @@ class GioHangController extends Controller
 
         $data = $request->validate([
             'dia_chi'     => 'required|string|max:500',
-            'phuong_thuc' => 'required|in:COD,Chuyển khoản',
+            'phuong_thuc' => 'required|in:COD,Chuyển khoản QR',
             'ghi_chu'     => 'nullable|string|max:500',
         ], [
             'dia_chi.required' => 'Vui lòng nhập địa chỉ giao hàng.',
@@ -157,6 +157,11 @@ class GioHangController extends Controller
             $hoaDon = $this->donHangService->taoDonTuGioHang($this->khachHang(), $this->gioHangCuaToi(), $data);
         } catch (RuntimeException $e) {
             return redirect()->route('giohang.index')->with('error', $e->getMessage());
+        }
+
+        if ($data['phuong_thuc'] === 'Chuyển khoản QR') {
+            return redirect()->route('donhang.thanhtoan', $hoaDon->id)
+                ->with('success', 'Đơn hàng đã được tạo. Vui lòng quét QR và chuyển khoản đúng số tiền với nội dung là mã đơn hàng.');
         }
 
         return redirect()->route('donhang.chitiet', $hoaDon->id)
