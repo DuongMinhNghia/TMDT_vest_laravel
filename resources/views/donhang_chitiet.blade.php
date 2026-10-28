@@ -172,6 +172,63 @@
         background: #f3d89b;
         transform: translateY(-1px);
     }
+
+    @media (max-width: 768px) {
+        .order-detail-wrap {
+            padding: 15px 10px 45px;
+        }
+        .order-detail-title {
+            font-size: 1.3rem;
+            flex-wrap: wrap;
+        }
+        .timeline-card {
+            padding: 16px 10px;
+            border-radius: 10px;
+        }
+        .step-icon {
+            font-size: 1.25rem;
+            margin-bottom: 2px;
+        }
+        .step-name {
+            font-size: 0.68rem;
+            line-height: 1.2;
+        }
+        .product-order-table thead {
+            display: none;
+        }
+        .product-order-table, .product-order-table tbody, .product-order-table tr, .product-order-table td {
+            display: block;
+            width: 100%;
+        }
+        .product-order-table tbody tr {
+            padding: 14px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .product-order-table tbody td {
+            padding: 5px 0 !important;
+            text-align: left !important;
+            border: none;
+        }
+        .product-order-table tbody td:first-child {
+            padding-bottom: 8px !important;
+        }
+        .product-order-table tbody td:not(:first-child) {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .product-order-table tbody td:not(:first-child)::before {
+            content: attr(data-label);
+            color: #94A3B8;
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .summary-sidebar {
+            padding: 16px 14px;
+            border-radius: 10px;
+        }
+    }
 </style>
 
 <div class="order-detail-wrap">
@@ -252,9 +309,9 @@
                                     </div>
                                 </div>
                             </td>
-                            <td style="padding:14px 18px;" class="text-center text-muted">{{ number_format($ct->don_gia, 0, ',', '.') }} VNĐ</td>
-                            <td style="padding:14px 18px;" class="text-center font-weight-bold">{{ $ct->so_luong }}</td>
-                            <td style="padding:14px 18px; color:#D4B26F; font-weight:700;" class="text-end">{{ number_format($ct->thanh_tien, 0, ',', '.') }} VNĐ</td>
+                            <td data-label="Đơn Giá" class="text-center text-muted">{{ number_format($ct->don_gia, 0, ',', '.') }} VNĐ</td>
+                            <td data-label="Số Lượng" class="text-center font-weight-bold">{{ $ct->so_luong }}</td>
+                            <td data-label="Thành Tiền" style="color:#D4B26F; font-weight:700;" class="text-end">{{ number_format($ct->thanh_tien, 0, ',', '.') }} VNĐ</td>
                         </tr>
                         @endforeach
                     </tbody>

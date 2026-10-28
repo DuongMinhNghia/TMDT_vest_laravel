@@ -274,6 +274,99 @@
         color: #f43f5e;
         border-color: rgba(244, 63, 94, 0.3);
     }
+
+    /* RESPONSIVE CHO MOBILE & TABLET */
+    @media (max-width: 991.98px) {
+        .lh-kpi-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .lh-top-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .lh-header-title {
+            font-size: 1.35rem;
+        }
+        .lh-kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .lh-kpi-card {
+            padding: 12px 14px;
+        }
+        .lh-kpi-number {
+            font-size: 1.3rem;
+        }
+        .lh-filter-card {
+            padding: 14px 12px;
+        }
+
+        /* CHUYỂN ĐỔI BẢNG THÀNH CARD THÔNG MINH */
+        .lh-table-card {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            overflow: visible;
+        }
+        .lh-table, .lh-table tbody, .lh-table tr, .lh-table td {
+            display: block;
+            width: 100%;
+        }
+        .lh-table thead {
+            display: none;
+        }
+        .lh-table tbody tr {
+            background: var(--adm-bg-surface);
+            border: 1px solid var(--adm-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+        .lh-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border: none;
+            text-align: right;
+            font-size: 0.85rem;
+        }
+        .lh-table tbody td::before {
+            content: attr(data-label);
+            font-size: 0.74rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--adm-text-muted);
+            text-align: left;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .lh-table tbody td:first-child {
+            padding-bottom: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .lh-table tbody td:last-child {
+            padding-top: 10px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            justify-content: flex-end;
+        }
+        .lh-table tbody td:last-child::before {
+            display: none;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .lh-kpi-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
 <div class="lh-container">
@@ -366,11 +459,11 @@
             <tbody>
                 @forelse($lichHens as $lh)
                 <tr>
-                    <td>
+                    <td data-label="Mã Lịch">
                         <strong style="color: var(--adm-gold);">{{ $lh->ma_lich_hen }}</strong>
                         <small style="color: var(--adm-text-dim); display: block; font-size: 0.72rem;">{{ $lh->so_nguoi_di_cung }} người đi cùng</small>
                     </td>
-                    <td>
+                    <td data-label="Khách Hàng">
                         <div style="font-weight: 600; color: var(--adm-text-main);">{{ $lh->khachHang->ho_ten ?? 'Khách vãng lai' }}</div>
                         <small style="color: var(--adm-text-muted);"><i class="bi bi-telephone me-1"></i>{{ $lh->khachHang->so_dien_thoai ?? 'Chưa có SĐT' }}</small>
                         @if($lh->khachHang?->hangThanhVien)
@@ -381,11 +474,11 @@
                         </div>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="Thời Gian">
                         <div style="color: var(--adm-text-main); font-weight: 600;">{{ $lh->thoi_gian_hen ? $lh->thoi_gian_hen->format('H:i') : '—' }}</div>
                         <small style="color: var(--adm-gold);">{{ $lh->thoi_gian_hen ? $lh->thoi_gian_hen->format('d/m/Y') : '—' }}</small>
                     </td>
-                    <td>
+                    <td data-label="Dịch Vụ">
                         <div style="color: var(--adm-text-main);">{{ $lh->loai_dich_vu }}</div>
                         @if($lh->sanPhamQuanTam)
                         <small style="color: var(--adm-gold); display: block;">
@@ -398,7 +491,7 @@
                         </small>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="Nhân Viên">
                         @if($lh->nhanVienTiepDon)
                             <div style="color: #38bdf8; font-weight: 600;">{{ $lh->nhanVienTiepDon->ho_ten }}</div>
                             <small style="color: var(--adm-text-dim);">{{ $lh->nhanVienTiepDon->chuc_vu }}</small>
@@ -406,12 +499,12 @@
                             <span style="color: var(--adm-text-dim); font-style: italic;">Chưa phân công</span>
                         @endif
                     </td>
-                    <td>
+                    <td data-label="Trạng Thái">
                         <span class="badge {{ $lh->badge_class }} px-2 py-1" style="font-size:0.75rem;">
                             {{ $lh->trang_thai }}
                         </span>
                     </td>
-                    <td style="text-align:center;">
+                    <td data-label="Thao Tác" style="text-align:center;">
                         <div class="d-flex gap-2 justify-content-center">
                             <button class="btn-edit-action" onclick='moModalCapNhat(@json($lh))'>
                                 <i class="bi bi-pencil-fill"></i> Duyệt

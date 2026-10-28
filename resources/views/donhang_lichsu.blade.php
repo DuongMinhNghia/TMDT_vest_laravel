@@ -100,6 +100,51 @@
         background: #D4B26F;
         color: #000;
     }
+    @media (max-width: 768px) {
+        .order-history-wrap {
+            padding: 15px 10px 45px;
+        }
+        .order-history-title {
+            font-size: 1.35rem;
+            margin-bottom: 16px;
+        }
+        .order-table-card {
+            border-radius: 10px;
+        }
+        .order-table thead {
+            display: none;
+        }
+        .order-table, .order-table tbody, .order-table tr, .order-table td {
+            display: block;
+            width: 100%;
+        }
+        .order-table tbody tr {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .order-table tbody td {
+            padding: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right !important;
+            border: none;
+        }
+        .order-table tbody td::before {
+            content: attr(data-label);
+            color: #94A3B8;
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            text-align: left;
+        }
+        .btn-view-order {
+            width: 100%;
+            justify-content: center;
+            margin-top: 6px;
+            padding: 8px 14px;
+        }
+    }
 </style>
 
 <div class="order-history-wrap">
@@ -133,20 +178,20 @@
                 @foreach($donHangs as $dh)
                 @php [$bg, $color, $border] = $mauTrangThai[$dh->trang_thai] ?? ['rgba(255,255,255,0.05)', '#94A3B8', 'rgba(255,255,255,0.1)']; @endphp
                 <tr>
-                    <td>
+                    <td data-label="Mã Đơn Hàng">
                         <strong style="color:#D4B26F;">{{ $dh->ma_don_hang }}</strong>
                     </td>
-                    <td style="color:#94A3B8;">{{ $dh->ngay_dat->format('d/m/Y H:i') }}</td>
-                    <td class="text-center" style="color:#CBD5E1;">{{ $dh->chi_tiets_count }}</td>
-                    <td style="color:#D4B26F; font-weight:700;" class="text-end">{{ number_format($dh->tong_tien, 0, ',', '.') }} VNĐ</td>
-                    <td class="text-center">
+                    <td data-label="Ngày Đặt" style="color:#94A3B8;">{{ $dh->ngay_dat->format('d/m/Y H:i') }}</td>
+                    <td data-label="Số Lượng Mẫu" class="text-center" style="color:#CBD5E1;">{{ $dh->chi_tiets_count }} mẫu</td>
+                    <td data-label="Tổng Giá Trị" style="color:#D4B26F; font-weight:700;" class="text-end">{{ number_format($dh->tong_tien, 0, ',', '.') }} VNĐ</td>
+                    <td data-label="Trạng Thái" class="text-center">
                         <span class="order-status-pill" style="background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $border }};">
                             {{ $dh->trang_thai }}
                         </span>
                     </td>
-                    <td class="text-end">
+                    <td data-label="" class="text-end">
                         <a href="{{ route('donhang.chitiet', $dh->id) }}" class="btn-view-order">
-                            <i class="bi bi-eye"></i> Xem Đơn
+                            <i class="bi bi-eye"></i> Xem Chi Tiết
                         </a>
                     </td>
                 </tr>

@@ -314,6 +314,42 @@
         position: relative;
         box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
     }
+
+    @media (max-width: 768px) {
+        .dashboard-wrap {
+            padding: 20px 0 60px;
+        }
+        .vip-card-number {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+        .nav-tabs-luxury {
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+        .nav-tabs-luxury .nav-link {
+            white-space: nowrap;
+            padding: 9px 14px;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+        .card-luxury {
+            padding: 16px 14px;
+            border-radius: 12px;
+        }
+        .sodo-card {
+            padding: 14px 16px;
+        }
+        .sodo-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .luxury-modal-content {
+            padding: 20px 16px;
+            border-radius: 12px;
+        }
+    }
 </style>
 
 <div class="dashboard-wrap">

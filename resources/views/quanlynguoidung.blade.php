@@ -275,6 +275,107 @@
         background: #f43f5e;
         color: #fff;
     }
+
+    /* RESPONSIVE CHO MOBILE & TABLET */
+    @media (max-width: 991.98px) {
+        .user-kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .user-top-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .user-header-title {
+            font-size: 1.35rem;
+        }
+        .user-kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .user-kpi-card {
+            padding: 12px 14px;
+        }
+        .user-kpi-num {
+            font-size: 1.3rem;
+        }
+        .user-kpi-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1.1rem;
+        }
+        .user-filter-card {
+            padding: 14px 12px;
+        }
+
+        /* CHUYỂN ĐỔI BẢNG THÀNH CARD THÔNG MINH */
+        .user-table-card {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            overflow: visible;
+        }
+        .user-table, .user-table tbody, .user-table tr, .user-table td {
+            display: block;
+            width: 100%;
+        }
+        .user-table thead {
+            display: none;
+        }
+        .user-table tbody tr {
+            background: var(--adm-bg-surface);
+            border: 1px solid var(--adm-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+        .user-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border: none;
+            text-align: right;
+            font-size: 0.85rem;
+        }
+        .user-table tbody td::before {
+            content: attr(data-label);
+            font-size: 0.74rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--adm-text-muted);
+            text-align: left;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .user-table tbody td:first-child {
+            display: none; /* Ẩn STT trên card mobile */
+        }
+        .user-table tbody td:nth-child(2) {
+            padding-bottom: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .user-table tbody td:last-child {
+            padding-top: 10px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            justify-content: flex-end;
+        }
+        .user-table tbody td:last-child::before {
+            display: none;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .user-kpi-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
 <div class="user-container">
@@ -376,15 +477,15 @@
             <tbody>
                 @forelse($users as $i => $user)
                 <tr>
-                    <td style="color: var(--adm-text-dim);">{{ $i + 1 }}</td>
-                    <td>
+                    <td data-label="STT" style="color: var(--adm-text-dim);">{{ $i + 1 }}</td>
+                    <td data-label="Tài Khoản">
                         <div class="d-flex align-items-center gap-3">
                             <div class="avatar-circle">{{ strtoupper(substr($user->name, 0, 1)) }}</div>
                             <span style="font-weight:600; color:var(--adm-text-main);">{{ $user->name }}</span>
                         </div>
                     </td>
-                    <td style="color: var(--adm-text-muted);">{{ $user->email }}</td>
-                    <td>
+                    <td data-label="Email" style="color: var(--adm-text-muted);">{{ $user->email }}</td>
+                    <td data-label="Phân Quyền">
                         @if($user->quyen === 'Admin')
                             <span class="badge-admin-role"><i class="bi bi-shield-shaded"></i> Admin</span>
                         @elseif($user->quyen === 'Nhân viên')
@@ -393,11 +494,11 @@
                             <span class="badge-customer-role"><i class="bi bi-person"></i> Khách hàng</span>
                         @endif
                     </td>
-                    <td style="color: var(--adm-text-muted);">{{ $user->phone ?? '—' }}</td>
-                    <td style="color: var(--adm-text-muted); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                    <td data-label="Điện Thoại" style="color: var(--adm-text-muted);">{{ $user->phone ?? '—' }}</td>
+                    <td data-label="Địa Chỉ" style="color: var(--adm-text-muted); max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                         {{ $user->address ?? '—' }}
                     </td>
-                    <td style="text-align:center;">
+                    <td data-label="Thao Tác" style="text-align:center;">
                         <div class="d-flex gap-2 justify-content-center">
                             <button class="btn-edit-action" onclick="moModalSua({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ $user->email }}', '{{ $user->quyen }}', '{{ $user->phone }}', '{{ addslashes($user->address) }}')">
                                 <i class="bi bi-pencil-fill"></i> Sửa

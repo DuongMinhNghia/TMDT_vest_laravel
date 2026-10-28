@@ -502,6 +502,93 @@
     .collection-banner-card:hover img {
         transform: scale(1.04);
     }
+
+    /* RESPONSIVE TRANG CHỦ CHO MOBILE & TABLET */
+    @media (max-width: 991.98px) {
+        .hero-carousel .carousel {
+            height: 440px;
+        }
+        .carousel-title {
+            font-size: 2.2rem;
+        }
+        .about-section {
+            padding: 50px 0;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-carousel .carousel {
+            height: 380px;
+        }
+        .carousel-title {
+            font-size: 1.65rem;
+            margin-bottom: 12px;
+        }
+        .carousel-badge {
+            font-size: 0.72rem;
+            padding: 4px 14px;
+            margin-bottom: 12px;
+        }
+        .carousel-description {
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+        .btn-carousel {
+            padding: 10px 22px;
+            font-size: 0.82rem;
+        }
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 36px;
+            height: 36px;
+        }
+        .carousel-control-prev { left: 10px; }
+        .carousel-control-next { right: 10px; }
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 25px;
+        }
+        .stat-card {
+            min-width: unset;
+            padding: 16px 10px;
+        }
+        .stat-number {
+            font-size: 1.6rem;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+        }
+        .product-image {
+            height: 240px;
+        }
+        .collection-banner-card {
+            height: 200px;
+            margin-bottom: 16px;
+        }
+        .collections-section {
+            padding: 45px 0;
+        }
+        .section-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .hero-carousel .carousel {
+            height: 320px;
+        }
+        .carousel-content {
+            padding: 20px 14px;
+        }
+        .carousel-title {
+            font-size: 1.35rem;
+        }
+        .product-image {
+            height: 200px;
+        }
+    }
 </style>
 
 {{-- THANH ĐIỀU KHIỂN QUẢN TRỊ VIÊN --}}

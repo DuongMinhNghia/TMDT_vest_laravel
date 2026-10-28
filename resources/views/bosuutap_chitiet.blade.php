@@ -240,6 +240,37 @@
         box-shadow: 0 6px 18px rgba(212, 178, 111, 0.3);
         color: #000;
     }
+
+    @media (max-width: 768px) {
+        .bst-hero {
+            height: 240px;
+            margin-bottom: 24px;
+            border-radius: 12px;
+        }
+        .bst-hero-overlay {
+            padding: 20px 16px;
+        }
+        .bst-hero-title {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+        }
+        .bst-hero-desc {
+            font-size: 0.82rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .bst-section-title {
+            font-size: 1.25rem;
+        }
+        .suit-img-wrap {
+            height: 220px;
+        }
+        .suit-body {
+            padding: 14px 12px;
+        }
+    }
 </style>
 
 <div class="bst-detail-wrap">

@@ -256,6 +256,23 @@
             color: var(--auth-text-dim);
             font-size: 0.8rem;
         }
+
+        @media (max-width: 575.98px) {
+            .auth-card-body {
+                padding: 24px 18px;
+            }
+            .auth-card-header {
+                padding: 16px;
+                font-size: 1.1rem;
+            }
+            .top-bar {
+                font-size: 0.72rem;
+                padding: 5px 0;
+            }
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 

@@ -431,7 +431,24 @@
         box-shadow: 0 10px 25px rgba(212, 178, 111, 0.45);
     }
 
+    @media (max-width: 991.98px) {
+        .summary-card {
+            position: static;
+            margin-top: 24px;
+        }
+    }
+
     @media (max-width: 768px) {
+        .cart-container {
+            padding: 16px 0 50px;
+        }
+        .cart-title {
+            font-size: 1.4rem;
+        }
+        .btn-back-store {
+            padding: 7px 14px;
+            font-size: 0.8rem;
+        }
         .cart-table thead {
             display: none;
         }
@@ -440,11 +457,11 @@
             width: 100%;
         }
         .cart-table tbody tr {
-            padding: 14px 10px;
+            padding: 14px 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         .cart-table tbody td {
-            padding: 6px 10px;
+            padding: 5px 8px;
             text-align: left !important;
         }
     }
@@ -596,7 +613,7 @@
                         <label class="form-label-summary">Phương thức thanh toán *</label>
                         <select name="phuong_thuc" class="form-input-summary">
                             <option value="COD">Thanh toán khi nhận hàng (COD)</option>
-                            <option value="Chuyển khoản QR" {{ old('phuong_thuc') == 'Chuyển khoản QR' ? 'selected' : '' }}>Chuyển khoản QR (Vietcombank/MoMo)</option>
+                            <option value="Chuyển khoản QR" {{ old('phuong_thuc') == 'Chuyển khoản QR' ? 'selected' : '' }}>Chuyển khoản QR (MBBank / VietQR)</option>
                         </select>
 
                         <label class="form-label-summary">Ghi chú giao hàng (nếu có)</label>

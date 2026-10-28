@@ -400,15 +400,68 @@
         margin-top: 24px;
     }
 
+    @media (max-width: 991.98px) {
+        .vip-invitation-card {
+            position: static;
+            margin-top: 25px;
+        }
+    }
+
     @media (max-width: 768px) {
+        .booking-page-wrap {
+            padding: 20px 0 60px;
+        }
+        .booking-hero-header {
+            margin-bottom: 25px;
+        }
+        .booking-hero-title {
+            font-size: 1.6rem;
+        }
+        .booking-hero-desc {
+            font-size: 0.86rem;
+        }
         .booking-card {
-            padding: 24px 20px;
+            padding: 22px 16px;
+            border-radius: 14px;
+        }
+        .card-section-title {
+            font-size: 1.1rem;
         }
         .service-options-grid {
             grid-template-columns: 1fr;
         }
         .party-size-chips {
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .party-chip-item {
+            min-width: unset;
+        }
+        .vest-preview-card {
+            padding: 12px 14px;
+            gap: 12px;
+        }
+        .vest-preview-card img {
+            width: 65px;
+            height: 80px;
+        }
+        .vip-invitation-card {
+            padding: 24px 18px;
+            border-radius: 14px;
+        }
+        .btn-submit-booking {
+            font-size: 0.9rem;
+            padding: 13px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .booking-card {
+            padding: 18px 12px;
+        }
+        .party-size-chips {
+            grid-template-columns: 1fr;
         }
     }
 </style>

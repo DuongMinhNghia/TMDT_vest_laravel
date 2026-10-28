@@ -281,6 +281,110 @@
         background: var(--adm-gold);
         color: #000;
     }
+
+    /* RESPONSIVE CHO MOBILE & TABLET */
+    @media (max-width: 991.98px) {
+        .ord-kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ord-top-bar {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .ord-header-title {
+            font-size: 1.35rem;
+        }
+        .ord-kpi-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .ord-kpi-card {
+            padding: 12px 14px;
+        }
+        .ord-kpi-num {
+            font-size: 1.3rem;
+        }
+        .ord-kpi-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1.1rem;
+        }
+        .ord-filter-card {
+            padding: 14px 12px;
+        }
+
+        /* CHUYỂN ĐỔI BẢNG THÀNH DẠNG CARD THÔNG MINH */
+        .ord-table-card {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            overflow: visible;
+        }
+        .ord-table, .ord-table tbody, .ord-table tr, .ord-table td {
+            display: block;
+            width: 100%;
+        }
+        .ord-table thead {
+            display: none;
+        }
+        .ord-table tbody tr {
+            background: var(--adm-bg-surface);
+            border: 1px solid var(--adm-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+        .ord-table tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border: none;
+            text-align: right;
+            font-size: 0.85rem;
+        }
+        .ord-table tbody td::before {
+            content: attr(data-label);
+            font-size: 0.74rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--adm-text-muted);
+            text-align: left;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .ord-table tbody td:first-child {
+            padding-bottom: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .ord-table tbody td:last-child {
+            padding-top: 10px;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            justify-content: flex-end;
+        }
+        .ord-table tbody td:last-child::before {
+            display: none;
+        }
+        .btn-update-status {
+            width: 100%;
+            padding: 9px;
+            justify-content: center;
+            font-size: 0.82rem;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .ord-kpi-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
 <div class="ord-container">
@@ -391,25 +495,25 @@
             <tbody>
                 @forelse($donHangs as $dh)
                 <tr>
-                    <td>
+                    <td data-label="Mã ĐH">
                         <a href="{{ route('donhang.chitiet', $dh->id) }}" style="color: var(--adm-gold); font-weight: 700; text-decoration: none;">
                             {{ $dh->ma_don_hang ?? '#'.str_pad($dh->id, 4, '0', STR_PAD_LEFT) }}
                         </a>
                     </td>
-                    <td>
+                    <td data-label="Khách Hàng">
                         <div style="font-weight: 600; color: var(--adm-text-main);">{{ $dh->khachHang->ho_ten ?? 'Khách vãng lai' }}</div>
                         <div style="color: var(--adm-text-dim); font-size: 0.76rem;">{{ $dh->khachHang->taiKhoan->email ?? '' }}</div>
                     </td>
-                    <td style="color: var(--adm-text-muted);">
+                    <td data-label="Ngày Đặt" style="color: var(--adm-text-muted);">
                         {{ \Carbon\Carbon::parse($dh->ngay_dat)->format('d/m/Y') }}
                     </td>
-                    <td style="color: var(--adm-text-muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem;">
+                    <td data-label="Địa Chỉ" style="color: var(--adm-text-muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.82rem;">
                         {{ $dh->dia_chi_giao_hang ?? '—' }}
                     </td>
-                    <td style="color: var(--adm-gold); font-weight: 700;">
+                    <td data-label="Tổng Tiền" style="color: var(--adm-gold); font-weight: 700;">
                         {{ number_format($dh->tong_tien, 0, ',', '.') }} VNĐ
                     </td>
-                    <td>
+                    <td data-label="Trạng Thái">
                         @if($dh->trang_thai === 'Hoàn Thành')
                             <span class="badge-status-pill badge-hoan">Hoàn Thành</span>
                         @elseif($dh->trang_thai === 'Đang may/gói')
@@ -426,7 +530,7 @@
                             <div style="color: var(--adm-text-dim); font-size: 0.72rem; margin-top: 3px;">Duyệt bởi: {{ $dh->nhanVienDuyet->ho_ten }}</div>
                         @endif
                     </td>
-                    <td style="text-align:center;">
+                    <td data-label="Cập Nhật" style="text-align:center;">
                         @if(count($luongTrangThai[$dh->trang_thai] ?? []) > 0)
                         <button class="btn-update-status" onclick="moModalCapNhat({{ $dh->id }}, '{{ $dh->trang_thai }}')">
                             <i class="bi bi-pencil-fill"></i> Xử lý

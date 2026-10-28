@@ -339,14 +339,31 @@
         background: linear-gradient(90deg, transparent, #D4B26F, transparent);
     }
 
-    @media (max-width: 992px) {
+    @media (max-width: 991.98px) {
+        .product-detail-container {
+            padding: 20px 0 50px;
+        }
+
+        .product-image-wrapper img {
+            height: 380px;
+            object-fit: cover;
+        }
+
         .product-info-section {
-            margin-top: 25px;
+            margin-top: 18px;
             padding: 24px 20px;
         }
 
         .product-title {
-            font-size: 1.7rem;
+            font-size: 1.6rem;
+            margin-bottom: 14px;
+        }
+
+        .product-price-box {
+            font-size: 1.4rem;
+            padding: 12px 18px;
+            margin: 15px 0 20px;
+            gap: 12px;
         }
 
         .custom-measurements {
@@ -355,11 +372,84 @@
 
         .action-buttons {
             flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
         }
 
         .btn-luxury {
             width: 100%;
             justify-content: center;
+            padding: 12px 20px;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .product-detail-container {
+            padding: 12px 0 35px;
+        }
+
+        .product-image-wrapper {
+            border-radius: 12px;
+        }
+
+        .product-image-wrapper img {
+            height: 270px;
+            object-fit: cover;
+        }
+
+        .product-info-section {
+            padding: 18px 14px;
+            border-radius: 12px;
+            margin-top: 14px;
+        }
+
+        .product-title {
+            font-size: 1.35rem;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+        }
+
+        .product-price-box {
+            font-size: 1.2rem;
+            padding: 10px 12px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .detail-label {
+            min-width: 90px;
+            font-size: 0.82rem;
+        }
+
+        .detail-value {
+            font-size: 0.82rem;
+        }
+
+        .size-selection {
+            margin: 16px 0;
+            padding-top: 12px;
+        }
+
+        .size-options {
+            gap: 8px;
+            margin-top: 10px;
+            margin-bottom: 14px;
+        }
+
+        .size-option label {
+            padding: 7px 14px;
+            font-size: 0.82rem;
+        }
+
+        .measurement-input input {
+            padding: 8px 10px;
+            font-size: 0.85rem;
+        }
+
+        .btn-luxury {
+            font-size: 0.85rem;
+            padding: 11px 16px;
         }
     }
 </style>

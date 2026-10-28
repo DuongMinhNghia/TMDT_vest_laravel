@@ -525,6 +525,55 @@
     nav[role="navigation"] > div:first-child {
         display: none !important;
     }
+
+    /* RESPONSIVE DANH MỤC TRANG PHỤC CHO MOBILE & TABLET */
+    @media (max-width: 991.98px) {
+        .filter-wrapper {
+            padding: 14px 16px;
+            margin-bottom: 24px;
+        }
+        .search-input-group {
+            min-width: 0;
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .product-image {
+            height: 230px;
+        }
+        .product-card-body {
+            padding: 14px 12px;
+        }
+        .product-card-title {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+        .price-current, .price-sale-current {
+            font-size: 1.05rem;
+        }
+        .btn-view-suit {
+            padding: 8px 12px;
+            font-size: 0.78rem;
+        }
+        .section-header {
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+        }
+        .section-header h2 {
+            font-size: 1.35rem;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .product-image {
+            height: 190px;
+        }
+        .btn-filter-trigger {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
 </style>
 
 {{-- THANH TÌM KIẾM & BỘ LỌC STUDIO --}}

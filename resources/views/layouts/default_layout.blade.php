@@ -19,6 +19,11 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            overflow-x: hidden;
+            max-width: 100vw;
+        }
+
         body {
             background-color: #111317;
             color: #f1f5f9;
@@ -344,6 +349,84 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #c19b2f;
         }
+
+        /* NAVBAR TOGGLER LUXURY */
+        .navbar-toggler {
+            border: 1px solid rgba(212, 178, 111, 0.45) !important;
+            background: rgba(212, 178, 111, 0.08) !important;
+            padding: 5px 9px !important;
+            border-radius: 7px !important;
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            outline: none !important;
+            transition: all 0.25s ease;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 2px rgba(212, 178, 111, 0.35) !important;
+        }
+
+        .navbar-toggler:hover {
+            background: rgba(212, 178, 111, 0.18) !important;
+        }
+
+        /* RESPONSIVE MOBILE CHO DEFAULT LAYOUT */
+        @media (max-width: 991.98px) {
+            .navbar-collapse {
+                background: #141720;
+                border: 1px solid rgba(212, 178, 111, 0.2);
+                border-radius: 12px;
+                padding: 16px;
+                margin-top: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            }
+            .navbar-nav {
+                align-items: flex-start !important;
+                gap: 4px;
+                width: 100%;
+            }
+            .nav-link-main {
+                width: 100%;
+                padding: 10px 14px !important;
+                font-size: 0.9rem !important;
+            }
+            .top-bar {
+                font-size: 0.72rem;
+                padding: 5px 0;
+            }
+            .top-bar .row {
+                gap: 4px;
+            }
+            .main-content {
+                padding: 15px 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            html {
+                font-size: 15px;
+            }
+            .navbar-brand {
+                font-size: 1.18rem !important;
+                letter-spacing: 1px;
+                margin-right: 0;
+            }
+            .container-fluid.px-4 {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+            }
+            .main-content {
+                padding: 12px 0;
+            }
+            footer {
+                padding: 35px 0 20px;
+            }
+            footer h5 {
+                margin-bottom: 12px;
+                font-size: 1.1rem;
+            }
+        }
     </style>
 </head>
 
@@ -351,7 +434,7 @@
 
     {{-- TOP BAR --}}
     <div class="top-bar">
-        <div class="container-fluid px-4">
+        <div class="container-fluid px-3 px-md-4">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
                     <span><i class="bi bi-clock"></i> Thời gian làm việc: Hàng ngày từ 9h - 21h</span>
@@ -364,17 +447,47 @@
         </div>
     </div>
 
+    @php
+        $khId = (Auth::check() && Auth::user()->isCustomer()) ? optional(Auth::user()->khachHang)->id : null;
+        $soLuongGioHang = $khId
+            ? \App\Models\ChiTietGioHang::whereHas('gioHang', fn($q) => $q->where('khach_hang_id', $khId))->sum('so_luong')
+            : 0;
+    @endphp
+
     {{-- NAVBAR --}}
-    <nav class="navbar navbar-expand-lg sticky-top">
-        <div class="container-fluid px-4">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container-fluid px-3 px-md-4">
             <a class="navbar-brand" href="{{ url('/') }}">
                 <i class="bi bi-gem"></i> KINGSMAN
             </a>
 
-            <button class="navbar-toggler border-0" type="button"
-                data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
-            </button>
+            {{-- MOBILE ACTION CLUSTER (Hiển thị ngay trên mobile, không bị ẩn vào menu) --}}
+            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+                @if(Auth::check() && Auth::user()->isCustomer())
+                <a href="{{ url('/gio-hang') }}" class="btn-action-gold cart-badge py-1 px-2" style="font-size: 0.8rem; text-decoration: none;">
+                    <i class="bi bi-cart3"></i>
+                    @if($soLuongGioHang > 0)
+                    <span class="badge">{{ $soLuongGioHang }}</span>
+                    @endif
+                </a>
+                @endif
+
+                @if(!Auth::check())
+                <a href="{{ url('/dang-nhap') }}" class="btn-action-gold py-1 px-2.5" style="font-size: 0.78rem; font-weight: 600; text-decoration: none;">
+                    <i class="bi bi-person"></i> Đăng nhập
+                </a>
+                @else
+                <a href="{{ Auth::user()->isCustomer() ? route('khachhang.dashboard') : url('/san-pham/danh-sach') }}" class="btn-action-gold py-1 px-2" style="font-size: 0.8rem; text-decoration: none;" title="{{ Auth::user()->name }}">
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                @endif
+
+                <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="bi bi-list" style="font-size: 1.55rem; color: #D4B26F; line-height: 1;"></i>
+                </button>
+            </div>
 
             <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
                 <ul class="navbar-nav align-items-center">
@@ -462,16 +575,11 @@
                     @endif
                 </ul>
 
-                <div class="d-flex align-items-center gap-2 ms-auto justify-content-end">
+                {{-- DESKTOP ACTION BAR (Ẩn trên mobile) --}}
+                <div class="d-none d-lg-flex align-items-center gap-2 ms-auto justify-content-end">
                     @if(Auth::check() && Auth::user()->isCustomer())
                     <a href="{{ url('/gio-hang') }}" class="btn-action-gold cart-badge">
                         <i class="bi bi-cart3"></i> Giỏ hàng
-                        @php
-                            $khId = optional(Auth::user()->khachHang)->id;
-                            $soLuongGioHang = $khId
-                                ? \App\Models\ChiTietGioHang::whereHas('gioHang', fn($q) => $q->where('khach_hang_id', $khId))->sum('so_luong')
-                                : 0;
-                        @endphp
                         @if($soLuongGioHang > 0)
                         <span class="badge">{{ $soLuongGioHang }}</span>
                         @endif
@@ -517,6 +625,43 @@
                     <a href="{{ url('/dang-nhap') }}" class="btn-action-gold">
                         <i class="bi bi-person"></i> Đăng nhập
                     </a>
+                    @endif
+                </div>
+
+                {{-- MOBILE ACTIONS INSIDE MENU (Hiển thị khi mở menu hamburger) --}}
+                <div class="d-lg-none mt-3 pt-3" style="border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                    @if(Auth::check())
+                        <div class="d-flex align-items-center justify-content-between mb-3 px-1">
+                            <span style="color: #D4B26F; font-size: 0.88rem; font-weight: 600;"><i class="bi bi-person-circle me-1"></i> {{ Auth::user()->name }}</span>
+                            @if(Auth::user()->isCustomer())
+                                <a href="{{ route('khachhang.dashboard') }}" class="badge py-1 px-2" style="background: rgba(212,178,111,0.2); color: #D4B26F; text-decoration: none;">Hồ sơ VIP</a>
+                            @endif
+                        </div>
+                        @if(Auth::user()->isCustomer())
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            <a href="{{ route('donhang.lichsu') }}" class="nav-link-main">
+                                <i class="bi bi-receipt"></i> Đơn hàng của tôi
+                            </a>
+                            <a href="{{ route('khachhang.dashboard') }}#lichhen" class="nav-link-main">
+                                <i class="bi bi-calendar2-heart"></i> Lịch hẹn của tôi
+                            </a>
+                        </div>
+                        @endif
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100 py-2" style="border-radius: 8px;">
+                                <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
+                            </button>
+                        </form>
+                    @else
+                        <div class="d-flex flex-column gap-2">
+                            <a href="{{ url('/dang-nhap') }}" class="btn-action-gold text-center py-2 text-decoration-none">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập tài khoản
+                            </a>
+                            <a href="{{ url('/dang-ky') }}" class="text-center py-2 text-decoration-none" style="border: 1px solid rgba(212,178,111,0.3); color: #D4B26F; border-radius: 6px; font-size: 0.85rem;">
+                                <i class="bi bi-person-plus me-1"></i> Chưa có tài khoản? Đăng ký
+                            </a>
+                        </div>
                     @endif
                 </div>
             </div>

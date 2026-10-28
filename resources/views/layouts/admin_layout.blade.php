@@ -349,6 +349,18 @@
                 display: block;
             }
         }
+
+        @media (max-width: 768px) {
+            .admin-content-body {
+                padding: 14px 12px;
+            }
+            .admin-topbar {
+                padding: 0 12px;
+            }
+            .admin-page-title {
+                font-size: 1.1rem;
+            }
+        }
     </style>
 
     @yield('styles')
