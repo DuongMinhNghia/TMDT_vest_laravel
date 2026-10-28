@@ -240,6 +240,40 @@
         border-top: 1px solid var(--adm-border);
         padding: 14px 22px;
     }
+
+    /* Workflow progression steps */
+    .lh-step {
+        flex: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 7px 10px;
+        min-height: 36px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--adm-text-dim);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        font-size: 0.78rem;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+    .lh-step.current {
+        background: rgba(212, 178, 111, 0.16);
+        color: var(--adm-gold);
+        border-color: rgba(212, 178, 111, 0.4);
+        font-weight: 700;
+    }
+    .lh-step.passed {
+        background: rgba(34, 197, 94, 0.1);
+        color: #4ade80;
+        border-color: rgba(34, 197, 94, 0.25);
+    }
+    .lh-step.cancelled {
+        background: rgba(244, 63, 94, 0.15);
+        color: #f43f5e;
+        border-color: rgba(244, 63, 94, 0.3);
+    }
 </style>
 
 <div class="lh-container">
@@ -411,7 +445,7 @@
 
 {{-- MODAL DUYỆT / CẬP NHẬT TRẠNG THÁI & PHÂN CÔNG NHÂN VIÊN --}}
 <div class="modal fade" id="modalCapNhatLich" tabindex="-1" style="background:rgba(0,0,0,0.85);">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content modal-content-luxury">
             <div class="modal-header">
                 <h5 class="modal-title" style="color: var(--adm-gold); font-family: var(--adm-font-heading); font-size: 1.25rem;">
@@ -422,25 +456,57 @@
             <form id="formCapNhatLich" method="POST">
                 @csrf
                 <div class="modal-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label" style="color: var(--adm-text-muted); font-size:0.8rem;">Mã lịch hẹn</label>
-                        <input type="text" id="capnhat_ma" class="lh-form-control" disabled style="opacity: 0.7;">
+                    <!-- Workflow visual progress -->
+                    <div class="mb-3 p-2 rounded" style="background: rgba(0,0,0,0.25); border: 1px solid var(--adm-border);">
+                        <div class="d-flex align-items-center justify-content-between gap-1 text-center">
+                            <div id="step_cxn" class="lh-step">
+                                <i class="bi bi-clock-history"></i>
+                                <span>1. Chờ xác nhận</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted" style="opacity:0.35; font-size: 0.7rem;"></i>
+                            <div id="step_dxn" class="lh-step">
+                                <i class="bi bi-telephone-check"></i>
+                                <span>2. Đã xác nhận</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted" style="opacity:0.35; font-size: 0.7rem;"></i>
+                            <div id="step_dtd" class="lh-step">
+                                <i class="bi bi-person-check"></i>
+                                <span>3. Đang tiếp đón</span>
+                            </div>
+                            <i class="bi bi-chevron-right text-muted" style="opacity:0.35; font-size: 0.7rem;"></i>
+                            <div id="step_ht" class="lh-step">
+                                <i class="bi bi-check2-circle"></i>
+                                <span>4. Hoàn thành</span>
+                            </div>
+                        </div>
+                        <div id="step_cancel_alert" class="mt-2 text-center" style="display:none;">
+                            <span class="badge bg-danger px-3 py-1"><i class="bi bi-x-circle me-1"></i>Lịch hẹn này đã bị hủy</span>
+                        </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label" style="color: var(--adm-text-muted); font-size:0.8rem;">Khách hàng</label>
-                        <input type="text" id="capnhat_khach" class="lh-form-control" disabled style="opacity: 0.7;">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" style="color: var(--adm-text-muted); font-size:0.8rem;">Mã lịch hẹn</label>
+                            <input type="text" id="capnhat_ma" class="lh-form-control" disabled style="opacity: 0.7;">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label" style="color: var(--adm-text-muted); font-size:0.8rem;">Khách hàng</label>
+                            <input type="text" id="capnhat_khach" class="lh-form-control" disabled style="opacity: 0.7;">
+                        </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label" style="color: var(--adm-text-main); font-size:0.84rem; font-weight:600;">Trạng thái xử lý *</label>
                         <select name="trang_thai" id="capnhat_trangthai" class="lh-form-select" required>
-                            <option value="Chờ xác nhận">Chờ xác nhận</option>
-                            <option value="Đã xác nhận">Đã xác nhận (Đã gọi điện chốt lịch)</option>
-                            <option value="Đang tiếp đón">Đang tiếp đón tại showroom</option>
-                            <option value="Hoàn thành">Hoàn thành (Đã thử đồ/đặt may)</option>
-                            <option value="Đã hủy">Đã hủy</option>
+                            <option value="Chờ xác nhận" data-raw="Chờ xác nhận">Chờ xác nhận</option>
+                            <option value="Đã xác nhận" data-raw="Đã xác nhận">Đã xác nhận (Đã gọi điện chốt lịch)</option>
+                            <option value="Đang tiếp đón" data-raw="Đang tiếp đón">Đang tiếp đón tại showroom</option>
+                            <option value="Hoàn thành" data-raw="Hoàn thành">Hoàn thành (Đã thử đồ/đặt may)</option>
+                            <option value="Đã hủy" data-raw="Đã hủy">Đã hủy</option>
                         </select>
+                        <div id="capnhat_huongdan" class="mt-2 p-2 rounded" style="font-size:0.8rem; background: rgba(212, 178, 111, 0.08); border: 1px dashed rgba(212, 178, 111, 0.3); color: var(--adm-gold);">
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -460,7 +526,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
-                    <button type="submit" class="btn-gold-filter">
+                    <button type="submit" id="btn_luu_capnhat" class="btn-gold-filter">
                         <i class="bi bi-save me-1"></i> Lưu Cập Nhật
                     </button>
                 </div>
@@ -470,13 +536,92 @@
 </div>
 
 <script>
+    const LUONG_TRANG_THAI = {
+        'Chờ xác nhận': ['Đã xác nhận', 'Đã hủy'],
+        'Đã xác nhận': ['Đang tiếp đón', 'Đã hủy'],
+        'Đang tiếp đón': ['Hoàn thành', 'Đã hủy'],
+        'Hoàn thành': [],
+        'Đã hủy': []
+    };
+
+    const HUONG_DAN_QUY_TRINH = {
+        'Chờ xác nhận': 'Lịch hẹn mới: Gọi điện xác nhận với khách trước khi chuyển sang "Đã xác nhận".',
+        'Đã xác nhận': 'Lịch đã chốt: Khi khách đến showroom thử đồ, chuyển sang "Đang tiếp đón".',
+        'Đang tiếp đón': 'Đang phục vụ: Sau khi tư vấn / thử đồ xong, chuyển sang "Hoàn thành".',
+        'Hoàn thành': 'Lịch hẹn đã hoàn thành xuất sắc. Vòng đời đã đóng.',
+        'Đã hủy': 'Lịch hẹn đã bị hủy. Vòng đời đã đóng.'
+    };
+
+    const THU_TU_CAC_BUOC = ['Chờ xác nhận', 'Đã xác nhận', 'Đang tiếp đón', 'Hoàn thành'];
+
     function moModalCapNhat(lh) {
         document.getElementById('formCapNhatLich').action = '{{ url("/lich-hen") }}/' + lh.id + '/cap-nhat';
         document.getElementById('capnhat_ma').value = lh.ma_lich_hen + ' (' + lh.loai_dich_vu + ')';
         document.getElementById('capnhat_khach').value = (lh.khach_hang ? lh.khach_hang.ho_ten : 'Khách vãng lai') + ' - ' + (lh.khach_hang ? (lh.khach_hang.so_dien_thoai || 'Chưa có SĐT') : '');
-        document.getElementById('capnhat_trangthai').value = lh.trang_thai;
         document.getElementById('capnhat_nhanvien').value = lh.nhan_vien_tiep_don_id || '';
         document.getElementById('capnhat_ghichu').value = lh.ghi_chu || '';
+
+        const currentStatus = lh.trang_thai;
+        const select = document.getElementById('capnhat_trangthai');
+        const allowedTransitions = LUONG_TRANG_THAI[currentStatus] || [];
+        const huongDanEl = document.getElementById('capnhat_huongdan');
+
+        // Cập nhật trạng thái trong select (không dùng icon cấm/chặn)
+        Array.from(select.options).forEach(opt => {
+            const val = opt.getAttribute('data-raw') || opt.value;
+            if (val === currentStatus) {
+                opt.disabled = false;
+                opt.textContent = val + ' (Hiện tại)';
+            } else if (allowedTransitions.includes(val)) {
+                opt.disabled = false;
+                if (val === 'Đã hủy') {
+                    opt.textContent = val + ' (Hủy lịch)';
+                } else {
+                    opt.textContent = val + ' (Bước tiếp theo)';
+                }
+            } else {
+                opt.disabled = true;
+                opt.textContent = val + ' (Chưa khả dụng)';
+            }
+        });
+
+        // Gợi ý bước hợp lệ tiếp theo
+        const nextStep = allowedTransitions.find(s => s !== 'Đã hủy');
+        select.value = nextStep || currentStatus;
+
+        // Cập nhật hướng dẫn văn bản
+        huongDanEl.innerHTML = '<i class="bi bi-info-circle me-1"></i>' + (HUONG_DAN_QUY_TRINH[currentStatus] || '');
+
+        // Cập nhật thanh quy trình trực quan (Visual Steps)
+        const stepEls = {
+            'Chờ xác nhận': document.getElementById('step_cxn'),
+            'Đã xác nhận': document.getElementById('step_dxn'),
+            'Đang tiếp đón': document.getElementById('step_dtd'),
+            'Hoàn thành': document.getElementById('step_ht')
+        };
+        const cancelAlert = document.getElementById('step_cancel_alert');
+
+        if (currentStatus === 'Đã hủy') {
+            cancelAlert.style.display = 'block';
+            Object.values(stepEls).forEach(el => {
+                if (el) el.className = 'lh-step';
+            });
+        } else {
+            cancelAlert.style.display = 'none';
+            const curIdx = THU_TU_CAC_BUOC.indexOf(currentStatus);
+            THU_TU_CAC_BUOC.forEach((status, idx) => {
+                const el = stepEls[status];
+                if (!el) return;
+                if (idx < curIdx) {
+                    el.className = 'lh-step passed';
+                } else if (idx === curIdx) {
+                    el.className = 'lh-step current';
+                } else {
+                    el.className = 'lh-step';
+                }
+            });
+        }
+
         new bootstrap.Modal(document.getElementById('modalCapNhatLich')).show();
     }
 </script>

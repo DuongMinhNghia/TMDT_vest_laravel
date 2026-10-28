@@ -193,7 +193,7 @@ class LichHenController extends Controller
             $lichHen = DB::transaction(function () use ($request, $id) {
                 $lichHen = LichHen::whereKey($id)->lockForUpdate()->firstOrFail();
 
-                if (!in_array($request->trang_thai, LichHen::trangThaiCoTheChuyenTu($lichHen->trang_thai), true)) {
+                if ($request->trang_thai !== $lichHen->trang_thai && !in_array($request->trang_thai, LichHen::trangThaiCoTheChuyenTu($lichHen->trang_thai), true)) {
                     throw new RuntimeException("Không thể chuyển lịch hẹn từ \"{$lichHen->trang_thai}\" sang \"{$request->trang_thai}\".");
                 }
 
