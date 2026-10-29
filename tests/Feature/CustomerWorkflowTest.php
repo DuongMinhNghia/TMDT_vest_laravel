@@ -164,6 +164,12 @@ class CustomerWorkflowTest extends TestCase
 
     public function test_customer_can_only_open_their_own_manual_qr_payment_page(): void
     {
+        config()->set('services.manual_transfer.demo_divisor', 1);
+        config()->set('services.manual_transfer.bank_id', 'MB');
+        config()->set('services.manual_transfer.bank_name', 'MBBank');
+        config()->set('services.manual_transfer.account_number', 'TEST-ACCOUNT');
+        config()->set('services.manual_transfer.account_name', 'KINGSMAN TEST');
+
         $customer = $this->account('khachhang@gmail.com');
         $order = HoaDon::create([
             'khach_hang_id' => $customer->khachHang->id,
@@ -178,7 +184,7 @@ class CustomerWorkflowTest extends TestCase
         $this->actingAs($customer)->get('/don-hang/' . $order->id . '/thanh-toan')
             ->assertOk()
             ->assertSee('DH-QR-001')
-            ->assertSee('4.000 VNĐ');
+            ->assertSee('4.000.000 VNĐ');
 
         $other = $this->otherCustomer();
         $this->actingAs($other->taiKhoan)->get('/don-hang/' . $order->id . '/thanh-toan')->assertNotFound();

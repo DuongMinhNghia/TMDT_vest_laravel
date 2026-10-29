@@ -509,18 +509,30 @@
                     </thead>
                     <tbody>
                         @foreach($gioHang as $key => $item)
-                        <tr>
+                        <tr class="{{ $item['kha_dung'] ? '' : 'opacity-75' }}">
                             <td>
                                 <div class="d-flex align-items-center gap-3">
+                                    @if($item['hinh_anh'])
                                     <img src="{{ asset('images/' . $item['hinh_anh']) }}"
                                         class="product-img" alt="{{ $item['ten_sp'] }}" />
+                                    @else
+                                    <div class="product-img d-flex align-items-center justify-content-center" style="background:#232733;color:#94A3B8;">
+                                        <i class="bi bi-image"></i>
+                                    </div>
+                                    @endif
                                     <div>
                                         <div class="product-name">{{ $item['ten_sp'] }}</div>
                                         <span class="size-badge">{{ $item['size'] }}</span>
+                                        @unless($item['kha_dung'])
+                                        <div style="color:#EF4444;font-size:0.78rem;font-weight:600;margin-top:7px;max-width:360px;">
+                                            Sản phẩm này hiện không còn kinh doanh. Vui lòng xóa khỏi giỏ hàng.
+                                        </div>
+                                        @endunless
                                     </div>
                                 </div>
                             </td>
                             <td class="text-center price-col">
+                                @if($item['kha_dung'])
                                 @if($item['sale'] > 0)
                                 <div style="color:#64748B; text-decoration:line-through; font-size:0.78rem; font-weight:400;">{{ number_format($item['gia_goc'], 0, ',', '.') }} VNĐ</div>
                                 <span style="color:#EF4444; font-size:0.75rem; font-weight:600;">-{{ $item['sale'] }}%</span>
@@ -529,8 +541,12 @@
                                 @if($item['so_luong'] > $item['ton'])
                                 <div style="color:#EF4444; font-size:0.75rem; font-weight:500;">Chỉ còn {{ $item['ton'] }} sản phẩm</div>
                                 @endif
+                                @else
+                                <span style="color:#94A3B8;font-size:0.82rem;">Không khả dụng</span>
+                                @endif
                             </td>
                             <td class="text-center">
+                                @if($item['kha_dung'])
                                 <div class="qty-control">
                                     <form method="POST" action="{{ route('giohang.update') }}" class="d-inline">
                                         @csrf
@@ -548,9 +564,16 @@
                                         <button type="submit" class="qty-btn" title="Tăng">+</button>
                                     </form>
                                 </div>
+                                @else
+                                <span class="qty-num">{{ $item['so_luong'] }}</span>
+                                @endif
                             </td>
                             <td class="text-end price-col">
+                                @if($item['kha_dung'])
                                 {{ number_format($item['gia'] * $item['so_luong'], 0, ',', '.') }} VNĐ
+                                @else
+                                &mdash;
+                                @endif
                             </td>
                             <td class="text-center">
                                 <form method="POST" action="{{ route('giohang.remove') }}" class="d-inline" onsubmit="return confirm('Xác nhận xóa sản phẩm này khỏi giỏ hàng?')">
@@ -605,10 +628,79 @@
                         <span>{{ number_format($tien['thanh_toan'], 0, ',', '.') }} VNĐ</span>
                     </div>
 
+                    @if($coSanPhamKhongKhaDung)
+                    <div class="alert alert-danger" style="font-size:0.84rem;">
+                        Giỏ hàng có sản phẩm không còn kinh doanh. Vui lòng xóa sản phẩm đó trước khi thanh toán.
+                    </div>
+                    @endif
+                    @if($loiDuLieuDiaChi)
+                    <div class="alert alert-danger" style="font-size:0.84rem;">
+                        {{ $loiDuLieuDiaChi }}
+                    </div>
+                    @endif
+
                     <form method="POST" action="{{ route('giohang.checkout') }}" style="margin-top:16px;">
                         @csrf
-                        <label class="form-label-summary">Địa chỉ giao hàng *</label>
-                        <textarea name="dia_chi" rows="2" required class="form-input-summary" placeholder="Số nhà, đường, phường/xã, quận/huyện...">{{ old('dia_chi', $diaChiMacDinh) }}</textarea>
+                        @if($khachHang->tinh_thanh_code && $khachHang->phuong_xa_code && $khachHang->ten_duong && $khachHang->dia_chi_chi_tiet)
+                        <div class="payment-detail" style="padding:12px;margin-bottom:10px;">
+                            <div class="d-flex gap-2 align-items-start" style="color:#CBD5E1;font-size:0.82rem;">
+                                <i class="bi bi-check-circle-fill mt-1" style="color:#10B981;"></i>
+                                <span><strong style="color:#D4B26F;">Đã tự động dùng địa chỉ trong hồ sơ</strong><br>{{ $khachHang->dia_chi }}</span>
+                            </div>
+                        </div>
+                        @endif
+                        <label class="form-label-summary" for="ten_nguoi_nhan">Tên người nhận *</label>
+                        <input id="ten_nguoi_nhan" type="text" name="ten_nguoi_nhan" required minlength="2" maxlength="100"
+                            class="form-input-summary @error('ten_nguoi_nhan') is-invalid @enderror"
+                            value="{{ old('ten_nguoi_nhan', $khachHang->ho_ten) }}" autocomplete="name">
+                        @error('ten_nguoi_nhan')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
+
+                        <label class="form-label-summary" for="so_dien_thoai_nhan">Số điện thoại người nhận *</label>
+                        <input id="so_dien_thoai_nhan" type="tel" name="so_dien_thoai_nhan" required maxlength="20"
+                            class="form-input-summary @error('so_dien_thoai_nhan') is-invalid @enderror"
+                            value="{{ old('so_dien_thoai_nhan', $khachHang->so_dien_thoai) }}" autocomplete="tel" inputmode="tel" placeholder="VD: 0912 345 678">
+                        @error('so_dien_thoai_nhan')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
+
+                        <label class="form-label-summary" for="tinh_thanh_code">Tỉnh / Thành phố *</label>
+                        <input id="province-combobox" type="text" list="province-options" required class="form-input-summary @error('tinh_thanh_code') is-invalid @enderror" placeholder="Chọn hoặc gõ Tỉnh / Thành phố" autocomplete="off">
+                        <datalist id="province-options">
+                            @foreach($tinhThanhs as $tinhThanh)<option value="{{ $tinhThanh['name'] }}"></option>@endforeach
+                        </datalist>
+                        <select id="tinh_thanh_code" name="tinh_thanh_code" class="d-none" aria-hidden="true" tabindex="-1">
+                            <option value="">Chọn Tỉnh / Thành phố</option>
+                            @foreach($tinhThanhs as $tinhThanh)
+                            <option value="{{ $tinhThanh['code'] }}" {{ (string) old('tinh_thanh_code', $khachHang->tinh_thanh_code) === (string) $tinhThanh['code'] ? 'selected' : '' }}>{{ $tinhThanh['name'] }}</option>
+                            @endforeach
+                        </select>
+                        @error('tinh_thanh_code')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
+
+                        <label class="form-label-summary" for="phuong_xa_code">Phường / Xã *</label>
+                        <input id="ward-combobox" type="text" list="ward-options" required class="form-input-summary @error('phuong_xa_code') is-invalid @enderror" placeholder="Chọn hoặc gõ Phường / Xã" autocomplete="off" disabled>
+                        <datalist id="ward-options"></datalist>
+                        <select id="phuong_xa_code" name="phuong_xa_code" disabled class="d-none" aria-hidden="true" tabindex="-1" data-selected="{{ old('phuong_xa_code', $khachHang->phuong_xa_code) }}">
+                            <option value="">Chọn Phường / Xã</option>
+                        </select>
+                        <div id="ward-loading" class="small mb-2" style="display:none;color:#94A3B8;">Đang tải danh sách Phường/Xã...</div>
+                        <div id="ward-error" class="text-danger small mb-2" style="display:none;"></div>
+                        @error('phuong_xa_code')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
+
+                        <label class="form-label-summary" for="ten_duong">Tên đường *</label>
+                        <div style="position:relative;">
+                            <input id="ten_duong" type="text" name="ten_duong" required minlength="2" maxlength="150"
+                                class="form-input-summary @error('ten_duong') is-invalid @enderror"
+                                value="{{ old('ten_duong', $khachHang->ten_duong) }}" autocomplete="off"
+                                placeholder="Nhập để tìm tên đường trong Phường/Xã đã chọn">
+                            <input id="google_place_id" type="hidden" name="google_place_id" value="{{ old('google_place_id', $khachHang->google_place_id) }}">
+                            <div id="street-suggestions" style="display:none;position:absolute;z-index:20;left:0;right:0;top:100%;background:#181B24;border:1px solid rgba(212,178,111,.35);border-radius:8px;max-height:240px;overflow:auto;"></div>
+                        </div>
+                        <small id="street-help" class="d-block mt-1" style="color:#94A3B8;font-size:.72rem;">Chọn Phường/Xã trước, sau đó nhập ít nhất 2 ký tự. Có thể nhập thủ công nếu không có gợi ý phù hợp.</small>
+                        @error('ten_duong')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
+
+                        <label class="form-label-summary" for="dia_chi_chi_tiet">Địa chỉ chi tiết *</label>
+                        <textarea id="dia_chi_chi_tiet" name="dia_chi_chi_tiet" rows="2" required minlength="2" maxlength="200"
+                            class="form-input-summary @error('dia_chi_chi_tiet') is-invalid @enderror"
+                            placeholder="Nhập số nhà, tòa nhà, thôn hoặc ấp..." autocomplete="street-address">{{ old('dia_chi_chi_tiet', $khachHang->dia_chi_chi_tiet) }}</textarea>
+                        @error('dia_chi_chi_tiet')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
 
                         <label class="form-label-summary">Phương thức thanh toán *</label>
                         <select name="phuong_thuc" class="form-input-summary">
@@ -619,7 +711,7 @@
                         <label class="form-label-summary">Ghi chú giao hàng (nếu có)</label>
                         <input type="text" name="ghi_chu" value="{{ old('ghi_chu') }}" maxlength="500" class="form-input-summary" placeholder="VD: Giao giờ hành chính, gọi trước...">
 
-                        <button type="submit" class="btn-checkout">
+                        <button type="submit" class="btn-checkout" {{ ($coSanPhamKhongKhaDung || $loiDuLieuDiaChi) ? 'disabled' : '' }}>
                             <i class="bi bi-bag-check-fill me-2"></i> Hoàn Tất Đặt Hàng
                         </button>
                     </form>
@@ -629,4 +721,141 @@
     </div>
     @endif
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const province = document.getElementById('tinh_thanh_code');
+    const ward = document.getElementById('phuong_xa_code');
+    if (!province || !ward) return;
+
+    const loading = document.getElementById('ward-loading');
+    const error = document.getElementById('ward-error');
+    const provinceCombobox = document.getElementById('province-combobox');
+    const wardCombobox = document.getElementById('ward-combobox');
+    const wardDatalist = document.getElementById('ward-options');
+    const selectedWard = ward.dataset.selected || '';
+    const endpoint = @json(route('giohang.phuongxa'));
+    const streetEndpoint = @json(route('diachi.goiyduong'));
+    const street = document.getElementById('ten_duong');
+    const placeId = document.getElementById('google_place_id');
+    const suggestions = document.getElementById('street-suggestions');
+    const streetHelp = document.getElementById('street-help');
+    const sessionToken = window.crypto?.randomUUID ? window.crypto.randomUUID() : '00000000-0000-4000-8000-' + String(Date.now()).padStart(12, '0').slice(-12);
+    let streetTimer;
+    const provinceOptions = Array.from(province.options).slice(1).map(option => ({ value: option.value, text: option.textContent }));
+    let wardOptions = [];
+
+    function normalizeSearch(value) {
+        return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+    }
+
+    provinceCombobox.addEventListener('input', function () {
+        const match = provinceOptions.find(item => normalizeSearch(item.text) === normalizeSearch(provinceCombobox.value.trim()));
+        const nextValue = match?.value || '';
+        if (province.value !== nextValue) {
+            province.value = nextValue;
+            province.dispatchEvent(new Event('change'));
+        }
+    });
+    wardCombobox.addEventListener('input', function () {
+        const match = wardOptions.find(item => normalizeSearch(item.text) === normalizeSearch(wardCombobox.value.trim()));
+        ward.value = match?.value || '';
+        ward.dispatchEvent(new Event('change'));
+    });
+
+    async function loadWards(restoreSelection = false) {
+        ward.innerHTML = '<option value="">Chọn Phường / Xã</option>';
+        ward.disabled = true;
+        wardCombobox.disabled = true;
+        wardCombobox.value = '';
+        wardDatalist.innerHTML = '';
+        error.style.display = 'none';
+        if (!province.value) return;
+
+        loading.style.display = 'block';
+        try {
+            const response = await fetch(endpoint + '?tinh_thanh_code=' + encodeURIComponent(province.value), {
+                headers: { 'Accept': 'application/json' }
+            });
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.message || 'Không thể tải danh sách địa chỉ.');
+
+            payload.data.forEach(function (item) {
+                const option = document.createElement('option');
+                option.value = item.code;
+                option.textContent = item.name;
+                if (restoreSelection && String(item.code) === String(selectedWard)) option.selected = true;
+                ward.appendChild(option);
+            });
+            wardOptions = payload.data.map(item => ({ value: String(item.code), text: item.name }));
+            wardOptions.forEach(item => wardDatalist.appendChild(new Option(item.text)));
+            ward.disabled = payload.data.length === 0;
+            wardCombobox.disabled = payload.data.length === 0;
+            const selected = wardOptions.find(item => String(item.value) === String(ward.value));
+            if (selected) wardCombobox.value = selected.text;
+            if (payload.data.length === 0) {
+                error.textContent = 'Không tìm thấy Phường/Xã thuộc Tỉnh/Thành phố đã chọn.';
+                error.style.display = 'block';
+            }
+        } catch (exception) {
+            error.textContent = exception.message || 'Không thể tải danh sách địa chỉ. Vui lòng thử lại sau.';
+            error.style.display = 'block';
+        } finally {
+            loading.style.display = 'none';
+        }
+    }
+
+    province.addEventListener('change', function () { loadWards(false); });
+    const initialProvince = provinceOptions.find(item => String(item.value) === String(province.value));
+    if (initialProvince) provinceCombobox.value = initialProvince.text;
+    if (province.value) loadWards(true);
+
+    street?.addEventListener('input', function () {
+        placeId.value = '';
+        suggestions.style.display = 'none';
+        clearTimeout(streetTimer);
+        if (street.value.trim().length < 2 || !province.value || !ward.value) return;
+        streetTimer = setTimeout(async function () {
+            try {
+                const params = new URLSearchParams({
+                    q: street.value.trim(), tinh_thanh_code: province.value,
+                    phuong_xa_code: ward.value, session_token: sessionToken
+                });
+                const response = await fetch(streetEndpoint + '?' + params, { headers: { Accept: 'application/json' } });
+                const payload = await response.json();
+                if (!response.ok) throw new Error(payload.message || 'Không thể tải gợi ý tên đường.');
+                suggestions.innerHTML = '';
+                payload.data.forEach(function (item) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.style.cssText = 'display:block;width:100%;padding:9px 12px;text-align:left;background:transparent;color:#F1F5F9;border:0;border-bottom:1px solid rgba(255,255,255,.06);';
+                    button.innerHTML = '<strong></strong><small style="display:block;color:#94A3B8"></small>';
+                    button.querySelector('strong').textContent = item.main_text;
+                    button.querySelector('small').textContent = item.secondary_text;
+                    button.addEventListener('click', function () {
+                        street.value = item.main_text;
+                        placeId.value = item.place_id;
+                        suggestions.style.display = 'none';
+                    });
+                    suggestions.appendChild(button);
+                });
+                if (payload.data.length) {
+                    const attribution = document.createElement('div');
+                    attribution.textContent = 'Gợi ý bởi Google';
+                    attribution.style.cssText = 'padding:7px 12px;text-align:right;color:#94A3B8;font-size:.7rem;';
+                    suggestions.appendChild(attribution);
+                    suggestions.style.display = 'block';
+                }
+                streetHelp.textContent = 'Có thể chọn gợi ý hoặc tiếp tục nhập thủ công.';
+            } catch (exception) {
+                streetHelp.textContent = exception.message + ' Bạn vẫn có thể nhập tên đường thủ công.';
+            }
+        }, 350);
+    });
+
+    document.addEventListener('click', function (event) {
+        if (suggestions && !suggestions.contains(event.target) && event.target !== street) suggestions.style.display = 'none';
+    });
+});
+</script>
 @endsection

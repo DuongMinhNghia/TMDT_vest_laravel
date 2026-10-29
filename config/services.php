@@ -41,6 +41,11 @@ return [
         'account_number' => env('MANUAL_TRANSFER_ACCOUNT_NUMBER'),
         'account_name' => env('MANUAL_TRANSFER_ACCOUNT_NAME'),
         'demo_divisor' => max(1, (int) env('MANUAL_TRANSFER_DEMO_DIVISOR', 1)),
+        'allow_demo_in_production' => env('MANUAL_TRANSFER_ALLOW_DEMO_IN_PRODUCTION', false),
+    ],
+
+    'google_maps' => [
+        'places_api_key' => env('GOOGLE_MAPS_PLACES_API_KEY'),
     ],
 
 ];

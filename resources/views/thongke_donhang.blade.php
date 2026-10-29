@@ -501,8 +501,8 @@
                         </a>
                     </td>
                     <td data-label="Khách Hàng">
-                        <div style="font-weight: 600; color: var(--adm-text-main);">{{ $dh->khachHang->ho_ten ?? 'Khách vãng lai' }}</div>
-                        <div style="color: var(--adm-text-dim); font-size: 0.76rem;">{{ $dh->khachHang->taiKhoan->email ?? '' }}</div>
+                        <div style="font-weight: 600; color: var(--adm-text-main);">{{ $dh->ten_nguoi_nhan ?? $dh->khachHang->ho_ten ?? 'Khách vãng lai' }}</div>
+                        <div style="color: var(--adm-text-dim); font-size: 0.76rem;">{{ $dh->so_dien_thoai_nhan ?? $dh->khachHang->taiKhoan->email ?? '' }}</div>
                     </td>
                     <td data-label="Ngày Đặt" style="color: var(--adm-text-muted);">
                         {{ \Carbon\Carbon::parse($dh->ngay_dat)->format('d/m/Y') }}

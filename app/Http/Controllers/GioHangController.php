@@ -7,8 +7,10 @@ use App\Models\GioHang;
 use App\Models\SanPham;
 use App\Models\Size;
 use App\Services\DonHangService;
+use App\Services\VietnamAddressService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use RuntimeException;
 
 /**
@@ -16,9 +18,10 @@ use RuntimeException;
  */
 class GioHangController extends Controller
 {
-    public function __construct(private DonHangService $donHangService)
-    {
-    }
+    public function __construct(
+        private DonHangService $donHangService,
+        private VietnamAddressService $vietnamAddressService,
+    ) {}
 
     private function khachHang()
     {
@@ -50,16 +53,22 @@ class GioHangController extends Controller
 
         $gioHang = [];
         foreach ($chiTiets as $ct) {
+            $sanPham = $ct->sanPham;
+            $size = $ct->size;
+            $khaDung = $sanPham && !$sanPham->trashed() && $size
+                && (int) $size->san_pham_id === (int) $ct->san_pham_id;
+
             $gioHang[$ct->id] = [
                 'id'       => $ct->san_pham_id,
-                'ten_sp'   => $ct->sanPham->ten_sp,
-                'gia'      => $ct->sanPham->gia_khuyen_mai,
-                'gia_goc'  => $ct->sanPham->gia_ban,
-                'sale'     => $ct->sanPham->phan_tram_giam,
-                'hinh_anh' => $ct->sanPham->hinh_anh,
-                'size'     => $ct->size->ten_size,
+                'ten_sp'   => $sanPham?->ten_sp ?? 'Sản phẩm không còn tồn tại',
+                'gia'      => $khaDung ? $sanPham->gia_khuyen_mai : 0,
+                'gia_goc'  => $khaDung ? $sanPham->gia_ban : 0,
+                'sale'     => $khaDung ? $sanPham->phan_tram_giam : 0,
+                'hinh_anh' => $sanPham?->hinh_anh,
+                'size'     => $size?->ten_size ?? 'Không xác định',
                 'so_luong' => $ct->so_luong,
-                'ton'      => $ct->size->so_luong_ton,
+                'ton'      => $khaDung ? $size->so_luong_ton : 0,
+                'kha_dung' => $khaDung,
             ];
         }
 
@@ -67,8 +76,34 @@ class GioHangController extends Controller
         $tongTien       = $tien['tam_tinh'];
         $diaChiMacDinh  = $khachHang->dia_chi;
         $tenHang        = optional($khachHang->hangThanhVien)->ten_hang;
+        $coSanPhamKhongKhaDung = collect($gioHang)->contains(fn ($item) => !$item['kha_dung']);
+        try {
+            $tinhThanhs = $this->vietnamAddressService->provinces();
+            $loiDuLieuDiaChi = null;
+        } catch (RuntimeException $e) {
+            $tinhThanhs = [];
+            $loiDuLieuDiaChi = $e->getMessage();
+        }
 
-        return view('giohang', compact('gioHang', 'tongTien', 'tien', 'diaChiMacDinh', 'tenHang'));
+        return view('giohang', compact(
+            'gioHang', 'tongTien', 'tien', 'diaChiMacDinh', 'tenHang', 'coSanPhamKhongKhaDung',
+            'tinhThanhs', 'loiDuLieuDiaChi', 'khachHang'
+        ));
+    }
+
+    public function phuongXas(Request $request)
+    {
+        $provinceCode = trim((string) $request->query('tinh_thanh_code'));
+
+        try {
+            if (!$this->vietnamAddressService->provinceExists($provinceCode)) {
+                return response()->json(['message' => 'Tỉnh/Thành phố không hợp lệ.'], 422);
+            }
+
+            return response()->json(['data' => $this->vietnamAddressService->wards($provinceCode)]);
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 503);
+        }
     }
 
     public function addToCart(Request $request)
@@ -77,7 +112,10 @@ class GioHangController extends Controller
             return $chan;
         }
 
-        $sanPham = SanPham::findOrFail($request->id);
+        $sanPham = SanPham::withTrashed()->find($request->id);
+        if (!$sanPham || $sanPham->trashed()) {
+            return back()->with('error', 'Sản phẩm này hiện không còn kinh doanh và không thể thêm vào giỏ hàng.');
+        }
         $size    = Size::where('san_pham_id', $sanPham->id)->where('ten_size', $request->size)->first();
 
         if (!$size) {
@@ -114,6 +152,12 @@ class GioHangController extends Controller
 
         $soLuongMoi = $chiTiet->so_luong + (int) $request->type;
 
+        if (!$chiTiet->sanPham || $chiTiet->sanPham->trashed() || !$chiTiet->size
+            || (int) $chiTiet->size->san_pham_id !== (int) $chiTiet->san_pham_id) {
+            return redirect()->route('giohang.index')
+                ->with('error', 'Sản phẩm này hiện không còn kinh doanh. Vui lòng xóa khỏi giỏ hàng.');
+        }
+
         if ($soLuongMoi <= 0) {
             $chiTiet->delete();
         } elseif (!$chiTiet->sanPham->kiemTraTonKhoSize($chiTiet->size->ten_size, $soLuongMoi)) {
@@ -145,12 +189,78 @@ class GioHangController extends Controller
             return $chan;
         }
 
-        $data = $request->validate([
-            'dia_chi'     => 'required|string|max:500',
+        $request->merge([
+            'ten_nguoi_nhan' => preg_replace('/\s+/u', ' ', trim((string) $request->input('ten_nguoi_nhan'))),
+            'so_dien_thoai_nhan' => $this->chuanHoaSoDienThoai((string) $request->input('so_dien_thoai_nhan')),
+            'dia_chi_chi_tiet' => preg_replace('/\s+/u', ' ', trim((string) $request->input('dia_chi_chi_tiet'))),
+            'ten_duong' => preg_replace('/\s+/u', ' ', trim((string) $request->input('ten_duong'))),
+            'tinh_thanh_code' => trim((string) $request->input('tinh_thanh_code')),
+            'phuong_xa_code' => trim((string) $request->input('phuong_xa_code')),
+        ]);
+
+        $validator = Validator::make($request->all(), [
+            'ten_nguoi_nhan' => ['required', 'string', 'min:2', 'max:100', 'regex:/^[\p{L}\s\.\'’\-]+$/u'],
+            'so_dien_thoai_nhan' => ['required', 'regex:/^0(?:3|5|7|8|9)\d{8}$/'],
+            'tinh_thanh_code' => ['required', 'string', 'max:10'],
+            'phuong_xa_code' => ['required', 'string', 'max:10'],
+            'dia_chi_chi_tiet' => ['required', 'string', 'min:2', 'max:200'],
+            'ten_duong' => ['required', 'string', 'min:2', 'max:150'],
+            'google_place_id' => ['nullable', 'string', 'max:255'],
             'phuong_thuc' => 'required|in:COD,Chuyển khoản QR',
             'ghi_chu'     => 'nullable|string|max:500',
         ], [
-            'dia_chi.required' => 'Vui lòng nhập địa chỉ giao hàng.',
+            'ten_nguoi_nhan.required' => 'Vui lòng nhập tên người nhận.',
+            'ten_nguoi_nhan.min' => 'Tên người nhận phải có ít nhất 2 ký tự.',
+            'ten_nguoi_nhan.max' => 'Tên người nhận không được vượt quá 100 ký tự.',
+            'ten_nguoi_nhan.regex' => 'Tên người nhận không hợp lệ.',
+            'so_dien_thoai_nhan.required' => 'Vui lòng nhập số điện thoại người nhận.',
+            'so_dien_thoai_nhan.regex' => 'Số điện thoại người nhận không hợp lệ.',
+            'tinh_thanh_code.required' => 'Vui lòng chọn Tỉnh/Thành phố.',
+            'phuong_xa_code.required' => 'Vui lòng chọn Phường/Xã.',
+            'dia_chi_chi_tiet.required' => 'Vui lòng nhập số nhà, tên đường hoặc địa chỉ giao hàng chi tiết.',
+            'dia_chi_chi_tiet.min' => 'Vui lòng nhập số nhà, tòa nhà, thôn hoặc ấp cụ thể.',
+            'dia_chi_chi_tiet.max' => 'Địa chỉ chi tiết không được vượt quá 200 ký tự.',
+            'ten_duong.required' => 'Vui lòng chọn hoặc nhập tên đường.',
+            'ten_duong.min' => 'Tên đường phải có ít nhất 2 ký tự.',
+        ]);
+
+        $diaChiHanhChinh = null;
+        $validator->after(function ($validator) use ($request, &$diaChiHanhChinh) {
+            if ($validator->errors()->hasAny(['tinh_thanh_code', 'phuong_xa_code'])) {
+                return;
+            }
+
+            try {
+                if (!$this->vietnamAddressService->provinceExists($request->tinh_thanh_code)) {
+                    $validator->errors()->add('tinh_thanh_code', 'Tỉnh/Thành phố đã chọn không tồn tại.');
+                    return;
+                }
+
+                $diaChiHanhChinh = $this->vietnamAddressService->resolve(
+                    $request->tinh_thanh_code,
+                    $request->phuong_xa_code
+                );
+                if (!$diaChiHanhChinh) {
+                    $validator->errors()->add('phuong_xa_code', 'Phường/Xã đã chọn không thuộc Tỉnh/Thành phố này.');
+                }
+            } catch (RuntimeException $e) {
+                $validator->errors()->add('tinh_thanh_code', $e->getMessage());
+            }
+
+            $detail = (string) $request->dia_chi_chi_tiet;
+            $compact = preg_replace('/[\s,\.\-\/]+/u', '', $detail);
+            if ($compact !== '' && (preg_match('/^(.)\1{5,}$/u', $compact)
+                || count(array_unique(preg_split('//u', mb_strtolower($compact), -1, PREG_SPLIT_NO_EMPTY))) < 3)) {
+                $validator->errors()->add('dia_chi_chi_tiet', 'Địa chỉ chi tiết chưa có ý nghĩa. Vui lòng nhập địa chỉ giao hàng cụ thể.');
+            }
+        });
+
+        $data = $validator->validate();
+        $data['dia_chi'] = implode(', ', [
+            $data['dia_chi_chi_tiet'],
+            $data['ten_duong'],
+            $diaChiHanhChinh['ward']['name'],
+            $diaChiHanhChinh['province']['name'],
         ]);
 
         try {
@@ -166,6 +276,19 @@ class GioHangController extends Controller
 
         return redirect()->route('donhang.chitiet', $hoaDon->id)
             ->with('success', 'Đặt hàng thành công! Mã đơn: ' . $hoaDon->ma_don_hang . '. Chờ xác nhận từ cửa hàng.');
+    }
+
+    private function chuanHoaSoDienThoai(string $phone): string
+    {
+        $phone = preg_replace('/[\s\.\-\(\)]+/', '', trim($phone));
+        if (str_starts_with($phone, '+84')) {
+            return '0' . substr($phone, 3);
+        }
+        if (str_starts_with($phone, '84')) {
+            return '0' . substr($phone, 2);
+        }
+
+        return $phone;
     }
 
     /** Chỉ cho quay lại trang cùng domain, tránh open-redirect */

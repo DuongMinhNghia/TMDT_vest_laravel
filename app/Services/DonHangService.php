@@ -28,7 +28,14 @@ class DonHangService
     {
         $tamTinh = 0;
         foreach ($chiTiets as $ct) {
-            $tamTinh += $ct->sanPham->tinhGiaBan($ct->so_luong); // TV1: đã trừ % Flash Sale
+            $sanPham = $ct->sanPham;
+            $size = $ct->size;
+            if (!$sanPham || $sanPham->trashed() || !$size
+                || (int) $size->san_pham_id !== (int) $ct->san_pham_id) {
+                continue;
+            }
+
+            $tamTinh += $sanPham->tinhGiaBan($ct->so_luong); // TV1: đã trừ % Flash Sale
         }
 
         $phanTramHang = (int) optional($khachHang?->hangThanhVien)->phan_tram_chiet_khau;
@@ -63,6 +70,34 @@ class DonHangService
                 throw new RuntimeException('Giỏ hàng trống!');
             }
 
+            // Validate every line before creating an invoice or changing stock.
+            // Products are locked as well as cart lines to close the window where
+            // an administrator discontinues a product during checkout.
+            $sanPhams = [];
+            $sizes = [];
+            foreach ($chiTiets as $ct) {
+                $sanPham = \App\Models\SanPham::withTrashed()
+                    ->whereKey($ct->san_pham_id)
+                    ->lockForUpdate()
+                    ->first();
+                $size = Size::whereKey($ct->size_id)->lockForUpdate()->first();
+
+                if (!$sanPham || $sanPham->trashed()) {
+                    throw new RuntimeException('Giỏ hàng có sản phẩm hiện không còn kinh doanh. Vui lòng xóa sản phẩm đó trước khi thanh toán.');
+                }
+                if (!$size || (int) $size->san_pham_id !== (int) $sanPham->id) {
+                    throw new RuntimeException("Thông tin size của sản phẩm \"{$sanPham->ten_sp}\" không còn hợp lệ. Vui lòng xóa khỏi giỏ hàng.");
+                }
+                if ((int) $size->so_luong_ton < (int) $ct->so_luong) {
+                    throw new RuntimeException("Sản phẩm \"{$sanPham->ten_sp}\" size {$size->ten_size} không đủ hàng trong kho!");
+                }
+
+                $sanPhams[$ct->id] = $sanPham;
+                $sizes[$ct->id] = $size;
+                $ct->setRelation('sanPham', $sanPham);
+                $ct->setRelation('size', $size);
+            }
+
             $tien = $this->tinhTien($chiTiets, $khachHang);
 
             $hoaDon = HoaDon::create([
@@ -71,6 +106,10 @@ class DonHangService
                 'trang_thai'             => HoaDon::CHO_XU_LY,
                 'tong_tien'              => $tien['thanh_toan'],
                 'phuong_thuc_thanh_toan' => $thongTin['phuong_thuc'] ?? 'COD',
+                'ten_nguoi_nhan'         => $thongTin['ten_nguoi_nhan'] ?? null,
+                'so_dien_thoai_nhan'     => $thongTin['so_dien_thoai_nhan'] ?? null,
+                'tinh_thanh_code'        => $thongTin['tinh_thanh_code'] ?? null,
+                'phuong_xa_code'         => $thongTin['phuong_xa_code'] ?? null,
                 'dia_chi_giao_hang'      => $thongTin['dia_chi'],
                 'ghi_chu'                => $thongTin['ghi_chu'] ?? null,
             ]);
@@ -80,7 +119,8 @@ class DonHangService
             ]);
 
             foreach ($chiTiets as $ct) {
-                $size = Size::whereKey($ct->size_id)->lockForUpdate()->first();
+                $sanPham = $sanPhams[$ct->id];
+                $size = $sizes[$ct->id];
 
                 // The WHERE condition is the integrity guard for both MySQL and
                 // SQLite: an affected-row count of zero means stock is insufficient.
@@ -90,7 +130,7 @@ class DonHangService
 
                 if (!$daTruKho) {
                     throw new RuntimeException(
-                        "Sản phẩm \"{$ct->sanPham->ten_sp}\" size {$ct->size->ten_size} không đủ hàng trong kho!"
+                        "Sản phẩm \"{$sanPham->ten_sp}\" size {$size->ten_size} không đủ hàng trong kho!"
                     );
                 }
 
@@ -98,12 +138,12 @@ class DonHangService
                     'hoa_don_id'  => $hoaDon->id,
                     'san_pham_id' => $ct->san_pham_id,
                     'size_id'     => $ct->size_id,
-                    'ten_san_pham' => $ct->sanPham->ten_sp,
+                    'ten_san_pham' => $sanPham->ten_sp,
                     'ten_size' => $size->ten_size,
-                    'hinh_anh_san_pham' => $ct->sanPham->hinh_anh,
-                    'don_gia'     => $ct->sanPham->gia_khuyen_mai, // chốt giá tại thời điểm mua
+                    'hinh_anh_san_pham' => $sanPham->hinh_anh,
+                    'don_gia'     => $sanPham->gia_khuyen_mai, // chốt giá tại thời điểm mua
                     'so_luong'    => $ct->so_luong,
-                    'thanh_tien'  => $ct->sanPham->tinhGiaBan($ct->so_luong),
+                    'thanh_tien'  => $sanPham->tinhGiaBan($ct->so_luong),
                 ]);
             }
 

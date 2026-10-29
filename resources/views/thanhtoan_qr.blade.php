@@ -3,19 +3,6 @@
 @section('title', 'Thanh Toán Đơn ' . $donHang->ma_don_hang . ' - Kingsman Vietnam')
 
 @section('content')
-@php
-    $bankId = config('services.manual_transfer.bank_id', 'MB');
-    $bankName = config('services.manual_transfer.bank_name', 'MBBank');
-    $accountNumber = config('services.manual_transfer.account_number');
-    $accountName = config('services.manual_transfer.account_name');
-    $soTienDon = (int) $donHang->tong_tien;
-    $heSoDemo = config('services.manual_transfer.demo_divisor', 1);
-    $soTien = (int) ceil($soTienDon / $heSoDemo);
-    $qrUrl = $accountNumber
-        ? 'https://img.vietqr.io/image/' . rawurlencode($bankId) . '-' . rawurlencode($accountNumber) . '-compact2.png?amount=' . $soTien . '&addInfo=' . rawurlencode($donHang->ma_don_hang) . '&accountName=' . rawurlencode($accountName ?? '')
-        : null;
-@endphp
-
 <style>
     .payment-wrap {
         max-width: 960px;
@@ -282,7 +269,7 @@
         </div>
 
         <div class="payment-body">
-            @if($qrUrl)
+            @if($paymentConfigValid && $qrUrl)
             <div class="row g-3 g-md-4 align-items-center">
                 <div class="col-12 col-md-5">
                     <div class="payment-qr-container">
@@ -295,8 +282,9 @@
                         <div class="payment-label">Số tiền cần chuyển {{ $heSoDemo > 1 ? '(demo)' : '' }}</div>
                         <div class="payment-value payment-amount">{{ number_format($soTien, 0, ',', '.') }} VNĐ</div>
                         @if($heSoDemo > 1)
-                        <small style="color:#94a3b8; font-size: 0.76rem;" class="d-block mt-1">Giá trị đơn: {{ number_format($soTienDon, 0, ',', '.') }} VNĐ · Chế độ demo 1/{{ number_format($heSoDemo, 0, ',', '.') }}</small>
+                        <small style="color:#fbbf24; font-size: 0.76rem; font-weight:600;" class="d-block mt-1">SỐ TIỀN DEMO — không phải tổng giá trị hóa đơn</small>
                         @endif
+                        <small style="color:#94a3b8; font-size: 0.76rem;" class="d-block mt-1">Tổng giá trị hóa đơn: {{ number_format($soTienDon, 0, ',', '.') }} VNĐ{{ $heSoDemo > 1 ? ' · Chế độ demo 1/' . number_format($heSoDemo, 0, ',', '.') : '' }}</small>
                     </div>
                     <div class="payment-detail">
                         <div class="payment-label">Ngân hàng</div>
@@ -331,7 +319,7 @@
             </div>
             @else
             <div class="payment-note">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i> Chưa có cấu hình tài khoản nhận tiền. Vui lòng liên hệ quản trị viên.
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> Cấu hình thanh toán chưa đầy đủ hoặc không hợp lệ. Vui lòng liên hệ quản trị viên.
             </div>
             @endif
 

@@ -18,6 +18,11 @@ class KhachHang extends Model
         'ho_ten',
         'so_dien_thoai',
         'dia_chi',
+        'tinh_thanh_code',
+        'phuong_xa_code',
+        'ten_duong',
+        'google_place_id',
+        'dia_chi_chi_tiet',
         'ngay_sinh',
         'gioi_tinh',
         'diem_tich_luy'

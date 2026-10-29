@@ -501,9 +501,46 @@
                                         <label class="form-label text-muted" style="font-size:0.82rem;">Email đăng nhập</label>
                                         <input type="text" class="form-control form-control-dark" value="{{ Auth::user()->email }}" disabled style="opacity:0.6;">
                                     </div>
+                                    <div class="col-12 mt-3"><h5 class="section-title-gold mb-0" style="font-size:1.05rem;"><i class="bi bi-geo-alt me-2"></i>Địa Chỉ Giao Hàng Mặc Định</h5></div>
+                                    @if($loiDuLieuDiaChi)<div class="col-12"><div class="alert alert-danger">{{ $loiDuLieuDiaChi }}</div></div>@endif
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted" style="font-size:0.82rem;">Tỉnh / Thành phố</label>
+                                        <input id="profile_province_combobox" type="text" list="profile_province_options" class="form-control form-control-dark" placeholder="Chọn hoặc gõ Tỉnh / Thành phố" autocomplete="off">
+                                        <datalist id="profile_province_options">
+                                            @foreach($tinhThanhs as $province)<option value="{{ $province['name'] }}"></option>@endforeach
+                                        </datalist>
+                                        <select id="profile_province" name="tinh_thanh_code" class="d-none" aria-hidden="true" tabindex="-1">
+                                            <option value="">Chọn Tỉnh / Thành phố</option>
+                                            @foreach($tinhThanhs as $province)
+                                            <option value="{{ $province['code'] }}" {{ (string) old('tinh_thanh_code', $khachHang->tinh_thanh_code) === (string) $province['code'] ? 'selected' : '' }}>{{ $province['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('tinh_thanh_code')<div class="text-danger small">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted" style="font-size:0.82rem;">Phường / Xã</label>
+                                        <input id="profile_ward_combobox" type="text" list="profile_ward_options" class="form-control form-control-dark" placeholder="Chọn hoặc gõ Phường / Xã" autocomplete="off" disabled>
+                                        <datalist id="profile_ward_options"></datalist>
+                                        <select id="profile_ward" name="phuong_xa_code" disabled data-selected="{{ old('phuong_xa_code', $khachHang->phuong_xa_code) }}" class="d-none" aria-hidden="true" tabindex="-1">
+                                            <option value="">Chọn Phường / Xã</option>
+                                        </select>
+                                        @error('phuong_xa_code')<div class="text-danger small">{{ $message }}</div>@enderror
+                                    </div>
                                     <div class="col-12">
-                                        <label class="form-label text-muted" style="font-size:0.82rem;">Địa chỉ giao hàng</label>
-                                        <input type="text" name="dia_chi" class="form-control form-control-dark" value="{{ old('dia_chi', $khachHang->dia_chi) }}" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." autocomplete="shipping street-address" readonly onfocus="this.removeAttribute('readonly');">
+                                        <label class="form-label text-muted" style="font-size:0.82rem;">Tên đường</label>
+                                        <div style="position:relative;">
+                                            <input id="profile_street" type="text" name="ten_duong" class="form-control form-control-dark" value="{{ old('ten_duong', $khachHang->ten_duong) }}" placeholder="Nhập để tìm tên đường theo Phường/Xã" autocomplete="off">
+                                            <input id="profile_place_id" type="hidden" name="google_place_id" value="{{ old('google_place_id', $khachHang->google_place_id) }}">
+                                            <div id="profile_street_suggestions" style="display:none;position:absolute;z-index:30;left:0;right:0;top:100%;background:#181B24;border:1px solid rgba(212,178,111,.35);border-radius:8px;max-height:240px;overflow:auto;"></div>
+                                        </div>
+                                        <small id="profile_street_help" style="color:#94A3B8;">Chọn Phường/Xã trước. Có thể nhập thủ công nếu không có gợi ý.</small>
+                                        @error('ten_duong')<div class="text-danger small">{{ $message }}</div>@enderror
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label text-muted" style="font-size:0.82rem;">Số nhà / Tòa nhà / Thôn / Ấp</label>
+                                        <input type="text" name="dia_chi_chi_tiet" class="form-control form-control-dark" value="{{ old('dia_chi_chi_tiet', $khachHang->dia_chi_chi_tiet) }}" placeholder="VD: Số 125, ngõ 8 hoặc Thôn Bình An">
+                                        @error('dia_chi_chi_tiet')<div class="text-danger small">{{ $message }}</div>@enderror
+                                        @if($khachHang->dia_chi)<small class="d-block mt-2" style="color:#D4B26F;">Địa chỉ đang lưu: {{ $khachHang->dia_chi }}</small>@endif
                                     </div>
                                     <div class="col-12 mt-4 pt-4" style="border-top:1px solid rgba(212,178,111,0.2);">
                                         <h5 class="section-title-gold mb-1" style="font-size:1.05rem;"><i class="bi bi-shield-lock me-2"></i>Đổi Mật Khẩu</h5>
@@ -876,5 +913,127 @@
             });
         });
     });
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const province = document.getElementById('profile_province');
+    const ward = document.getElementById('profile_ward');
+    const street = document.getElementById('profile_street');
+    const placeId = document.getElementById('profile_place_id');
+    const suggestions = document.getElementById('profile_street_suggestions');
+    const help = document.getElementById('profile_street_help');
+    const provinceCombobox = document.getElementById('profile_province_combobox');
+    const wardCombobox = document.getElementById('profile_ward_combobox');
+    const wardDatalist = document.getElementById('profile_ward_options');
+    if (!province || !ward || !street) return;
+
+    const wardEndpoint = @json(route('giohang.phuongxa'));
+    const streetEndpoint = @json(route('diachi.goiyduong'));
+    const selectedWard = ward.dataset.selected || '';
+    const sessionToken = window.crypto?.randomUUID ? window.crypto.randomUUID() : '00000000-0000-4000-8000-' + String(Date.now()).padStart(12, '0').slice(-12);
+    let timer;
+    const provinceOptions = Array.from(province.options).slice(1).map(option => ({ value: option.value, text: option.textContent }));
+    let wardOptions = [];
+
+    function normalizeSearch(value) {
+        return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+    }
+
+    provinceCombobox.addEventListener('input', function () {
+        const match = provinceOptions.find(item => normalizeSearch(item.text) === normalizeSearch(provinceCombobox.value.trim()));
+        const nextValue = match?.value || '';
+        if (province.value !== nextValue) {
+            province.value = nextValue;
+            province.dispatchEvent(new Event('change'));
+        }
+    });
+    wardCombobox.addEventListener('input', function () {
+        const match = wardOptions.find(item => normalizeSearch(item.text) === normalizeSearch(wardCombobox.value.trim()));
+        ward.value = match?.value || '';
+        ward.dispatchEvent(new Event('change'));
+    });
+
+    async function loadWards(restore = false) {
+        ward.innerHTML = '<option value="">Chọn Phường / Xã</option>';
+        ward.disabled = true;
+        wardCombobox.disabled = true;
+        wardCombobox.value = '';
+        wardDatalist.innerHTML = '';
+        if (!province.value) return;
+        try {
+            const response = await fetch(wardEndpoint + '?tinh_thanh_code=' + encodeURIComponent(province.value), { headers: { Accept: 'application/json' } });
+            const payload = await response.json();
+            if (!response.ok) throw new Error(payload.message || 'Không thể tải Phường/Xã.');
+            payload.data.forEach(function (item) {
+                const option = document.createElement('option');
+                option.value = item.code;
+                option.textContent = item.name;
+                if (restore && String(item.code) === String(selectedWard)) option.selected = true;
+                ward.appendChild(option);
+            });
+            wardOptions = payload.data.map(item => ({ value: String(item.code), text: item.name }));
+            wardOptions.forEach(item => wardDatalist.appendChild(new Option(item.text)));
+            ward.disabled = payload.data.length === 0;
+            wardCombobox.disabled = payload.data.length === 0;
+            const selected = wardOptions.find(item => String(item.value) === String(ward.value));
+            if (selected) wardCombobox.value = selected.text;
+        } catch (exception) {
+            help.textContent = exception.message;
+        }
+    }
+
+    province.addEventListener('change', function () {
+        street.value = '';
+        placeId.value = '';
+        loadWards(false);
+    });
+    ward.addEventListener('change', function () {
+        street.value = '';
+        placeId.value = '';
+    });
+    const initialProvince = provinceOptions.find(item => String(item.value) === String(province.value));
+    if (initialProvince) provinceCombobox.value = initialProvince.text;
+    if (province.value) loadWards(true);
+
+    street.addEventListener('input', function () {
+        placeId.value = '';
+        suggestions.style.display = 'none';
+        clearTimeout(timer);
+        if (street.value.trim().length < 2 || !province.value || !ward.value) return;
+        timer = setTimeout(async function () {
+            try {
+                const params = new URLSearchParams({ q: street.value.trim(), tinh_thanh_code: province.value, phuong_xa_code: ward.value, session_token: sessionToken });
+                const response = await fetch(streetEndpoint + '?' + params, { headers: { Accept: 'application/json' } });
+                const payload = await response.json();
+                if (!response.ok) throw new Error(payload.message || 'Không thể tải gợi ý tên đường.');
+                suggestions.innerHTML = '';
+                payload.data.forEach(function (item) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.style.cssText = 'display:block;width:100%;padding:9px 12px;text-align:left;background:transparent;color:#F1F5F9;border:0;border-bottom:1px solid rgba(255,255,255,.06);';
+                    button.innerHTML = '<strong></strong><small style="display:block;color:#94A3B8"></small>';
+                    button.querySelector('strong').textContent = item.main_text;
+                    button.querySelector('small').textContent = item.secondary_text;
+                    button.addEventListener('click', function () {
+                        street.value = item.main_text;
+                        placeId.value = item.place_id;
+                        suggestions.style.display = 'none';
+                    });
+                    suggestions.appendChild(button);
+                });
+                if (payload.data.length) {
+                    const attribution = document.createElement('div');
+                    attribution.textContent = 'Gợi ý bởi Google';
+                    attribution.style.cssText = 'padding:7px 12px;text-align:right;color:#94A3B8;font-size:.7rem;';
+                    suggestions.appendChild(attribution);
+                    suggestions.style.display = 'block';
+                }
+                help.textContent = 'Có thể chọn gợi ý hoặc nhập tên đường thủ công.';
+            } catch (exception) {
+                help.textContent = exception.message + ' Bạn vẫn có thể nhập thủ công.';
+            }
+        }, 350);
+    });
+});
 </script>
 @endsection

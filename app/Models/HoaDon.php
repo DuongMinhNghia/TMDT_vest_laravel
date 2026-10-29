@@ -33,6 +33,10 @@ class HoaDon extends Model
         'trang_thai',
         'tong_tien',
         'phuong_thuc_thanh_toan',
+        'ten_nguoi_nhan',
+        'so_dien_thoai_nhan',
+        'tinh_thanh_code',
+        'phuong_xa_code',
         'dia_chi_giao_hang',
         'ghi_chu'
     ];

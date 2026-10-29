@@ -17,6 +17,7 @@ use App\Http\Controllers\KhachHangDashboardController;
 use App\Http\Controllers\LichHenController;
 use App\Http\Controllers\HangThanhVienController;
 use App\Http\Controllers\QuenMatKhauController;
+use App\Http\Controllers\AddressLookupController;
 
 // 1. Route xác thực (Guest)
 Route::middleware('guest')->group(function () {
@@ -43,6 +44,9 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     // Giỏ hàng
     Route::get('/gio-hang', [GioHangController::class, 'index'])->name('giohang.index');
+    Route::get('/gio-hang/phuong-xa', [GioHangController::class, 'phuongXas'])->middleware('role:khach_hang')->name('giohang.phuongxa');
+    Route::get('/dia-chi/goi-y-duong', [AddressLookupController::class, 'streets'])
+        ->middleware(['role:khach_hang', 'throttle:30,1'])->name('diachi.goiyduong');
     Route::post('/gio-hang/them', [GioHangController::class, 'addToCart'])->middleware('role:khach_hang')->name('giohang.add');
     Route::patch('/gio-hang/update', [GioHangController::class, 'updateSL'])->middleware('role:khach_hang')->name('giohang.update');
     Route::delete('/gio-hang/xoa', [GioHangController::class, 'remove'])->middleware('role:khach_hang')->name('giohang.remove');

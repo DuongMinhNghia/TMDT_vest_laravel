@@ -61,8 +61,45 @@ class DonHangController extends Controller
 
         $donHang = HoaDon::where('khach_hang_id', $khachHang->id)->findOrFail($id);
         abort_unless($donHang->phuong_thuc_thanh_toan === 'Chuyển khoản QR', 404);
+        abort_unless(
+            $donHang->trang_thai === HoaDon::CHO_XU_LY,
+            409,
+            'Đơn hàng này không còn ở trạng thái chờ thanh toán.'
+        );
 
-        return view('thanhtoan_qr', compact('donHang'));
+        $bankId = trim((string) config('services.manual_transfer.bank_id', ''));
+        $bankName = trim((string) config('services.manual_transfer.bank_name', ''));
+        $accountNumber = trim((string) config('services.manual_transfer.account_number', ''));
+        $accountName = trim((string) config('services.manual_transfer.account_name', ''));
+        $divisorConfig = config('services.manual_transfer.demo_divisor', 1);
+        $divisorValid = filter_var($divisorConfig, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        $paymentConfigValid = $bankId !== '' && $bankName !== '' && $accountNumber !== ''
+            && $accountName !== '' && $divisorValid !== false;
+
+        $heSoDemo = $divisorValid === false ? 1 : (int) $divisorValid;
+        if (app()->environment('production')
+            && !config('services.manual_transfer.allow_demo_in_production', false)) {
+            $heSoDemo = 1;
+        }
+
+        $soTienDon = (int) $donHang->tong_tien;
+        $soTien = (int) ceil($soTienDon / $heSoDemo);
+        $qrUrl = null;
+
+        if ($paymentConfigValid) {
+            $query = http_build_query([
+                'amount' => $soTien,
+                'addInfo' => $donHang->ma_don_hang,
+                'accountName' => $accountName,
+            ], '', '&', PHP_QUERY_RFC3986);
+            $qrUrl = 'https://img.vietqr.io/image/' . rawurlencode($bankId)
+                . '-' . rawurlencode($accountNumber) . '-compact2.png?' . $query;
+        }
+
+        return view('thanhtoan_qr', compact(
+            'donHang', 'bankId', 'bankName', 'accountNumber', 'accountName',
+            'soTienDon', 'soTien', 'heSoDemo', 'qrUrl', 'paymentConfigValid'
+        ));
     }
 
     public function huy($id)

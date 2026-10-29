@@ -20,7 +20,9 @@ class ChiTietGioHang extends Model
 
     public function sanPham()
     {
-        return $this->belongsTo(SanPham::class, 'san_pham_id');
+        // Keep discontinued products visible in the cart so the customer can
+        // see why they cannot be purchased and explicitly remove them.
+        return $this->belongsTo(SanPham::class, 'san_pham_id')->withTrashed();
     }
 
     public function size()

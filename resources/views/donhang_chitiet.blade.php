@@ -325,6 +325,8 @@
                 <div style="color:#94A3B8; font-size:0.86rem; line-height:2;">
                     <div>Ngày đặt: <strong style="color:#F1F5F9;">{{ $donHang->ngay_dat->format('d/m/Y H:i') }}</strong></div>
                     <div>Thanh toán: <strong style="color:#F1F5F9;">{{ $donHang->phuong_thuc_thanh_toan }}</strong></div>
+                    <div>Người nhận: <strong style="color:#F1F5F9;">{{ $donHang->ten_nguoi_nhan ?? $donHang->khachHang->ho_ten ?? 'N/A' }}</strong></div>
+                    @if($donHang->so_dien_thoai_nhan)<div>Điện thoại: <span style="color:#F1F5F9;">{{ $donHang->so_dien_thoai_nhan }}</span></div>@endif
                     <div>Giao đến: <span style="color:#F1F5F9;">{{ $donHang->dia_chi_giao_hang }}</span></div>
                     @if($donHang->ghi_chu)<div>Ghi chú: <span style="color:#CBD5E1;">"{{ $donHang->ghi_chu }}"</span></div>@endif
                     @if($laNhanSu)

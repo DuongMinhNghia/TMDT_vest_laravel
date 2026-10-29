@@ -9,6 +9,9 @@ use App\Models\KhachHang;
 use App\Models\HangThanhVien;
 use App\Models\SoDoKhachHang;
 use App\Rules\StrongPassword;
+use App\Services\VietnamAddressService;
+use Illuminate\Support\Facades\Validator;
+use RuntimeException;
 
 class KhachHangDashboardController extends Controller
 {
@@ -38,7 +41,7 @@ class KhachHangDashboardController extends Controller
     /**
      * Dashboard tập trung: Thẻ VIP, Số đo, Lịch hẹn, Lịch sử mua
      */
-    public function index()
+    public function index(VietnamAddressService $addresses)
     {
         $khachHang = $this->getKhachHangHienTai()->load([
             'hangThanhVien',
@@ -49,25 +52,65 @@ class KhachHangDashboardController extends Controller
 
         $tienDo = $khachHang->tienDoThangHang();
         $cacHang = HangThanhVien::orderBy('diem_toi_thieu', 'asc')->get();
+        try {
+            $tinhThanhs = $addresses->provinces();
+            $loiDuLieuDiaChi = null;
+        } catch (RuntimeException $e) {
+            $tinhThanhs = [];
+            $loiDuLieuDiaChi = $e->getMessage();
+        }
 
-        return view('khachhang_dashboard', compact('khachHang', 'tienDo', 'cacHang'));
+        return view('khachhang_dashboard', compact(
+            'khachHang', 'tienDo', 'cacHang', 'tinhThanhs', 'loiDuLieuDiaChi'
+        ));
     }
 
     /**
      * Cập nhật thông tin cá nhân
      */
-    public function capNhatThongTin(Request $request)
+    public function capNhatThongTin(Request $request, VietnamAddressService $addresses)
     {
         $khachHang = $this->getKhachHangHienTai();
         $doiMatKhau = $request->filled('current_password')
             || $request->filled('password')
             || $request->filled('password_confirmation');
 
-        $request->validate([
-            'ho_ten'        => 'required|string|max:100',
-            'so_dien_thoai' => 'nullable|string|max:15',
-            'dia_chi'       => 'nullable|string|max:255',
+        $request->merge([
+            'ho_ten' => preg_replace('/\s+/u', ' ', trim((string) $request->ho_ten)),
+            'so_dien_thoai' => preg_replace('/[\s\.\-\(\)]+/', '', trim((string) $request->so_dien_thoai)),
+            'tinh_thanh_code' => trim((string) $request->tinh_thanh_code),
+            'phuong_xa_code' => trim((string) $request->phuong_xa_code),
+            'ten_duong' => preg_replace('/\s+/u', ' ', trim((string) $request->ten_duong)),
+            'dia_chi_chi_tiet' => preg_replace('/\s+/u', ' ', trim((string) $request->dia_chi_chi_tiet)),
         ]);
+
+        $validator = Validator::make($request->all(), [
+            'ho_ten'        => 'required|string|max:100',
+            'so_dien_thoai' => ['nullable', 'regex:/^0(?:3|5|7|8|9)\d{8}$/'],
+            'tinh_thanh_code' => ['nullable', 'required_with:phuong_xa_code,ten_duong,dia_chi_chi_tiet', 'string', 'max:10'],
+            'phuong_xa_code' => ['nullable', 'required_with:tinh_thanh_code,ten_duong,dia_chi_chi_tiet', 'string', 'max:10'],
+            'ten_duong' => ['nullable', 'required_with:tinh_thanh_code,phuong_xa_code,dia_chi_chi_tiet', 'string', 'min:2', 'max:150'],
+            'google_place_id' => ['nullable', 'string', 'max:255'],
+            'dia_chi_chi_tiet' => ['nullable', 'required_with:tinh_thanh_code,phuong_xa_code,ten_duong', 'string', 'min:2', 'max:200'],
+        ], [
+            'so_dien_thoai.regex' => 'Số điện thoại không hợp lệ.',
+            'tinh_thanh_code.required_with' => 'Vui lòng chọn Tỉnh/Thành phố.',
+            'phuong_xa_code.required_with' => 'Vui lòng chọn Phường/Xã.',
+            'ten_duong.required_with' => 'Vui lòng chọn hoặc nhập tên đường.',
+            'dia_chi_chi_tiet.required_with' => 'Vui lòng nhập số nhà, tòa nhà, thôn hoặc ấp.',
+        ]);
+
+        $resolved = null;
+        $validator->after(function ($validator) use ($request, $addresses, &$resolved) {
+            if (!$request->filled('tinh_thanh_code') || !$request->filled('phuong_xa_code')) {
+                return;
+            }
+            $resolved = $addresses->resolve($request->tinh_thanh_code, $request->phuong_xa_code);
+            if (!$resolved) {
+                $validator->errors()->add('phuong_xa_code', 'Phường/Xã không thuộc Tỉnh/Thành phố đã chọn.');
+            }
+        });
+        $validator->validate();
 
         if ($doiMatKhau) {
             $request->validate([
@@ -89,9 +132,27 @@ class KhachHangDashboardController extends Controller
             Auth::user()->update(['password' => $request->password]);
         }
 
-        $khachHang->update($request->only([
-            'ho_ten', 'so_dien_thoai', 'dia_chi'
-        ]));
+        $profileData = $request->only([
+            'ho_ten', 'so_dien_thoai', 'tinh_thanh_code', 'phuong_xa_code',
+            'ten_duong', 'google_place_id', 'dia_chi_chi_tiet',
+        ]);
+        if ($resolved) {
+            $profileData['dia_chi'] = implode(', ', [
+                $request->dia_chi_chi_tiet,
+                $request->ten_duong,
+                $resolved['ward']['name'],
+                $resolved['province']['name'],
+            ]);
+        } elseif (!$request->filled('tinh_thanh_code')) {
+            unset(
+                $profileData['tinh_thanh_code'],
+                $profileData['phuong_xa_code'],
+                $profileData['ten_duong'],
+                $profileData['google_place_id'],
+                $profileData['dia_chi_chi_tiet'],
+            );
+        }
+        $khachHang->update($profileData);
 
         return back()->with('success', $doiMatKhau
             ? 'Cập nhật thông tin và mật khẩu thành công!'

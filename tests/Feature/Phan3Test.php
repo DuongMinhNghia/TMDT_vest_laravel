@@ -20,6 +20,22 @@ class Phan3Test extends TestCase
     private function khach(): TaiKhoan { return TaiKhoan::where('email', 'khachhang@gmail.com')->first(); }
     private function admin(): TaiKhoan { return TaiKhoan::where('email', 'admin@gmail.com')->first(); }
     private function ton(int $sp, string $size): int { return Size::where('san_pham_id', $sp)->where('ten_size', $size)->value('so_luong_ton'); }
+    private function checkoutData(string $method = 'COD'): array
+    {
+        $addresses = app(\App\Services\VietnamAddressService::class);
+        $province = $addresses->provinces()[0];
+        $ward = $addresses->wards($province['code'])[0];
+
+        return [
+            'ten_nguoi_nhan' => 'Nguyễn Văn An',
+            'so_dien_thoai_nhan' => '0912345678',
+            'tinh_thanh_code' => $province['code'],
+            'phuong_xa_code' => $ward['code'],
+            'ten_duong' => 'Phố Nguyễn Trãi',
+            'dia_chi_chi_tiet' => 'Số 125',
+            'phuong_thuc' => $method,
+        ];
+    }
 
     public function test_toan_bo_luong_mua_hang(): void
     {
@@ -47,7 +63,7 @@ class Phan3Test extends TestCase
         $this->actingAs($khach)->get('/gio-hang')->assertOk()->assertSee('Vest 2 mảnh đen cổ điển');
 
         // 3. Checkout -> trừ kho, tạo đơn
-        $res = $this->actingAs($khach)->post('/gio-hang/checkout', ['dia_chi' => '1 Lê Lợi', 'phuong_thuc' => 'COD']);
+        $res = $this->actingAs($khach)->post('/gio-hang/checkout', $this->checkoutData());
         $hd  = HoaDon::first();
         $res->assertRedirect(route('donhang.chitiet', $hd->id));
         $this->assertEquals($tonM - 2, $this->ton(1, 'M'));
@@ -69,7 +85,7 @@ class Phan3Test extends TestCase
 
         // 6. Đơn mới -> admin duyệt theo luồng
         $this->actingAs($khach)->post('/gio-hang/them', ['id' => 1, 'size' => 'M']);
-        $this->actingAs($khach)->post('/gio-hang/checkout', ['dia_chi' => '1 Lê Lợi', 'phuong_thuc' => 'COD']);
+        $this->actingAs($khach)->post('/gio-hang/checkout', $this->checkoutData());
         $hd2 = HoaDon::latest('id')->first();
         $admin = $this->admin();
 
@@ -108,7 +124,7 @@ class Phan3Test extends TestCase
 
         $this->actingAs($khach)->post('/gio-hang/them', ['id' => 4, 'size' => 'M']); // 4.500.000, không sale
         $this->actingAs($khach)->get('/gio-hang')->assertOk()->assertSee('Ưu đãi hạng');
-        $this->actingAs($khach)->post('/gio-hang/checkout', ['dia_chi' => 'x', 'phuong_thuc' => 'COD']);
+        $this->actingAs($khach)->post('/gio-hang/checkout', $this->checkoutData());
 
         $hd = HoaDon::first();
         $gia = (int) \App\Models\SanPham::find(4)->gia_khuyen_mai;
@@ -127,7 +143,7 @@ class Phan3Test extends TestCase
     {
         $khach = $this->khach();
         $this->actingAs($khach)->post('/gio-hang/them', ['id' => 1, 'size' => 'M']);
-        $this->actingAs($khach)->post('/gio-hang/checkout', ['dia_chi' => 'x', 'phuong_thuc' => 'COD']);
+        $this->actingAs($khach)->post('/gio-hang/checkout', $this->checkoutData());
         $hd = HoaDon::first();
         foreach (['Đang may/gói', 'Đang giao', 'Hoàn Thành'] as $tt) {
             $this->actingAs($this->admin())->post("/don-hang/{$hd->id}/cap-nhat", ['trang_thai' => $tt]);
