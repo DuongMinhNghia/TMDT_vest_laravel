@@ -80,24 +80,20 @@ class KhachHangDashboardController extends Controller
             'so_dien_thoai' => preg_replace('/[\s\.\-\(\)]+/', '', trim((string) $request->so_dien_thoai)),
             'tinh_thanh_code' => trim((string) $request->tinh_thanh_code),
             'phuong_xa_code' => trim((string) $request->phuong_xa_code),
-            'ten_duong' => preg_replace('/\s+/u', ' ', trim((string) $request->ten_duong)),
             'dia_chi_chi_tiet' => preg_replace('/\s+/u', ' ', trim((string) $request->dia_chi_chi_tiet)),
         ]);
 
         $validator = Validator::make($request->all(), [
             'ho_ten'        => 'required|string|max:100',
             'so_dien_thoai' => ['nullable', 'regex:/^0(?:3|5|7|8|9)\d{8}$/'],
-            'tinh_thanh_code' => ['nullable', 'required_with:phuong_xa_code,ten_duong,dia_chi_chi_tiet', 'string', 'max:10'],
-            'phuong_xa_code' => ['nullable', 'required_with:tinh_thanh_code,ten_duong,dia_chi_chi_tiet', 'string', 'max:10'],
-            'ten_duong' => ['nullable', 'required_with:tinh_thanh_code,phuong_xa_code,dia_chi_chi_tiet', 'string', 'min:2', 'max:150'],
-            'google_place_id' => ['nullable', 'string', 'max:255'],
-            'dia_chi_chi_tiet' => ['nullable', 'required_with:tinh_thanh_code,phuong_xa_code,ten_duong', 'string', 'min:2', 'max:200'],
+            'tinh_thanh_code' => ['nullable', 'required_with:phuong_xa_code,dia_chi_chi_tiet', 'string', 'max:10'],
+            'phuong_xa_code' => ['nullable', 'required_with:tinh_thanh_code,dia_chi_chi_tiet', 'string', 'max:10'],
+            'dia_chi_chi_tiet' => ['nullable', 'required_with:tinh_thanh_code,phuong_xa_code', 'string', 'min:2', 'max:200'],
         ], [
             'so_dien_thoai.regex' => 'Số điện thoại không hợp lệ.',
             'tinh_thanh_code.required_with' => 'Vui lòng chọn Tỉnh/Thành phố.',
             'phuong_xa_code.required_with' => 'Vui lòng chọn Phường/Xã.',
-            'ten_duong.required_with' => 'Vui lòng chọn hoặc nhập tên đường.',
-            'dia_chi_chi_tiet.required_with' => 'Vui lòng nhập số nhà, tòa nhà, thôn hoặc ấp.',
+            'dia_chi_chi_tiet.required_with' => 'Vui lòng nhập số nhà, tên đường và địa chỉ cụ thể.',
         ]);
 
         $resolved = null;
@@ -134,12 +130,11 @@ class KhachHangDashboardController extends Controller
 
         $profileData = $request->only([
             'ho_ten', 'so_dien_thoai', 'tinh_thanh_code', 'phuong_xa_code',
-            'ten_duong', 'google_place_id', 'dia_chi_chi_tiet',
+            'dia_chi_chi_tiet',
         ]);
         if ($resolved) {
             $profileData['dia_chi'] = implode(', ', [
                 $request->dia_chi_chi_tiet,
-                $request->ten_duong,
                 $resolved['ward']['name'],
                 $resolved['province']['name'],
             ]);
@@ -147,8 +142,6 @@ class KhachHangDashboardController extends Controller
             unset(
                 $profileData['tinh_thanh_code'],
                 $profileData['phuong_xa_code'],
-                $profileData['ten_duong'],
-                $profileData['google_place_id'],
                 $profileData['dia_chi_chi_tiet'],
             );
         }

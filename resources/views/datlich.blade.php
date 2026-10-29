@@ -2,6 +2,55 @@
 
 @section('title', 'Đặt Lịch Trải Nghiệm Showroom - Kingsman Vietnam')
 
+@section('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<style>
+    .flatpickr-calendar {
+        background: #181B24;
+        border: 1px solid rgba(212, 178, 111, 0.35);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        color: #F1F5F9;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .flatpickr-months .flatpickr-month,
+    .flatpickr-current-month .flatpickr-monthDropdown-months,
+    .flatpickr-current-month input.cur-year,
+    .flatpickr-time input,
+    .flatpickr-time .flatpickr-am-pm {
+        background: #181B24;
+        color: #F1F5F9;
+    }
+    span.flatpickr-weekday,
+    .flatpickr-day {
+        color: #CBD5E1;
+    }
+    .flatpickr-day:hover,
+    .flatpickr-day:focus {
+        background: rgba(212, 178, 111, 0.16);
+        border-color: #D4B26F;
+    }
+    .flatpickr-day.selected,
+    .flatpickr-day.selected:hover {
+        background: #D4B26F;
+        border-color: #D4B26F;
+        color: #111317;
+    }
+    .flatpickr-day.flatpickr-disabled,
+    .flatpickr-day.prevMonthDay,
+    .flatpickr-day.nextMonthDay {
+        color: #566071;
+    }
+    .flatpickr-time {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+    .flatpickr-time input:hover,
+    .flatpickr-time .flatpickr-am-pm:hover,
+    .flatpickr-time input:focus {
+        background: #202532;
+    }
+</style>
+@endsection
+
 @section('content')
 <style>
     .booking-page-wrap {
@@ -599,7 +648,17 @@
                                 <label class="field-label">Thời gian đến showroom *</label>
                                 <div class="input-icon-group">
                                     <i class="bi bi-calendar2-week-fill input-icon"></i>
-                                    <input type="datetime-local" name="thoi_gian_hen" class="form-control-custom" min="{{ date('Y-m-d\TH:i', strtotime('+1 hour')) }}" value="{{ old('thoi_gian_hen') }}" required>
+                                    <input
+                                        type="datetime-local"
+                                        id="thoi_gian_hen"
+                                        name="thoi_gian_hen"
+                                        class="form-control-custom"
+                                        value="{{ old('thoi_gian_hen') }}"
+                                        min="{{ now()->addHour()->format('Y-m-d\TH:i') }}"
+                                        placeholder="dd/mm/yyyy HH:mm"
+                                        autocomplete="off"
+                                        required
+                                    >
                                 </div>
                                 <small style="font-size: 0.76rem; color:#94A3B8; display:block; margin-top:5px;">
                                     <i class="bi bi-info-circle me-1 text-warning"></i> Giờ mở cửa: 08:30 - 21:00 tất cả các ngày trong tuần
@@ -744,4 +803,29 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/vn.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const appointmentInput = document.getElementById('thoi_gian_hen');
+        if (!appointmentInput || typeof flatpickr === 'undefined') return;
+
+        flatpickr(appointmentInput, {
+            locale: 'vn',
+            enableTime: true,
+            time_24hr: true,
+            minuteIncrement: 5,
+            minDate: new Date(Date.now() + 60 * 60 * 1000),
+            dateFormat: 'Y-m-d\\TH:i',
+            altInput: true,
+            altFormat: 'd/m/Y H:i',
+            altInputClass: 'form-control-custom',
+            allowInput: false,
+            disableMobile: true
+        });
+    });
+</script>
 @endsection

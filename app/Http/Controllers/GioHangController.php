@@ -193,7 +193,6 @@ class GioHangController extends Controller
             'ten_nguoi_nhan' => preg_replace('/\s+/u', ' ', trim((string) $request->input('ten_nguoi_nhan'))),
             'so_dien_thoai_nhan' => $this->chuanHoaSoDienThoai((string) $request->input('so_dien_thoai_nhan')),
             'dia_chi_chi_tiet' => preg_replace('/\s+/u', ' ', trim((string) $request->input('dia_chi_chi_tiet'))),
-            'ten_duong' => preg_replace('/\s+/u', ' ', trim((string) $request->input('ten_duong'))),
             'tinh_thanh_code' => trim((string) $request->input('tinh_thanh_code')),
             'phuong_xa_code' => trim((string) $request->input('phuong_xa_code')),
         ]);
@@ -204,8 +203,6 @@ class GioHangController extends Controller
             'tinh_thanh_code' => ['required', 'string', 'max:10'],
             'phuong_xa_code' => ['required', 'string', 'max:10'],
             'dia_chi_chi_tiet' => ['required', 'string', 'min:2', 'max:200'],
-            'ten_duong' => ['required', 'string', 'min:2', 'max:150'],
-            'google_place_id' => ['nullable', 'string', 'max:255'],
             'phuong_thuc' => 'required|in:COD,Chuyển khoản QR',
             'ghi_chu'     => 'nullable|string|max:500',
         ], [
@@ -220,8 +217,6 @@ class GioHangController extends Controller
             'dia_chi_chi_tiet.required' => 'Vui lòng nhập số nhà, tên đường hoặc địa chỉ giao hàng chi tiết.',
             'dia_chi_chi_tiet.min' => 'Vui lòng nhập số nhà, tòa nhà, thôn hoặc ấp cụ thể.',
             'dia_chi_chi_tiet.max' => 'Địa chỉ chi tiết không được vượt quá 200 ký tự.',
-            'ten_duong.required' => 'Vui lòng chọn hoặc nhập tên đường.',
-            'ten_duong.min' => 'Tên đường phải có ít nhất 2 ký tự.',
         ]);
 
         $diaChiHanhChinh = null;
@@ -258,7 +253,6 @@ class GioHangController extends Controller
         $data = $validator->validate();
         $data['dia_chi'] = implode(', ', [
             $data['dia_chi_chi_tiet'],
-            $data['ten_duong'],
             $diaChiHanhChinh['ward']['name'],
             $diaChiHanhChinh['province']['name'],
         ]);

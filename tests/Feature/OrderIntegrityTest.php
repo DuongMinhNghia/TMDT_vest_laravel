@@ -147,6 +147,12 @@ class OrderIntegrityTest extends TestCase
         $service->capNhatTrangThai($order->id, HoaDon::HOAN_THANH);
         $pointsAfter = (int) $customer->fresh()->diem_tich_luy;
         $this->assertGreaterThan($pointsBefore, $pointsAfter);
+        $this->assertSame(HoaDon::DA_THANH_TOAN, $order->fresh()->trang_thai_thanh_toan);
+        $this->assertNotNull($order->fresh()->thanh_toan_luc);
+        $this->assertDatabaseHas('lich_su_thanh_toans', [
+            'hoa_don_id' => $order->id,
+            'trang_thai_moi' => HoaDon::DA_THANH_TOAN,
+        ]);
 
         try {
             $service->capNhatTrangThai($order->id, HoaDon::HOAN_THANH);

@@ -8,8 +8,6 @@ use App\Models\Size;
 use App\Models\TaiKhoan;
 use App\Services\VietnamAddressService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\Client\Request;
-use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class ShippingAddressCheckoutTest extends TestCase
@@ -47,8 +45,7 @@ class ShippingAddressCheckoutTest extends TestCase
             'so_dien_thoai_nhan' => '+84 912-345-678',
             'tinh_thanh_code' => $province['code'],
             'phuong_xa_code' => $ward['code'],
-            'ten_duong' => 'Đường Nguyễn Trãi',
-            'dia_chi_chi_tiet' => '  Số 125, ngõ 8  ',
+            'dia_chi_chi_tiet' => '  Số 125, ngõ 8, đường Nguyễn Trãi  ',
             'phuong_thuc' => $paymentMethod,
             'ghi_chu' => 'Gọi trước khi giao',
         ];
@@ -64,6 +61,8 @@ class ShippingAddressCheckoutTest extends TestCase
             ->get(route('giohang.index'))
             ->assertOk()
             ->assertSee('Chọn Tỉnh / Thành phố')
+            ->assertSee('Xác Nhận Đặt Hàng')
+            ->assertSee('id="checkout-address-dialog"', false)
             ->assertSee('list="province-options"', false)
             ->assertSee('list="ward-options"', false)
             ->assertSee($province['name']);
@@ -98,7 +97,7 @@ class ShippingAddressCheckoutTest extends TestCase
         $this->assertSame((string) $payload['tinh_thanh_code'], $order->tinh_thanh_code);
         $this->assertSame((string) $payload['phuong_xa_code'], $order->phuong_xa_code);
         $this->assertSame(
-            'Số 125, ngõ 8, Đường Nguyễn Trãi, ' . $resolved['ward']['name'] . ', ' . $resolved['province']['name'],
+            'Số 125, ngõ 8, đường Nguyễn Trãi, ' . $resolved['ward']['name'] . ', ' . $resolved['province']['name'],
             $order->dia_chi_giao_hang
         );
         $this->assertSame($stockBefore - 1, (int) Size::findOrFail($item->size_id)->so_luong_ton);
@@ -206,45 +205,6 @@ class ShippingAddressCheckoutTest extends TestCase
             ->assertJson(['message' => 'Tỉnh/Thành phố không hợp lệ.']);
     }
 
-    public function test_google_street_suggestions_are_scoped_to_selected_ward_and_keep_key_server_side(): void
-    {
-        config()->set('services.google_maps.places_api_key', 'server-only-test-key');
-        $province = $this->addresses()->provinces()[0];
-        $ward = $this->addresses()->wards($province['code'])[0];
-        Http::fake([
-            'places.googleapis.com/*' => Http::response([
-                'suggestions' => [[
-                    'placePrediction' => [
-                        'placeId' => 'google-place-1',
-                        'text' => ['text' => 'Đường Nguyễn Trãi, ' . $ward['name'] . ', ' . $province['name'] . ', Việt Nam'],
-                        'structuredFormat' => [
-                            'mainText' => ['text' => 'Đường Nguyễn Trãi'],
-                            'secondaryText' => ['text' => $ward['name'] . ', ' . $province['name'] . ', Việt Nam'],
-                        ],
-                    ],
-                ]],
-            ]),
-        ]);
-        $this->actingAs($this->customer())
-            ->getJson(route('diachi.goiyduong', [
-                'q' => 'Nguyễn Trãi',
-                'tinh_thanh_code' => $province['code'],
-                'phuong_xa_code' => $ward['code'],
-                'session_token' => '550e8400-e29b-41d4-a716-446655440000',
-            ]))
-            ->assertOk()
-            ->assertJsonPath('data.0.main_text', 'Đường Nguyễn Trãi')
-            ->assertJsonMissing(['server-only-test-key']);
-
-        Http::assertSent(function (Request $request) use ($province, $ward) {
-            return $request->url() === 'https://places.googleapis.com/v1/places:autocomplete'
-                && $request->hasHeader('X-Goog-Api-Key', 'server-only-test-key')
-                && str_contains($request['input'], $ward['name'])
-                && str_contains($request['input'], $province['name'])
-                && $request['includedRegionCodes'] === ['vn'];
-        });
-    }
-
     public function test_structured_profile_address_is_saved_and_prefilled_at_checkout(): void
     {
         $province = $this->addresses()->provinces()[0];
@@ -256,18 +216,15 @@ class ShippingAddressCheckoutTest extends TestCase
             'so_dien_thoai' => '0912345678',
             'tinh_thanh_code' => $province['code'],
             'phuong_xa_code' => $ward['code'],
-            'ten_duong' => 'Đường Nguyễn Trãi',
-            'google_place_id' => 'google-place-1',
-            'dia_chi_chi_tiet' => 'Số 125, ngõ 8',
+            'dia_chi_chi_tiet' => 'Số 125, ngõ 8, đường Nguyễn Trãi',
         ])->assertSessionHas('success');
 
         $profile = $customer->khachHang->fresh();
         $this->assertSame((string) $province['code'], $profile->tinh_thanh_code);
         $this->assertSame((string) $ward['code'], $profile->phuong_xa_code);
-        $this->assertSame('Đường Nguyễn Trãi', $profile->ten_duong);
-        $this->assertSame('Số 125, ngõ 8', $profile->dia_chi_chi_tiet);
+        $this->assertSame('Số 125, ngõ 8, đường Nguyễn Trãi', $profile->dia_chi_chi_tiet);
         $this->assertSame(
-            'Số 125, ngõ 8, Đường Nguyễn Trãi, ' . $ward['name'] . ', ' . $province['name'],
+            'Số 125, ngõ 8, đường Nguyễn Trãi, ' . $ward['name'] . ', ' . $province['name'],
             $profile->dia_chi
         );
 
@@ -282,7 +239,7 @@ class ShippingAddressCheckoutTest extends TestCase
             ->get(route('giohang.index'))
             ->assertOk()
             ->assertSee('Đã tự động dùng địa chỉ trong hồ sơ')
-            ->assertSee('value="Đường Nguyễn Trãi"', false)
+            ->assertSee('Số 125, ngõ 8, đường Nguyễn Trãi')
             ->assertSee('value="' . $ward['code'] . '"', false);
     }
 }

@@ -269,7 +269,7 @@
     }
 
     .summary-body {
-        padding: 22px;
+        padding: 22px 22px 14px;
     }
 
     .summary-row {
@@ -363,6 +363,204 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(212, 178, 111, 0.35);
         color: #000;
+    }
+
+    .btn-checkout:disabled {
+        opacity: 0.48;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .checkout-dialog {
+        width: min(720px, calc(100vw - 28px));
+        max-height: min(90vh, 860px);
+        padding: 0;
+        overflow-y: auto;
+        background: #141720;
+        color: #F1F5F9;
+        border: 1px solid rgba(212, 178, 111, 0.38);
+        border-radius: 16px;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.72);
+    }
+
+    .checkout-dialog:not([open]) {
+        display: none;
+    }
+
+    .checkout-dialog[open] {
+        position: fixed;
+        inset: 50% auto auto 50%;
+        margin: 0;
+        transform: translate(-50%, -50%);
+    }
+
+    .checkout-dialog::backdrop {
+        background: rgba(3, 5, 9, 0.78);
+        backdrop-filter: blur(4px);
+    }
+
+    .checkout-dialog-header {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 22px;
+        background: #181B24;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .checkout-dialog-title {
+        margin: 0;
+        color: #D4B26F;
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .checkout-dialog-close {
+        flex: 0 0 auto;
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: transparent;
+        color: #CBD5E1;
+        font-size: 1.25rem;
+        cursor: pointer;
+    }
+
+    .checkout-dialog-close:hover {
+        color: #D4B26F;
+        border-color: #D4B26F;
+        background: rgba(212, 178, 111, 0.08);
+    }
+
+    .checkout-dialog-form {
+        padding: 4px 24px 24px;
+    }
+
+    .profile-address-card {
+        display: grid;
+        grid-template-columns: 46px minmax(0, 1fr);
+        gap: 14px;
+        margin: 18px 0 6px;
+        padding: 16px;
+        background: linear-gradient(135deg, rgba(212, 178, 111, 0.11), rgba(24, 27, 36, 0.92));
+        border: 1px solid rgba(212, 178, 111, 0.38);
+        border-radius: 12px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    }
+
+    .profile-address-icon {
+        width: 46px;
+        height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: rgba(212, 178, 111, 0.16);
+        border: 1px solid rgba(212, 178, 111, 0.32);
+        color: #D4B26F;
+        font-size: 1.25rem;
+    }
+
+    .profile-address-heading {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 7px;
+    }
+
+    .profile-address-label {
+        color: #D4B26F;
+        font-size: 0.88rem;
+        font-weight: 700;
+    }
+
+    .profile-address-status {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(16, 185, 129, 0.12);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #34D399;
+        font-size: 0.7rem;
+        font-weight: 700;
+    }
+
+    .profile-address-text {
+        margin: 0;
+        color: #F1F5F9;
+        font-size: 0.9rem;
+        line-height: 1.55;
+        font-style: normal;
+    }
+
+    .profile-address-recipient {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 12px;
+        margin-top: 9px;
+        padding-top: 9px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+        color: #94A3B8;
+        font-size: 0.76rem;
+    }
+
+    .profile-address-recipient i {
+        color: #D4B26F;
+        margin-right: 4px;
+    }
+
+    body:has(.checkout-dialog[open]) {
+        overflow: hidden;
+    }
+
+    @media (max-width: 575.98px) {
+        .checkout-dialog {
+            width: calc(100vw - 16px);
+            max-height: calc(100vh - 16px);
+            border-radius: 12px;
+        }
+
+        .checkout-dialog-header {
+            padding: 15px 16px;
+        }
+
+        .checkout-dialog-form {
+            padding: 2px 16px 18px;
+        }
+
+        .profile-address-card {
+            grid-template-columns: 38px minmax(0, 1fr);
+            gap: 11px;
+            padding: 13px;
+        }
+
+        .profile-address-icon {
+            width: 38px;
+            height: 38px;
+            font-size: 1rem;
+        }
+
+        .profile-address-heading {
+            display: block;
+        }
+
+        .profile-address-status {
+            margin-top: 6px;
+        }
     }
 
     /* TRẠNG THÁI GIỎ HÀNG TRỐNG */
@@ -639,15 +837,50 @@
                     </div>
                     @endif
 
-                    <form method="POST" action="{{ route('giohang.checkout') }}" style="margin-top:16px;">
-                        @csrf
-                        @if($khachHang->tinh_thanh_code && $khachHang->phuong_xa_code && $khachHang->ten_duong && $khachHang->dia_chi_chi_tiet)
-                        <div class="payment-detail" style="padding:12px;margin-bottom:10px;">
-                            <div class="d-flex gap-2 align-items-start" style="color:#CBD5E1;font-size:0.82rem;">
-                                <i class="bi bi-check-circle-fill mt-1" style="color:#10B981;"></i>
-                                <span><strong style="color:#D4B26F;">Đã tự động dùng địa chỉ trong hồ sơ</strong><br>{{ $khachHang->dia_chi }}</span>
+                    <button
+                        type="button"
+                        id="open-checkout-dialog"
+                        class="btn-checkout"
+                        {{ ($coSanPhamKhongKhaDung || $loiDuLieuDiaChi) ? 'disabled' : '' }}
+                    >
+                        <i class="bi bi-bag-check-fill me-2"></i> Xác Nhận Đặt Hàng
+                    </button>
+
+                    <dialog id="checkout-address-dialog" class="checkout-dialog" aria-labelledby="checkout-dialog-title">
+                        <div class="checkout-dialog-header">
+                            <div>
+                                <h2 id="checkout-dialog-title" class="checkout-dialog-title">Thông Tin Nhận Hàng</h2>
+                                <small style="color:#94A3B8;">Kiểm tra địa chỉ trước khi hoàn tất đơn hàng</small>
                             </div>
+                            <button type="button" id="close-checkout-dialog" class="checkout-dialog-close" aria-label="Đóng form đặt hàng">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
                         </div>
+
+                    <form method="POST" action="{{ route('giohang.checkout') }}" class="checkout-dialog-form">
+                        @csrf
+                        @if($khachHang->tinh_thanh_code && $khachHang->phuong_xa_code && $khachHang->dia_chi_chi_tiet)
+                        <section class="profile-address-card" aria-label="Địa chỉ giao hàng mặc định">
+                            <div class="profile-address-icon" aria-hidden="true">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+                            <div>
+                                <div class="profile-address-heading">
+                                    <div>
+                                        <div class="profile-address-label">Địa chỉ mặc định trong hồ sơ</div>
+                                        <small style="color:#94A3B8;">Đã tự động dùng địa chỉ trong hồ sơ</small>
+                                    </div>
+                                    <span class="profile-address-status"><i class="bi bi-check-circle-fill"></i> Đang sử dụng</span>
+                                </div>
+                                <address class="profile-address-text">{{ $khachHang->dia_chi }}</address>
+                                <div class="profile-address-recipient">
+                                    <span><i class="bi bi-person-fill"></i>{{ $khachHang->ho_ten }}</span>
+                                    @if($khachHang->so_dien_thoai)
+                                    <span><i class="bi bi-telephone-fill"></i>{{ $khachHang->so_dien_thoai }}</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </section>
                         @endif
                         <label class="form-label-summary" for="ten_nguoi_nhan">Tên người nhận *</label>
                         <input id="ten_nguoi_nhan" type="text" name="ten_nguoi_nhan" required minlength="2" maxlength="100"
@@ -684,22 +917,11 @@
                         <div id="ward-error" class="text-danger small mb-2" style="display:none;"></div>
                         @error('phuong_xa_code')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
 
-                        <label class="form-label-summary" for="ten_duong">Tên đường *</label>
-                        <div style="position:relative;">
-                            <input id="ten_duong" type="text" name="ten_duong" required minlength="2" maxlength="150"
-                                class="form-input-summary @error('ten_duong') is-invalid @enderror"
-                                value="{{ old('ten_duong', $khachHang->ten_duong) }}" autocomplete="off"
-                                placeholder="Nhập để tìm tên đường trong Phường/Xã đã chọn">
-                            <input id="google_place_id" type="hidden" name="google_place_id" value="{{ old('google_place_id', $khachHang->google_place_id) }}">
-                            <div id="street-suggestions" style="display:none;position:absolute;z-index:20;left:0;right:0;top:100%;background:#181B24;border:1px solid rgba(212,178,111,.35);border-radius:8px;max-height:240px;overflow:auto;"></div>
-                        </div>
-                        <small id="street-help" class="d-block mt-1" style="color:#94A3B8;font-size:.72rem;">Chọn Phường/Xã trước, sau đó nhập ít nhất 2 ký tự. Có thể nhập thủ công nếu không có gợi ý phù hợp.</small>
-                        @error('ten_duong')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
-
                         <label class="form-label-summary" for="dia_chi_chi_tiet">Địa chỉ chi tiết *</label>
-                        <textarea id="dia_chi_chi_tiet" name="dia_chi_chi_tiet" rows="2" required minlength="2" maxlength="200"
+                        <textarea id="dia_chi_chi_tiet" name="dia_chi_chi_tiet" rows="3" required minlength="2" maxlength="200"
                             class="form-input-summary @error('dia_chi_chi_tiet') is-invalid @enderror"
-                            placeholder="Nhập số nhà, tòa nhà, thôn hoặc ấp..." autocomplete="street-address">{{ old('dia_chi_chi_tiet', $khachHang->dia_chi_chi_tiet) }}</textarea>
+                            placeholder="VD: 306/6 Đặng Thùy Trâm, tòa nhà A..." autocomplete="street-address">{{ old('dia_chi_chi_tiet', $khachHang->dia_chi_chi_tiet) }}</textarea>
+                        <small class="d-block mt-1" style="color:#94A3B8;font-size:.72rem;">Nhập số nhà, tên đường, tòa nhà, thôn hoặc ấp cụ thể.</small>
                         @error('dia_chi_chi_tiet')<div class="text-danger small mb-2">{{ $message }}</div>@enderror
 
                         <label class="form-label-summary">Phương thức thanh toán *</label>
@@ -715,6 +937,7 @@
                             <i class="bi bi-bag-check-fill me-2"></i> Hoàn Tất Đặt Hàng
                         </button>
                     </form>
+                    </dialog>
                 </div>
             </div>
         </div>
@@ -724,6 +947,27 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const checkoutDialog = document.getElementById('checkout-address-dialog');
+    const openCheckoutDialog = document.getElementById('open-checkout-dialog');
+    const closeCheckoutDialog = document.getElementById('close-checkout-dialog');
+
+    function showCheckoutDialog() {
+        if (!checkoutDialog || checkoutDialog.open) return;
+        checkoutDialog.showModal();
+    }
+
+    openCheckoutDialog?.addEventListener('click', showCheckoutDialog);
+    closeCheckoutDialog?.addEventListener('click', function () {
+        checkoutDialog?.close();
+    });
+    checkoutDialog?.addEventListener('click', function (event) {
+        if (event.target === checkoutDialog) checkoutDialog.close();
+    });
+
+    @if($errors->any())
+    showCheckoutDialog();
+    @endif
+
     const province = document.getElementById('tinh_thanh_code');
     const ward = document.getElementById('phuong_xa_code');
     if (!province || !ward) return;
@@ -735,13 +979,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const wardDatalist = document.getElementById('ward-options');
     const selectedWard = ward.dataset.selected || '';
     const endpoint = @json(route('giohang.phuongxa'));
-    const streetEndpoint = @json(route('diachi.goiyduong'));
-    const street = document.getElementById('ten_duong');
-    const placeId = document.getElementById('google_place_id');
-    const suggestions = document.getElementById('street-suggestions');
-    const streetHelp = document.getElementById('street-help');
-    const sessionToken = window.crypto?.randomUUID ? window.crypto.randomUUID() : '00000000-0000-4000-8000-' + String(Date.now()).padStart(12, '0').slice(-12);
-    let streetTimer;
     const provinceOptions = Array.from(province.options).slice(1).map(option => ({ value: option.value, text: option.textContent }));
     let wardOptions = [];
 
@@ -810,52 +1047,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (initialProvince) provinceCombobox.value = initialProvince.text;
     if (province.value) loadWards(true);
 
-    street?.addEventListener('input', function () {
-        placeId.value = '';
-        suggestions.style.display = 'none';
-        clearTimeout(streetTimer);
-        if (street.value.trim().length < 2 || !province.value || !ward.value) return;
-        streetTimer = setTimeout(async function () {
-            try {
-                const params = new URLSearchParams({
-                    q: street.value.trim(), tinh_thanh_code: province.value,
-                    phuong_xa_code: ward.value, session_token: sessionToken
-                });
-                const response = await fetch(streetEndpoint + '?' + params, { headers: { Accept: 'application/json' } });
-                const payload = await response.json();
-                if (!response.ok) throw new Error(payload.message || 'Không thể tải gợi ý tên đường.');
-                suggestions.innerHTML = '';
-                payload.data.forEach(function (item) {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    button.style.cssText = 'display:block;width:100%;padding:9px 12px;text-align:left;background:transparent;color:#F1F5F9;border:0;border-bottom:1px solid rgba(255,255,255,.06);';
-                    button.innerHTML = '<strong></strong><small style="display:block;color:#94A3B8"></small>';
-                    button.querySelector('strong').textContent = item.main_text;
-                    button.querySelector('small').textContent = item.secondary_text;
-                    button.addEventListener('click', function () {
-                        street.value = item.main_text;
-                        placeId.value = item.place_id;
-                        suggestions.style.display = 'none';
-                    });
-                    suggestions.appendChild(button);
-                });
-                if (payload.data.length) {
-                    const attribution = document.createElement('div');
-                    attribution.textContent = 'Gợi ý bởi Google';
-                    attribution.style.cssText = 'padding:7px 12px;text-align:right;color:#94A3B8;font-size:.7rem;';
-                    suggestions.appendChild(attribution);
-                    suggestions.style.display = 'block';
-                }
-                streetHelp.textContent = 'Có thể chọn gợi ý hoặc tiếp tục nhập thủ công.';
-            } catch (exception) {
-                streetHelp.textContent = exception.message + ' Bạn vẫn có thể nhập tên đường thủ công.';
-            }
-        }, 350);
-    });
-
-    document.addEventListener('click', function (event) {
-        if (suggestions && !suggestions.contains(event.target) && event.target !== street) suggestions.style.display = 'none';
-    });
 });
 </script>
 @endsection

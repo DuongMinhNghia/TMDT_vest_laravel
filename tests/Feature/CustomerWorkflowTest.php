@@ -145,6 +145,8 @@ class CustomerWorkflowTest extends TestCase
             ->post('/don-hang/' . $order->id . '/xac-nhan-nhan-hang')
             ->assertSessionHas('success');
         $this->assertSame(HoaDon::HOAN_THANH, $order->fresh()->trang_thai);
+        $this->assertSame(HoaDon::DA_THANH_TOAN, $order->fresh()->trang_thai_thanh_toan);
+        $this->assertNotNull($order->fresh()->thanh_toan_luc);
 
         $other = $this->otherCustomer();
         $otherOrder = HoaDon::create([

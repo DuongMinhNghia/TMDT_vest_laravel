@@ -94,8 +94,7 @@ class DiscontinuedCartProductTest extends TestCase
                 'phuong_xa_code' => app(\App\Services\VietnamAddressService::class)->wards(
                     app(\App\Services\VietnamAddressService::class)->provinces()[0]['code']
                 )[0]['code'],
-                'ten_duong' => 'Phố Nguyễn Trãi',
-                'dia_chi_chi_tiet' => 'Số 125',
+                'dia_chi_chi_tiet' => 'Số 125, phố Nguyễn Trãi',
                 'phuong_thuc' => 'COD',
             ])
             ->assertRedirect(route('giohang.index'))

@@ -7,6 +7,7 @@ use App\Models\HangThanhVien;
 use App\Models\HoaDon;
 use App\Models\ChiTietHoaDon;
 use App\Models\KhachHang;
+use App\Models\LichSuThanhToan;
 use App\Models\NhanVien;
 use App\Models\Size;
 use Illuminate\Support\Facades\DB;
@@ -181,6 +182,7 @@ class DonHangService
                 $this->hoanKho($hoaDon);
             }
             if ($trangThaiMoi === HoaDon::HOAN_THANH) {
+                $this->danhDauDaThanhToanKhiHoanThanh($hoaDon, $nhanVien?->tai_khoan_id);
                 $this->congDiemVaThangHang($hoaDon);
             }
 
@@ -226,6 +228,7 @@ class DonHangService
             }
 
             $hoaDon->update(['trang_thai' => HoaDon::HOAN_THANH]);
+            $this->danhDauDaThanhToanKhiHoanThanh($hoaDon, $khachHang->tai_khoan_id);
             $this->congDiemVaThangHang($hoaDon);
 
             return $hoaDon;
@@ -237,6 +240,37 @@ class DonHangService
         foreach ($hoaDon->chiTiets as $ct) {
             Size::whereKey($ct->size_id)->increment('so_luong_ton', $ct->so_luong);
         }
+    }
+
+    /**
+     * Hoàn thành đơn đồng nghĩa cửa hàng đã thu tiền (QR hoặc COD).
+     * Thao tác này chạy trong transaction cập nhật đơn và không ghi lịch sử lặp.
+     */
+    private function danhDauDaThanhToanKhiHoanThanh(HoaDon $hoaDon, ?int $taiKhoanId): void
+    {
+        if ($hoaDon->trang_thai_thanh_toan === HoaDon::DA_THANH_TOAN) {
+            return;
+        }
+
+        if ($hoaDon->trang_thai_thanh_toan === HoaDon::DA_HOAN_TIEN) {
+            throw new RuntimeException('Đơn đã hoàn tiền không thể chuyển sang hoàn thành.');
+        }
+
+        $trangThaiCu = $hoaDon->trang_thai_thanh_toan ?: HoaDon::CHUA_THANH_TOAN;
+        $hoaDon->update([
+            'trang_thai_thanh_toan' => HoaDon::DA_THANH_TOAN,
+            'thanh_toan_luc' => $hoaDon->thanh_toan_luc ?: now(),
+            'nguoi_xac_nhan_thanh_toan_id' => $hoaDon->nguoi_xac_nhan_thanh_toan_id ?: $taiKhoanId,
+        ]);
+
+        LichSuThanhToan::create([
+            'hoa_don_id' => $hoaDon->id,
+            'tai_khoan_id' => $taiKhoanId,
+            'trang_thai_cu' => $trangThaiCu,
+            'trang_thai_moi' => HoaDon::DA_THANH_TOAN,
+            'hanh_dong' => 'Hệ thống xác nhận thanh toán khi đơn hoàn thành',
+            'ghi_chu' => 'Đồng bộ tự động theo trạng thái đơn hàng.',
+        ]);
     }
 
     /**

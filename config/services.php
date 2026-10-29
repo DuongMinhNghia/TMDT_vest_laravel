@@ -44,8 +44,4 @@ return [
         'allow_demo_in_production' => env('MANUAL_TRANSFER_ALLOW_DEMO_IN_PRODUCTION', false),
     ],
 
-    'google_maps' => [
-        'places_api_key' => env('GOOGLE_MAPS_PLACES_API_KEY'),
-    ],
-
 ];

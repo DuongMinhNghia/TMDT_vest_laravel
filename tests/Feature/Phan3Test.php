@@ -31,8 +31,7 @@ class Phan3Test extends TestCase
             'so_dien_thoai_nhan' => '0912345678',
             'tinh_thanh_code' => $province['code'],
             'phuong_xa_code' => $ward['code'],
-            'ten_duong' => 'Phố Nguyễn Trãi',
-            'dia_chi_chi_tiet' => 'Số 125',
+            'dia_chi_chi_tiet' => 'Số 125, phố Nguyễn Trãi',
             'phuong_thuc' => $method,
         ];
     }
