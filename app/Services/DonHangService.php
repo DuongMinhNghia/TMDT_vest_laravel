@@ -106,6 +106,7 @@ class DonHangService
                 'trang_thai'             => HoaDon::CHO_XU_LY,
                 'tong_tien'              => $tien['thanh_toan'],
                 'phuong_thuc_thanh_toan' => $thongTin['phuong_thuc'] ?? 'COD',
+                'trang_thai_thanh_toan'  => HoaDon::CHUA_THANH_TOAN,
                 'ten_nguoi_nhan'         => $thongTin['ten_nguoi_nhan'] ?? null,
                 'so_dien_thoai_nhan'     => $thongTin['so_dien_thoai_nhan'] ?? null,
                 'tinh_thanh_code'        => $thongTin['tinh_thanh_code'] ?? null,
@@ -174,6 +175,9 @@ class DonHangService
             $hoaDon->update($duLieu);
 
             if ($trangThaiMoi === HoaDon::DA_HUY) {
+                if ($hoaDon->trang_thai_thanh_toan === HoaDon::DA_THANH_TOAN) {
+                    throw new RuntimeException('Đơn đã thanh toán không thể hủy trực tiếp. Vui lòng xử lý hoàn tiền thủ công trước.');
+                }
                 $this->hoanKho($hoaDon);
             }
             if ($trangThaiMoi === HoaDon::HOAN_THANH) {
@@ -195,6 +199,10 @@ class DonHangService
 
             if ($hoaDon->trang_thai !== HoaDon::CHO_XU_LY) {
                 throw new RuntimeException('Chỉ có thể hủy đơn khi đang ở trạng thái "Chờ xử lý".');
+            }
+
+            if ($hoaDon->trang_thai_thanh_toan === HoaDon::DA_THANH_TOAN) {
+                throw new RuntimeException('Đơn đã thanh toán không thể hủy trực tiếp. Vui lòng liên hệ cửa hàng để xử lý hoàn tiền.');
             }
 
             $hoaDon->update(['trang_thai' => HoaDon::DA_HUY]);

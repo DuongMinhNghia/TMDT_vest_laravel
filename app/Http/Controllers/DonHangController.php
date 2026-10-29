@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HoaDon;
 use App\Services\DonHangService;
+use App\Services\PaymentStatusService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use RuntimeException;
@@ -13,9 +14,10 @@ use RuntimeException;
  */
 class DonHangController extends Controller
 {
-    public function __construct(private DonHangService $donHangService)
-    {
-    }
+    public function __construct(
+        private DonHangService $donHangService,
+        private PaymentStatusService $paymentStatusService,
+    ) {}
 
     public function lichSu()
     {
@@ -34,7 +36,10 @@ class DonHangController extends Controller
 
     public function chiTiet($id)
     {
-        $donHang = HoaDon::with(['chiTiets.sanPham', 'chiTiets.size', 'khachHang.taiKhoan', 'nhanVienDuyet'])
+        $donHang = HoaDon::with([
+            'chiTiets.sanPham', 'chiTiets.size', 'khachHang.taiKhoan', 'nhanVienDuyet', 'nguoiXacNhanThanhToan',
+            'lichSuThanhToans' => fn ($query) => $query->with('taiKhoan')->latest(),
+        ])
             ->findOrFail($id);
 
         $user    = Auth::user();
@@ -47,7 +52,8 @@ class DonHangController extends Controller
         $phiShip = HoaDon::PHI_VAN_CHUYEN;
         $giamHang = max(0, $tamTinh + $phiShip - $donHang->tong_tien); // tong_tien = tạm tính - giảm hạng + ship
 
-        $coTheHuy = $laChuDon && $donHang->trang_thai === HoaDon::CHO_XU_LY;
+        $coTheHuy = $laChuDon && $donHang->trang_thai === HoaDon::CHO_XU_LY
+            && $donHang->trang_thai_thanh_toan !== HoaDon::DA_THANH_TOAN;
         $coTheXacNhanNhanHang = $laChuDon && $donHang->trang_thai === HoaDon::DANG_GIAO;
 
         return view('donhang_chitiet', compact('donHang', 'tamTinh', 'phiShip', 'giamHang', 'coTheHuy', 'coTheXacNhanNhanHang', 'laNhanSu'));
@@ -114,6 +120,22 @@ class DonHangController extends Controller
         }
 
         return redirect()->route('donhang.chitiet', $id)->with('success', 'Đã hủy đơn hàng, số lượng đã được hoàn lại kho.');
+    }
+
+    public function yeuCauXacNhanThanhToan($id)
+    {
+        $khachHang = Auth::user()?->khachHang;
+        abort_unless($khachHang, 403);
+
+        try {
+            $this->paymentStatusService->requestConfirmation((int) $id, $khachHang->id, Auth::user());
+        } catch (ModelNotFoundException $e) {
+            throw $e;
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Yêu cầu xác nhận thanh toán đã được ghi nhận. KINGSMAN sẽ kiểm tra giao dịch và cập nhật trạng thái đơn hàng.');
     }
 
     public function xacNhanNhanHang($id)

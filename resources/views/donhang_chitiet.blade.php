@@ -325,6 +325,8 @@
                 <div style="color:#94A3B8; font-size:0.86rem; line-height:2;">
                     <div>Ngày đặt: <strong style="color:#F1F5F9;">{{ $donHang->ngay_dat->format('d/m/Y H:i') }}</strong></div>
                     <div>Thanh toán: <strong style="color:#F1F5F9;">{{ $donHang->phuong_thuc_thanh_toan }}</strong></div>
+                    <div>Trạng thái đơn hàng: <strong style="color:#F1F5F9;">{{ $donHang->trang_thai }}</strong></div>
+                    <div>Trạng thái thanh toán: <strong style="color:{{ $donHang->trang_thai_thanh_toan === \App\Models\HoaDon::DA_THANH_TOAN ? '#10B981' : ($donHang->trang_thai_thanh_toan === \App\Models\HoaDon::CHO_XAC_NHAN_THANH_TOAN ? '#F59E0B' : '#EF4444') }};">{{ $donHang->trang_thai_thanh_toan }}</strong></div>
                     <div>Người nhận: <strong style="color:#F1F5F9;">{{ $donHang->ten_nguoi_nhan ?? $donHang->khachHang->ho_ten ?? 'N/A' }}</strong></div>
                     @if($donHang->so_dien_thoai_nhan)<div>Điện thoại: <span style="color:#F1F5F9;">{{ $donHang->so_dien_thoai_nhan }}</span></div>@endif
                     <div>Giao đến: <span style="color:#F1F5F9;">{{ $donHang->dia_chi_giao_hang }}</span></div>
@@ -332,8 +334,23 @@
                     @if($laNhanSu)
                     <div>Khách hàng: <strong style="color:#F1F5F9;">{{ $donHang->khachHang->ho_ten ?? 'N/A' }}</strong></div>
                     <div>Nhân viên duyệt: <span style="color:#38bdf8;">{{ $donHang->nhanVienDuyet->ho_ten ?? 'Chưa phân công' }}</span></div>
+                    @if($donHang->nguoiXacNhanThanhToan)<div>Xác nhận thanh toán bởi: <span style="color:#10B981;">{{ $donHang->nguoiXacNhanThanhToan->name }}</span></div>@endif
                     @endif
                 </div>
+
+                @if($laNhanSu && $donHang->lichSuThanhToans->isNotEmpty())
+                <div class="mt-3" style="border-top:1px solid rgba(255,255,255,.08);padding-top:12px;">
+                    <div style="color:#D4B26F;font-weight:700;font-size:.85rem;margin-bottom:6px;">Lịch sử thanh toán</div>
+                    @foreach($donHang->lichSuThanhToans as $history)
+                    <div style="color:#94A3B8;font-size:.76rem;margin-bottom:5px;">
+                        {{ $history->created_at->format('d/m/Y H:i') }} — {{ $history->hanh_dong }}
+                        ({{ $history->trang_thai_cu }} → {{ $history->trang_thai_moi }})
+                        @if($history->taiKhoan) · {{ $history->taiKhoan->name }}@endif
+                        @if($history->ghi_chu) · {{ $history->ghi_chu }}@endif
+                    </div>
+                    @endforeach
+                </div>
+                @endif
 
                 <hr style="border-color:rgba(255,255,255,0.08); margin:16px 0;">
 

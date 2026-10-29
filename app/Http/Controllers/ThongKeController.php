@@ -6,6 +6,7 @@ use App\Models\HoaDon;
 use App\Models\KhachHang;
 use App\Models\SanPham;
 use App\Services\DonHangService;
+use App\Services\PaymentStatusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,9 +18,10 @@ use RuntimeException;
  */
 class ThongKeController extends Controller
 {
-    public function __construct(private DonHangService $donHangService)
-    {
-    }
+    public function __construct(
+        private DonHangService $donHangService,
+        private PaymentStatusService $paymentStatusService,
+    ) {}
 
     private function chiChoQuanTri(): void
     {
@@ -88,7 +90,7 @@ class ThongKeController extends Controller
         $tuNgay    = $request->tu_ngay ?? '';
         $denNgay   = $request->den_ngay ?? '';
 
-        $donHangs = HoaDon::with(['khachHang.taiKhoan', 'nhanVienDuyet'])
+        $donHangs = HoaDon::with(['khachHang.taiKhoan', 'nhanVienDuyet', 'nguoiXacNhanThanhToan'])
             ->when($trangThai, fn($q) => $q->where('trang_thai', $trangThai))
             ->when($tuNgay, fn($q) => $q->whereDate('ngay_dat', '>=', $tuNgay))
             ->when($denNgay, fn($q) => $q->whereDate('ngay_dat', '<=', $denNgay))
@@ -121,5 +123,30 @@ class ThongKeController extends Controller
         }
 
         return redirect()->route('thongke.donhang')->with('success', 'Cập nhật trạng thái thành công!');
+    }
+
+    public function xacNhanThanhToan($id)
+    {
+        abort_unless(Auth::user()->isAdmin(), 403);
+        try {
+            $this->paymentStatusService->confirm((int) $id, Auth::user());
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Đã xác nhận thanh toán cho đơn hàng thành công.');
+    }
+
+    public function tuChoiThanhToan(Request $request, $id)
+    {
+        abort_unless(Auth::user()->isAdmin(), 403);
+        $data = $request->validate(['ly_do' => ['nullable', 'string', 'max:500']]);
+        try {
+            $this->paymentStatusService->reject((int) $id, Auth::user(), $data['ly_do'] ?? null);
+        } catch (RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Đã từ chối yêu cầu xác nhận thanh toán.');
     }
 }

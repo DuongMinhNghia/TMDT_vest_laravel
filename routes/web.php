@@ -56,6 +56,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/don-hang', [DonHangController::class, 'lichSu'])->middleware('role:khach_hang')->name('donhang.lichsu');
     Route::get('/don-hang/{id}', [DonHangController::class, 'chiTiet'])->name('donhang.chitiet');
     Route::get('/don-hang/{id}/thanh-toan', [DonHangController::class, 'thanhToan'])->middleware('role:khach_hang')->name('donhang.thanhtoan');
+    Route::post('/don-hang/{id}/yeu-cau-xac-nhan-thanh-toan', [DonHangController::class, 'yeuCauXacNhanThanhToan'])->middleware('role:khach_hang')->name('donhang.yeucau-thanhtoan');
     Route::post('/don-hang/{id}/huy', [DonHangController::class, 'huy'])->middleware('role:khach_hang')->name('donhang.huy');
     Route::post('/don-hang/{id}/xac-nhan-nhan-hang', [DonHangController::class, 'xacNhanNhanHang'])->middleware('role:khach_hang')->name('donhang.xacnhan-nhanhang');
     Route::post('/san-pham/{id}/danh-gia', [DanhGiaController::class, 'luu'])->middleware('role:khach_hang')->name('danhgia.luu');
@@ -127,6 +128,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/thong-ke/doanh-thu', [ThongKeController::class, 'doanhThu'])->middleware('role:admin')->name('thongke.doanhthu');
     Route::get('/thong-ke/don-hang', [ThongKeController::class, 'donHang'])->middleware('role:admin,nhan_vien')->name('thongke.donhang');
     Route::post('/don-hang/{id}/cap-nhat', [ThongKeController::class, 'capNhatTrangThai'])->middleware('role:admin,nhan_vien')->name('thongke.capnhat');
+    Route::post('/don-hang/{id}/xac-nhan-thanh-toan', [ThongKeController::class, 'xacNhanThanhToan'])->middleware('role:admin')->name('thongke.xacnhan-thanhtoan');
+    Route::post('/don-hang/{id}/tu-choi-thanh-toan', [ThongKeController::class, 'tuChoiThanhToan'])->middleware('role:admin')->name('thongke.tuchoi-thanhtoan');
 });
 
 // Public wildcard detail routes must follow protected static management routes.

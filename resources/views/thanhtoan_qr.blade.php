@@ -317,6 +317,24 @@
             <div class="payment-note mt-3 mt-md-4">
                 <i class="bi bi-info-circle-fill me-1"></i> Vui lòng chuyển <strong>đúng số tiền hiển thị</strong> và ghi <strong>đúng mã đơn hàng</strong> làm nội dung. Hệ thống sẽ xác nhận thanh toán sau khi nhận được tiền.
             </div>
+            <div class="payment-detail mt-3">
+                <div class="payment-label">Trạng thái thanh toán</div>
+                <div class="payment-value" style="color:{{ $donHang->trang_thai_thanh_toan === \App\Models\HoaDon::DA_THANH_TOAN ? '#10B981' : ($donHang->trang_thai_thanh_toan === \App\Models\HoaDon::CHO_XAC_NHAN_THANH_TOAN ? '#F59E0B' : '#EF4444') }};">
+                    {{ $donHang->trang_thai_thanh_toan }}
+                </div>
+            </div>
+            @if($donHang->trang_thai_thanh_toan === \App\Models\HoaDon::CHUA_THANH_TOAN)
+            <form method="POST" action="{{ route('donhang.yeucau-thanhtoan', $donHang->id) }}" class="mt-3">
+                @csrf
+                <button type="submit" class="btn-action-submit w-100" style="border:0;">
+                    <i class="bi bi-check-circle me-1"></i> Tôi đã chuyển khoản — Yêu cầu xác nhận
+                </button>
+            </form>
+            @elseif($donHang->trang_thai_thanh_toan === \App\Models\HoaDon::CHO_XAC_NHAN_THANH_TOAN)
+            <div class="payment-note mt-3">
+                <i class="bi bi-hourglass-split me-1"></i> Vui lòng chờ cửa hàng kiểm tra giao dịch chuyển khoản.
+            </div>
+            @endif
             @else
             <div class="payment-note">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i> Cấu hình thanh toán chưa đầy đủ hoặc không hợp lệ. Vui lòng liên hệ quản trị viên.

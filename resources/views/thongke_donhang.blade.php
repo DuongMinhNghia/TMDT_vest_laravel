@@ -488,7 +488,8 @@
                     <th>Ngày Đặt</th>
                     <th>Địa Chỉ Nhận</th>
                     <th>Tổng Tiền</th>
-                    <th>Trạng Thái</th>
+                    <th>Trạng Thái Đơn</th>
+                    <th>Thanh Toán</th>
                     <th style="text-align:center; width: 120px;">Cập Nhật</th>
                 </tr>
             </thead>
@@ -530,6 +531,27 @@
                             <div style="color: var(--adm-text-dim); font-size: 0.72rem; margin-top: 3px;">Duyệt bởi: {{ $dh->nhanVienDuyet->ho_ten }}</div>
                         @endif
                     </td>
+                    <td data-label="Thanh Toán">
+                        <div style="font-weight:700;color:{{ $dh->trang_thai_thanh_toan === \App\Models\HoaDon::DA_THANH_TOAN ? '#10B981' : ($dh->trang_thai_thanh_toan === \App\Models\HoaDon::CHO_XAC_NHAN_THANH_TOAN ? '#F59E0B' : '#EF4444') }};">
+                            {{ $dh->trang_thai_thanh_toan }}
+                        </div>
+                        <small style="color:var(--adm-text-dim);">{{ $dh->phuong_thuc_thanh_toan }}</small>
+                        @if(Auth::user()->isAdmin() && $dh->phuong_thuc_thanh_toan === 'Chuyển khoản QR' && $dh->trang_thai !== \App\Models\HoaDon::DA_HUY)
+                            @if(in_array($dh->trang_thai_thanh_toan, [\App\Models\HoaDon::CHUA_THANH_TOAN, \App\Models\HoaDon::CHO_XAC_NHAN_THANH_TOAN], true))
+                            <form method="POST" action="{{ route('thongke.xacnhan-thanhtoan', $dh->id) }}" class="mt-2">
+                                @csrf
+                                <button class="btn-update-status" type="submit">Xác nhận đã thanh toán</button>
+                            </form>
+                            @endif
+                            @if($dh->trang_thai_thanh_toan === \App\Models\HoaDon::CHO_XAC_NHAN_THANH_TOAN)
+                            <form method="POST" action="{{ route('thongke.tuchoi-thanhtoan', $dh->id) }}" class="mt-1">
+                                @csrf
+                                <input type="hidden" name="ly_do" value="Không tìm thấy giao dịch phù hợp">
+                                <button class="btn btn-sm btn-outline-danger" type="submit">Từ chối xác nhận</button>
+                            </form>
+                            @endif
+                        @endif
+                    </td>
                     <td data-label="Cập Nhật" style="text-align:center;">
                         @if(count($luongTrangThai[$dh->trang_thai] ?? []) > 0)
                         <button class="btn-update-status" onclick="moModalCapNhat({{ $dh->id }}, '{{ $dh->trang_thai }}')">
@@ -542,7 +564,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" style="text-align:center; padding:50px; color: var(--adm-text-dim);">
+                    <td colspan="8" style="text-align:center; padding:50px; color: var(--adm-text-dim);">
                         <i class="bi bi-inbox" style="font-size:2.5rem; display:block; margin-bottom:10px;"></i>
                         Không có đơn hàng nào theo điều kiện lọc
                     </td>

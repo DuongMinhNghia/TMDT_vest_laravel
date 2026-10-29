@@ -171,6 +171,7 @@
                     <th class="text-center">Số Mẫu</th>
                     <th class="text-end">Tổng Giá Trị</th>
                     <th class="text-center">Trạng Thái Đơn</th>
+                    <th class="text-center">Thanh Toán</th>
                     <th class="text-end">Chi Tiết</th>
                 </tr>
             </thead>
@@ -187,6 +188,11 @@
                     <td data-label="Trạng Thái" class="text-center">
                         <span class="order-status-pill" style="background:{{ $bg }}; color:{{ $color }}; border:1px solid {{ $border }};">
                             {{ $dh->trang_thai }}
+                        </span>
+                    </td>
+                    <td data-label="Thanh Toán" class="text-center">
+                        <span class="order-status-pill" style="color:{{ $dh->trang_thai_thanh_toan === \App\Models\HoaDon::DA_THANH_TOAN ? '#10B981' : ($dh->trang_thai_thanh_toan === \App\Models\HoaDon::CHO_XAC_NHAN_THANH_TOAN ? '#F59E0B' : '#EF4444') }};">
+                            {{ $dh->trang_thai_thanh_toan }}
                         </span>
                     </td>
                     <td data-label="" class="text-end">

@@ -66,6 +66,20 @@
             transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
+        @media (min-width: 992px) {
+            body.admin-sidebar-collapsed .admin-sidebar {
+                transform: translateX(-100%);
+            }
+
+            body.admin-sidebar-collapsed .admin-topbar {
+                left: 0;
+            }
+
+            body.admin-sidebar-collapsed .admin-main-wrap {
+                margin-left: 0;
+            }
+        }
+
         .sidebar-brand-box {
             height: var(--adm-topbar-height);
             padding: 0 20px;
@@ -434,7 +448,7 @@
     <!-- ADMIN TOPBAR -->
     <header class="admin-topbar" id="adminTopbar">
         <div class="topbar-left">
-            <button type="button" class="btn-toggle-sidebar" onclick="toggleAdminSidebar()" title="Đóng/Mở Sidebar">
+            <button type="button" class="btn-toggle-sidebar" id="adminSidebarToggle" onclick="toggleAdminSidebar()" title="Đóng/Mở Sidebar" aria-label="Đóng sidebar" aria-controls="adminSidebar" aria-expanded="true">
                 <i class="bi bi-list fs-5"></i>
             </button>
             <div class="d-none d-md-block text-muted" style="font-size: 0.82rem;">
@@ -481,12 +495,60 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const adminSidebarStorageKey = 'kingsman_admin_sidebar_collapsed';
+
+        function isAdminMobileViewport() {
+            return window.matchMedia('(max-width: 991.98px)').matches;
+        }
+
+        function updateAdminSidebarToggleState() {
+            const toggle = document.getElementById('adminSidebarToggle');
+            if (!toggle) return;
+
+            const sidebar = document.getElementById('adminSidebar');
+            const isOpen = isAdminMobileViewport()
+                ? sidebar?.classList.contains('show')
+                : !document.body.classList.contains('admin-sidebar-collapsed');
+
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            toggle.setAttribute('aria-label', isOpen ? 'Đóng sidebar' : 'Mở sidebar');
+            toggle.title = isOpen ? 'Đóng sidebar' : 'Mở sidebar';
+        }
+
         function toggleAdminSidebar() {
             const sidebar = document.getElementById('adminSidebar');
             const overlay = document.getElementById('sidebarOverlay');
-            if (sidebar) sidebar.classList.toggle('show');
-            if (overlay) overlay.classList.toggle('show');
+
+            if (isAdminMobileViewport()) {
+                if (sidebar) sidebar.classList.toggle('show');
+                if (overlay) overlay.classList.toggle('show');
+            } else {
+                document.body.classList.toggle('admin-sidebar-collapsed');
+                localStorage.setItem(
+                    adminSidebarStorageKey,
+                    document.body.classList.contains('admin-sidebar-collapsed') ? '1' : '0'
+                );
+            }
+
+            updateAdminSidebarToggleState();
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!isAdminMobileViewport() && localStorage.getItem(adminSidebarStorageKey) === '1') {
+                document.body.classList.add('admin-sidebar-collapsed');
+            }
+            updateAdminSidebarToggleState();
+        });
+
+        window.addEventListener('resize', function () {
+            const sidebar = document.getElementById('adminSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (!isAdminMobileViewport()) {
+                sidebar?.classList.remove('show');
+                overlay?.classList.remove('show');
+            }
+            updateAdminSidebarToggleState();
+        });
     </script>
 
     @include('partials.system-popup')

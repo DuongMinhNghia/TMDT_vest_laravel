@@ -16,6 +16,11 @@ class HoaDon extends Model
     public const HOAN_THANH = 'Hoàn Thành';
     public const DA_HUY     = 'Đã hủy';
 
+    public const CHUA_THANH_TOAN = 'Chưa thanh toán';
+    public const CHO_XAC_NHAN_THANH_TOAN = 'Chờ xác nhận';
+    public const DA_THANH_TOAN = 'Đã thanh toán';
+    public const DA_HOAN_TIEN = 'Đã hoàn tiền';
+
     /** Luồng chuyển trạng thái hợp lệ: trạng thái hiện tại => các trạng thái được phép chuyển tới */
     public const LUONG_TRANG_THAI = [
         self::CHO_XU_LY  => [self::DANG_MAY, self::DA_HUY],
@@ -33,6 +38,10 @@ class HoaDon extends Model
         'trang_thai',
         'tong_tien',
         'phuong_thuc_thanh_toan',
+        'trang_thai_thanh_toan',
+        'yeu_cau_xac_nhan_luc',
+        'thanh_toan_luc',
+        'nguoi_xac_nhan_thanh_toan_id',
         'ten_nguoi_nhan',
         'so_dien_thoai_nhan',
         'tinh_thanh_code',
@@ -43,7 +52,11 @@ class HoaDon extends Model
 
     protected function casts(): array
     {
-        return ['ngay_dat' => 'datetime'];
+        return [
+            'ngay_dat' => 'datetime',
+            'yeu_cau_xac_nhan_luc' => 'datetime',
+            'thanh_toan_luc' => 'datetime',
+        ];
     }
 
     public function khachHang()
@@ -59,6 +72,16 @@ class HoaDon extends Model
     public function chiTiets()
     {
         return $this->hasMany(ChiTietHoaDon::class, 'hoa_don_id');
+    }
+
+    public function nguoiXacNhanThanhToan()
+    {
+        return $this->belongsTo(TaiKhoan::class, 'nguoi_xac_nhan_thanh_toan_id');
+    }
+
+    public function lichSuThanhToans()
+    {
+        return $this->hasMany(LichSuThanhToan::class, 'hoa_don_id');
     }
 
     public static function trangThaiCoTheChuyenTu(string $hienTai): array
